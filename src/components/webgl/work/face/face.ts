@@ -48,8 +48,8 @@ export default class WebGLFace extends WebGLCanvasBase {
 		if(this.faceGroup == null) return
 		// レスポンシブcanvasとの位置合わせ （めんどい...
 
-		const mousePosForRaycast = new Vector2((this.mouse.positionOnCanvas.x / CanvasSize.size.x)*2-1, -(this.mouse.positionOnCanvas.y / CanvasSize.size.y)*2+1)
-		this.raycaster.setFromCamera(mousePosForRaycast, this.camera)
+		// raycastように-1 ~ 1に変換
+		this.raycaster.setFromCamera(this.mouse.positionForRaycast, this.camera)
 		const intersects = this.raycaster.intersectObject(this.faceMesh)
 		if(intersects.length > 0) console.log(intersects);
 	}

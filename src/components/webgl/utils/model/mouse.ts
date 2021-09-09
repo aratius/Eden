@@ -44,6 +44,10 @@ export default class Mouse extends Vector2 {
 		return mouseCanvasPos
 	}
 
+	public get positionForRaycast(): Vector2 {
+		return new Vector2((this.positionOnCanvas.x / CanvasSize.size.x)*2-1, -(this.positionOnCanvas.y / CanvasSize.size.y)*2+1)
+	}
+
 	/**
 	 * ポジションセット
 	 * @param x
