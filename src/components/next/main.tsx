@@ -1,5 +1,5 @@
 import { Component } from "react";
-import WebGLMain from "../webgl/entry/main";
+import WebGLMain from "../webgl/work/main";
 import styles from "../../styles/layout/top/top.module.scss"
 
 export default class Main extends Component {

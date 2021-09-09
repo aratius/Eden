@@ -5,7 +5,7 @@ import { RendererSettings } from '../../interfaces'
 import { CameraSettings } from '../../interfaces'
 import Mouse from '../model/mouse'
 import Group2D_ish from "./2DGroup_ish"
-import { Vector2 } from "three"
+import { Group, Vector2 } from "three"
 import { CanvasSize } from "../../config/config"
 import Stats from "stats.js"
 
@@ -14,7 +14,7 @@ import Stats from "stats.js"
  * これを継承してそれぞれのWebGLシーンをつくる
  * 汎用性を考えて作ったつもり
  */
-export default abstract class WebGLCanvasBase {
+export default abstract class WebGLCanvasBase extends Group {
 	// シーン
 	protected scene: MainScene = null
 	// レンダラ
@@ -44,6 +44,7 @@ export default abstract class WebGLCanvasBase {
 	 * @param camera
 	 */
 	constructor(canvas: HTMLCanvasElement = null, renderer: RendererSettings = null, camera: CameraSettings = null) {
+		super()
 		this.scene = new MainScene()
 		this.renderer = new MainRenderer(canvas, renderer)
 		this.camera = new MainCamera(camera)
@@ -73,9 +74,6 @@ export default abstract class WebGLCanvasBase {
 	 * 共通の初期化処理あればここで
 	 */
 	public init(): void {
-
-		console.log(location);
-
 		if(location.hostname === "localhost") document.body.appendChild(this.stats.dom)
 
 		this.startTime = new Date().getTime() / 1000
