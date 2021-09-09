@@ -1,4 +1,4 @@
-import { AmbientLight, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, Ray, Raycaster, SphereBufferGeometry, Texture, Vector2 } from "three";
+import { AmbientLight, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, Ray, Raycaster, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import { loadGLTF, loadTexture } from "../../utils";
 import WebGLCanvasBase from "../../utils/template/template";
@@ -28,12 +28,6 @@ export default class WebGLFace extends WebGLCanvasBase {
 		const ambient: AmbientLight = new AmbientLight()
 		this.scene.add(ambient)
 
-		// this.scene.add(
-		// 	new Mesh(
-		// 		new SphereBufferGeometry(30, 30, 15),
-		// 		new MeshLambertMaterial({color: 0xff0000})
-		// 	)
-		// )
 	}
 
 	_onDeInit(): void {}
@@ -45,13 +39,18 @@ export default class WebGLFace extends WebGLCanvasBase {
 	}
 
 	private checkRaycast(): void {
-		if(this.faceGroup == null) return
+		if(!this.isReadyFace) return
 		// レスポンシブcanvasとの位置合わせ （めんどい...
 
 		// raycastように-1 ~ 1に変換
 		this.raycaster.setFromCamera(this.mouse.positionForRaycast, this.camera)
 		const intersects = this.raycaster.intersectObject(this.faceMesh)
-		if(intersects.length > 0) console.log(intersects);
+		if(intersects.length > 0) {
+			const point = intersects[0].point;
+			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
+		} else {
+			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = new Vector3(-999, -999, -999)
+		}
 	}
 
 	private async initFace(): Promise<void> {
