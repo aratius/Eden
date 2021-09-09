@@ -1,0 +1,71 @@
+.container {
+	width: 100vw;
+	height: 100vh;
+
+	// デフォルトのスタイルを上書き
+	.canvas {
+		display: block;
+		width: 100%!important;
+		height: 100%!important;
+		object-fit: cover!important;
+	}
+
+	.debug {
+		position: absolute;
+		top: 60px;
+		left: 10px;
+		color: gray;
+		font-size: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		// opacity: 0;
+
+		p {
+			margin-bottom: 5px;
+		}
+
+		&__scrollIndex {
+			display: inline-block;
+		}
+
+		&__normPos {
+			display: inline-block;
+		}
+
+		&__renderInfo {
+			display: inline-block;
+		}
+	}
+
+	.company_history {
+		position: absolute;
+		top: 50%;
+		left: 100px;
+		transform: translateY(-50%);
+		color: white;
+		font-size: 3.5rem;
+		display: flex;
+		flex-direction: column;
+
+		li {
+			margin-bottom: 10px;
+			opacity: 0;
+		}
+
+		&__date {
+			display: inline-block;
+		}
+
+		&__member_num {
+			display: inline-block;
+		}
+
+		&__average_age {
+			display: inline-block;
+		}
+
+		&__contents {
+			display: inline-block;
+		}
+	}
+}
