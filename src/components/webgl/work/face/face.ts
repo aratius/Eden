@@ -5,6 +5,7 @@ import WebGLCanvasBase from "../../utils/template/template";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { FaceMaterial } from "../../utils/material/faceMat";
 import { CanvasSize } from "../../config/config";
+import gsap from "gsap";
 const isBrowser = typeof window !== 'undefined';
 const dat = isBrowser ? require("dat.gui") : undefined
 
@@ -27,6 +28,10 @@ export default class WebGLFace extends WebGLCanvasBase {
 	private mouseAcceleration: Vector2 = new Vector2(0, 0)
 	private mouseAmount: Vector2 = new Vector2(0, 0)
 	private isIncreasedMouseSpeed: boolean = false
+	private _emotion: number = 0
+	private abandonedTimer: NodeJS.Timer = null
+	private sulkTween: GSAPTween = null
+	private isSulKing: boolean = false
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas)
@@ -61,6 +66,19 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.updateMouse()
 		if(this.isReadyFace) (<FaceMaterial>this.faceMesh.material).uniforms.u_time.value = this.elapsedTime
 		if(this.isReadyFace) (<FaceMaterial>this.faceMesh.material).uniforms.u_mouse_amount.value = this.mouseAmount.clone().multiply(new Vector2(1, -1))
+		if(!this.isSulKing) {
+			this.emotion += this.mouseAmount.length()*0.003
+			this.emotion *= 0.9
+		}
+	}
+
+	private set emotion(val: number) {
+		this._emotion = val
+		if(this.faceMesh != null) (<FaceMaterial>this.faceMesh.material).uniforms.u_emotion.value = this._emotion
+	}
+
+	private get emotion(): number {
+		return this._emotion
 	}
 
 	private checkRaycast(): void {
@@ -72,10 +90,44 @@ export default class WebGLFace extends WebGLCanvasBase {
 		const intersects = this.raycaster.intersectObject(this.faceMesh)
 		if(intersects.length > 0) {
 			const point = intersects[0].point;
-			if(this.isIncreasedMouseSpeed) (<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
-		} else if(this.mouseAmount.length() < 0.1) {
-			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = new Vector3(-999, -999, -999)
+			this.onTouchFace(point)
+		} else {
+			this.onDidNotTouchFace()
 		}
+	}
+
+	private onTouchFace(point: Vector3): void {
+		this.careAbout()
+		// スピードが上がっている時の位置を記憶して、その後は更新しない （前回の情報記憶もどき
+		if(this.isIncreasedMouseSpeed) (<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
+	}
+
+	private onDidNotTouchFace(): void {
+		if(this.mouseAmount.length() < 0.1) {
+			// スピードが収まったら衝突位置をぶっ飛ばす
+			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = new Vector3(-999, -999, -999)
+			if(this.abandonedTimer == null) this.abandonedTimer = setTimeout(this.sulk, 2000)
+		}
+	}
+
+	/**
+	 * 相手してあげたとき
+	 * 無視カウント秒数タイマーをクリアする
+	 */
+	private careAbout(): void {
+		if(this.abandonedTimer != null) clearTimeout(this.abandonedTimer)
+		this.abandonedTimer = null
+		this.isSulKing = false
+		if(this.sulkTween != null) this.sulkTween.kill()
+	}
+
+	/**
+	 * 拗ねる
+	 */
+	private sulk = (): void => {
+		if(this.sulkTween != null) this.sulkTween.kill()
+		this.sulkTween = gsap.to(this, {emotion: -1, duration: 1, ease: "elastic.out(2)"})
+		this.isSulKing = true
 	}
 
 	private updateMouse(): void {
