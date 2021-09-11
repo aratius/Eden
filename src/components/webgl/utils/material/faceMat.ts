@@ -13,6 +13,7 @@ export class FaceMaterial extends ShaderMaterial{
 					u_time: {value: 0},
 					u_intersect_pos: {value: new Vector3()},
 					u_emotion: {value: 0},
+					u_blink_amount: {value: 0},
 					u_mouse_amount: {value: new Vector2()},
 					u_eye_position: {value: [new Vector3(), new Vector3()]}
 				},

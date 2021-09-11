@@ -35,6 +35,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 	private sulkTween: GSAPTween = null
 	private isSulKing: boolean = false
 	private faceRotationY: number = 0
+	private blinkTween: GSAPTimeline = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas)
@@ -47,9 +48,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.params = new Parameters()
 	}
 
-	_onInit(): void {
-		this.initFace()
-
+	async _onInit(): Promise<void> {
 		this.renderer.setClearColor(0x000000)
 
 		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
@@ -58,6 +57,8 @@ export default class WebGLFace extends WebGLCanvasBase {
 		const ambient: AmbientLight = new AmbientLight()
 		this.scene.add(ambient)
 
+		await this.initFace()
+		this.loopBlink()
 	}
 
 	_onDeInit(): void {}
@@ -144,6 +145,26 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.isSulKing = true
 	}
 
+	/**
+	 * 再帰的に瞬き処理
+	 */
+	private loopBlink = (): void => {
+		const blinkSpeed: number = Math.random()*0.05 + 0.05
+
+		if(this.blinkTween != null) {
+			// this.blinkTween.pause()
+			this.blinkTween.kill()
+		}
+		this.blinkTween = gsap.timeline()
+			.to((<FaceMaterial>this.faceMesh.material).uniforms.u_blink_amount, {value: 1, duration: blinkSpeed, ease: "sine.inOut"})
+			.to((<FaceMaterial>this.faceMesh.material).uniforms.u_blink_amount, {value: 0, duration: blinkSpeed, ease: "expo.out"})
+
+		const minDelay: number = blinkSpeed*2*1000
+		const delay: number = Math.random() < 0.3 ? Math.random()*50+minDelay : Math.random()*3000+2000
+
+		setTimeout(this.loopBlink, delay)
+	}
+
 	private updateMouse(): void {
 		this.mouseSpeed = this.mouse.positionOnCanvas.clone().sub(this.lastMousePos.clone())
 
@@ -168,6 +189,8 @@ export default class WebGLFace extends WebGLCanvasBase {
 		let happy: Group = null
 		// 悲しい
 		let sad: Group = null
+		// 目を閉じる
+		let blind: Group = null
 
 		const loadTex: Promise<void> = new Promise<void>(async (res) => {
 			faceTexture = await loadTexture("/assets/models/face/textures/Texture4_baseColor.png")
@@ -185,8 +208,12 @@ export default class WebGLFace extends WebGLCanvasBase {
 			sad = await loadGLTF("/assets/models/face/sad.glb")
 			res(null)
 		})
+		const loadBlind: Promise<void> = new Promise<void>(async (res) => {
+			blind = await loadGLTF("/assets/models/face/blind.glb")
+			res(null)
+		})
 
-		await Promise.all([loadTex, loadNone, loadHappy, loadSad])
+		await Promise.all([loadTex, loadNone, loadHappy, loadSad, loadBlind])
 
 		this.faceGroup = none
 		this.scene.add(this.faceGroup)
@@ -201,8 +228,10 @@ export default class WebGLFace extends WebGLCanvasBase {
 
 		const happyGeo: BufferGeometry = this.getMeshFromGroup(happy).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
 		const sadGeo: BufferGeometry = this.getMeshFromGroup(sad).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
+		const blindGeo: BufferGeometry = this.getMeshFromGroup(blind).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
 		this.faceMesh.geometry.setAttribute("happy_position", happyGeo.attributes.position)
 		this.faceMesh.geometry.setAttribute("sad_position", sadGeo.attributes.position)
+		this.faceMesh.geometry.setAttribute("blind_position", blindGeo.attributes.position)
 
 		this.initEyesForFix()
 		this.isReadyFace = true
