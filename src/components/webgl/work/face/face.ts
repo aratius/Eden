@@ -11,7 +11,6 @@ const isBrowser = typeof window !== 'undefined';
 const dat = isBrowser ? require("dat.gui") : undefined
 
 class Parameters {
-	emotion: number = 0
 }
 
 export default class WebGLFace extends WebGLCanvasBase {
@@ -21,6 +20,8 @@ export default class WebGLFace extends WebGLCanvasBase {
 	private faceGroup: Group = null
 	private faceMesh: Mesh = null
 	private eyeMesh: Mesh = null
+	private leftEyeMark: Mesh = null
+	private rightEyeMark: Mesh = null
 	private isReadyFace: boolean = false
 	private raycaster: Raycaster = new Raycaster()
 	private lastMousePos: Vector2 = new Vector2()
@@ -44,9 +45,6 @@ export default class WebGLFace extends WebGLCanvasBase {
 		}
 		this.gui = new dat.GUI()
 		this.params = new Parameters()
-		this.gui.add(this.params, "emotion", -1, 1).onChange(() => {
-			if(this.faceMesh != null) (<FaceMaterial>this.faceMesh.material).uniforms.u_emotion.value = this.params.emotion
-		})
 	}
 
 	_onInit(): void {
@@ -68,13 +66,11 @@ export default class WebGLFace extends WebGLCanvasBase {
 	_onUpdate(): void {
 		this.checkRaycast()
 		this.updateMouse()
-		if(this.isReadyFace) (<FaceMaterial>this.faceMesh.material).uniforms.u_time.value = this.elapsedTime
-		if(this.isReadyFace) (<FaceMaterial>this.faceMesh.material).uniforms.u_mouse_amount.value = this.mouseAmount.clone().multiply(new Vector2(1, -1))
-		if(!this.isSulKing) {
-			this.emotion += this.mouseAmount.length()*0.003
-			this.emotion *= 0.9
-		}
-		if(this.faceGroup != null) {
+		if(this.isReadyFace) {
+			(<FaceMaterial>this.faceMesh.material).uniforms.u_time.value = this.elapsedTime;
+			(<FaceMaterial>this.faceMesh.material).uniforms.u_mouse_amount.value = this.mouseAmount.clone().multiply(new Vector2(1, -1));
+			(<FaceMaterial>this.faceMesh.material).uniforms.u_eye_position.value = [this.leftEyeMark.getWorldPosition(new Vector3()), this.rightEyeMark.getWorldPosition(new Vector3)];
+
 			// パーリンノイズでランダムに揺らして生きてる感じ
 			this.faceGroup.rotation.x = noise.simplex2((this.elapsedTime)/3, 1) * 0.02
 			this.faceGroup.rotation.y = noise.simplex2((this.elapsedTime+1)/3, 1) * 0.02
@@ -83,6 +79,11 @@ export default class WebGLFace extends WebGLCanvasBase {
 			this.faceRotationY *= 0.9
 			this.faceGroup.rotation.y += this.faceRotationY
 		}
+		if(!this.isSulKing) {
+			this.emotion += this.mouseAmount.length()*0.003
+			this.emotion *= 0.9
+		}
+
 	}
 
 	private set emotion(val: number) {
@@ -203,8 +204,27 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.faceMesh.geometry.setAttribute("happy_position", happyGeo.attributes.position)
 		this.faceMesh.geometry.setAttribute("sad_position", sadGeo.attributes.position)
 
+		this.initEyesForFix()
 		this.isReadyFace = true
 
+	}
+
+	/**
+	 * 頂点シェーダーに渡すための目の位置の目印をセット
+	 */
+	private initEyesForFix(): void {
+		const leftEyePosition: Vector3 = new Vector3(65, 65, 130)
+		const rightEyePosition: Vector3 = new Vector3(-65, 65, 130)
+		const eye: Mesh = new Mesh(
+			new SphereGeometry(0),
+			new MeshBasicMaterial({color: 0xff0000})
+		)
+		this.leftEyeMark = eye.clone()
+		this.leftEyeMark.position.set(leftEyePosition.x, leftEyePosition.y, leftEyePosition.z)
+		this.faceGroup.add(this.leftEyeMark)
+		this.rightEyeMark = eye.clone()
+		this.rightEyeMark.position.set(rightEyePosition.x, rightEyePosition.y, rightEyePosition.z)
+		this.faceGroup.add(this.rightEyeMark)
 	}
 
 	/**
