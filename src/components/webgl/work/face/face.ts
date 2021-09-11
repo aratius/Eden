@@ -6,6 +6,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { FaceMaterial } from "../../utils/material/faceMat";
 import { CanvasSize } from "../../config/config";
 import gsap from "gsap";
+const noise = require('simplenoise')
 const isBrowser = typeof window !== 'undefined';
 const dat = isBrowser ? require("dat.gui") : undefined
 
@@ -32,6 +33,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 	private abandonedTimer: NodeJS.Timer = null
 	private sulkTween: GSAPTween = null
 	private isSulKing: boolean = false
+	private faceRotationY: number = 0
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas)
@@ -50,8 +52,10 @@ export default class WebGLFace extends WebGLCanvasBase {
 	_onInit(): void {
 		this.initFace()
 
-		const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
-		controls.update()
+		this.renderer.setClearColor(0x000000)
+
+		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
+		// controls.update()
 
 		const ambient: AmbientLight = new AmbientLight()
 		this.scene.add(ambient)
@@ -69,6 +73,15 @@ export default class WebGLFace extends WebGLCanvasBase {
 		if(!this.isSulKing) {
 			this.emotion += this.mouseAmount.length()*0.003
 			this.emotion *= 0.9
+		}
+		if(this.faceGroup != null) {
+			// パーリンノイズでランダムに揺らして生きてる感じ
+			this.faceGroup.rotation.x = noise.simplex2((this.elapsedTime)/3, 1) * 0.02
+			this.faceGroup.rotation.y = noise.simplex2((this.elapsedTime+1)/3, 1) * 0.02
+			this.faceGroup.rotation.z = noise.simplex2((this.elapsedTime+2)/3, 1) * 0.01
+			this.faceRotationY += this.mouseSpeed.x * 0.0001
+			this.faceRotationY *= 0.9
+			this.faceGroup.rotation.y += this.faceRotationY
 		}
 	}
 
@@ -126,7 +139,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 	 */
 	private sulk = (): void => {
 		if(this.sulkTween != null) this.sulkTween.kill()
-		this.sulkTween = gsap.to(this, {emotion: -1, duration: 1, ease: "elastic.out(2)"})
+		this.sulkTween = gsap.to(this, {emotion: -1, duration: 1, ease: "sine.inOut(2)"})
 		this.isSulKing = true
 	}
 
@@ -191,6 +204,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.faceMesh.geometry.setAttribute("sad_position", sadGeo.attributes.position)
 
 		this.isReadyFace = true
+
 	}
 
 	/**

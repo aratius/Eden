@@ -17,6 +17,7 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "sass": "^1.35.2",
+    "simplenoise": "^1.0.1",
     "three": "^0.130.1",
     "three-gltf-loader": "^1.111.0"
   },

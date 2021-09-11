@@ -1,4 +1,4 @@
-import { ShaderMaterial, Texture, Vector2, Vector3 } from "three";
+import { DoubleSide, ShaderMaterial, Texture, Vector2, Vector3 } from "three";
 import vertShader from "./shader/face.vert"
 import fragShader from "./shader/face.frag"
 
@@ -17,6 +17,7 @@ export class FaceMaterial extends ShaderMaterial{
 				},
 				vertexShader: vertShader,
 				fragmentShader: fragShader,
+				side: DoubleSide,
 				// wireframe: true
 			}
 		)
