@@ -1,6 +1,6 @@
 import { AmbientLight, BufferGeometry, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, Ray, Raycaster, SphereBufferGeometry, SphereGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
-import { getMeshFromGroup, loadGLTF, loadTexture } from "../../utils";
+import { getMeshFromGroup, loadGLTF, loadTexture, powerVector2 } from "../../utils";
 import WebGLCanvasBase from "../../utils/template/template";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { FaceMaterial } from "../../utils/material/faceMat";
@@ -75,8 +75,10 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.updateMouse()
 		if(this.isReadyFace) {
 			(<FaceMaterial>this.faceMesh.material).uniforms.u_time.value = this.elapsedTime;
-			(<FaceMaterial>this.faceMesh.material).uniforms.u_mouse_amount.value = this.mouseAmount.clone().multiply(new Vector2(1, -1));
 			(<FaceMaterial>this.faceMesh.material).uniforms.u_eye_position.value = [this.leftEyeMark.getWorldPosition(new Vector3()), this.rightEyeMark.getWorldPosition(new Vector3)];
+			const peak: number = 50;
+			const amount: Vector2 = this.mouseAmount.clone().multiply(new Vector2(1, -1));
+			(<FaceMaterial>this.faceMesh.material).uniforms.u_mouse_amount.value = powerVector2(amount.multiplyScalar(peak), 0.5)
 
 			// パーリンノイズでランダムに揺らして生きてる感じ
 			this.faceGroup.rotation.x = noise.simplex2((this.elapsedTime)/3, 1) * 0.02
@@ -145,6 +147,9 @@ export default class WebGLFace extends WebGLCanvasBase {
 	 */
 	private onPullFace(): void {
 		this.mouseAmount = this.mouse.positionOnCanvas.clone().sub(this.grabStartPos.clone()).divideScalar(10)
+
+		// 撫で に戻ったときに急にmouseSpeedが上がらないように
+		this.lastMousePos = this.mouse.positionOnCanvas
 	}
 
 	/**
@@ -181,7 +186,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 
 		const elastically: number = 0.2
 		const friction: number = 0.9
-		this.mouseAcceleration.add(this.mouseSpeed.clone().divideScalar(30))
+		if(this.touchingFaceMesh.length > 0) this.mouseAcceleration.add(this.mouseSpeed.clone().divideScalar(30))
 		this.mouseAcceleration.sub(this.mouseAmount.clone().multiplyScalar(elastically))
 		this.mouseAmount.add(this.mouseAcceleration.clone())
 		this.mouseAmount.multiplyScalar(friction)

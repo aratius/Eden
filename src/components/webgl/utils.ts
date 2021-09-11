@@ -1,4 +1,4 @@
-import { Euler, Group, Mesh, Object3D, Texture, TextureLoader, Vector3 } from "three";
+import { Euler, Group, Mesh, Object3D, Texture, TextureLoader, Vector2, Vector3 } from "three";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { EasingFn } from "./interfaces";
@@ -177,4 +177,14 @@ export const getMeshFromGroup = (group: Group | Object3D): Mesh[] =>{
 
 	}
 	return meshes
+}
+
+/**
+ * 負でも統合そのままVec2の累乗
+ * @param p
+ * @param val
+ * @returns
+ */
+export const powerVector2 = (p: Vector2, val: number): Vector2 => {
+	return new Vector2(Math.sign(p.x) * Math.pow(Math.abs(p.x), val), Math.sign(p.y) * Math.pow(Math.abs(p.y), val))
 }
