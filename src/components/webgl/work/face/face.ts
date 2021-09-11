@@ -71,8 +71,8 @@ export default class WebGLFace extends WebGLCanvasBase {
 	_onResize(): void {}
 
 	_onUpdate(): void {
-		this.processStrokingFace()
 		this.updateMouse()
+		this.processStrokingFace()
 		if(this.isReadyFace) {
 			(<FaceMaterial>this.faceMesh.material).uniforms.u_time.value = this.elapsedTime;
 			(<FaceMaterial>this.faceMesh.material).uniforms.u_eye_position.value = [this.leftEyeMark.getWorldPosition(new Vector3()), this.rightEyeMark.getWorldPosition(new Vector3)];
@@ -137,9 +137,9 @@ export default class WebGLFace extends WebGLCanvasBase {
 	 */
 	private onGrabFace(): void {
 		const point = this.touchingFaceMesh[0].point;
-			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
-			this.grabStartPos = this.mouse.positionOnCanvas
-			this.isGrabbingFace = true
+		(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
+		this.grabStartPos = this.mouse.positionOnCanvas
+		this.isGrabbingFace = true
 	}
 
 	/**
@@ -150,6 +150,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 
 		// 撫で に戻ったときに急にmouseSpeedが上がらないように
 		this.lastMousePos = this.mouse.positionOnCanvas
+		this.lastMouseSpeed = this.mouseSpeed
 	}
 
 	/**
@@ -191,7 +192,8 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.mouseAmount.add(this.mouseAcceleration.clone())
 		this.mouseAmount.multiplyScalar(friction)
 
-		this.isIncreasedMouseSpeed = Math.abs(this.mouseSpeed.length()) > Math.abs(this.lastMouseSpeed.length())
+		const threshold: number = 10
+		this.isIncreasedMouseSpeed = Math.abs(this.mouseSpeed.length()) > Math.abs(this.lastMouseSpeed.length()) && Math.abs(this.mouseSpeed.length()) > threshold
 		this.lastMouseSpeed = this.mouseSpeed
 		this.lastMousePos = this.mouse.positionOnCanvas
 	}
