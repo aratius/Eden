@@ -1,6 +1,6 @@
 import { AmbientLight, BufferGeometry, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, Ray, Raycaster, SphereBufferGeometry, SphereGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
-import { loadGLTF, loadTexture } from "../../utils";
+import { getMeshFromGroup, loadGLTF, loadTexture } from "../../utils";
 import WebGLCanvasBase from "../../utils/template/template";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { FaceMaterial } from "../../utils/material/faceMat";
@@ -36,6 +36,8 @@ export default class WebGLFace extends WebGLCanvasBase {
 	private isSulKing: boolean = false
 	private faceRotationY: number = 0
 	private blinkTween: GSAPTimeline = null
+	private isGrabbingFace: boolean = false
+	private grabStartPos: Vector2 = new  Vector2()
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas)
@@ -46,6 +48,10 @@ export default class WebGLFace extends WebGLCanvasBase {
 		}
 		this.gui = new dat.GUI()
 		this.params = new Parameters()
+
+		window.addEventListener("mousedown", this.onMouseDown)
+		window.addEventListener("mousemove", this.onMouseMove)
+		window.addEventListener("mouseup", this.onMouseUp)
 	}
 
 	async _onInit(): Promise<void> {
@@ -65,7 +71,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 	_onResize(): void {}
 
 	_onUpdate(): void {
-		this.checkRaycast()
+		this.checkFaceRaycastAndProcess()
 		this.updateMouse()
 		if(this.isReadyFace) {
 			(<FaceMaterial>this.faceMesh.material).uniforms.u_time.value = this.elapsedTime;
@@ -96,15 +102,43 @@ export default class WebGLFace extends WebGLCanvasBase {
 		return this._emotion
 	}
 
-	private checkRaycast(): void {
-		if(!this.isReadyFace) return
-		// レスポンシブcanvasとの位置合わせ （めんどい...
-
+	private get touchingFaceMesh(): any[] {
+		if(!this.isReadyFace) return []
 		// raycastように-1 ~ 1に変換
 		this.raycaster.setFromCamera(this.mouse.positionForRaycast, this.camera)
-		const intersects = this.raycaster.intersectObject(this.faceMesh)
-		if(intersects.length > 0) {
-			const point = intersects[0].point;
+		return this.raycaster.intersectObject(this.faceMesh)
+	}
+
+	private onMouseDown = (e: any) => {
+		if(!this.isReadyFace) return
+		if(this.touchingFaceMesh.length > 0){
+			const point = this.touchingFaceMesh[0].point;
+			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
+			this.grabStartPos = this.mouse.positionOnCanvas
+			this.isGrabbingFace = true
+		}
+	}
+
+	private onMouseMove = (e: any) => {
+		if(!this.isReadyFace) return
+		if(this.isGrabbingFace) {
+			this.mouseAmount = this.mouse.positionOnCanvas.clone().sub(this.grabStartPos.clone()).divideScalar(10)
+		}
+	}
+
+	private onMouseUp = (e: any) => {
+		if(!this.isReadyFace) return
+		this.isGrabbingFace = false
+		this.grabStartPos = new Vector2()
+	}
+
+	private checkFaceRaycastAndProcess(): void {
+		if(!this.isReadyFace) return
+		if(this.isGrabbingFace) return
+
+		if(this.touchingFaceMesh.length > 0) {
+
+			const point = this.touchingFaceMesh[0].point;
 			this.onTouchFace(point)
 		} else {
 			this.onDidNotTouchFace()
@@ -166,6 +200,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 	}
 
 	private updateMouse(): void {
+		if(this.isGrabbingFace) return
 		this.mouseSpeed = this.mouse.positionOnCanvas.clone().sub(this.lastMousePos.clone())
 
 		const elastically: number = 0.2
@@ -218,7 +253,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.faceGroup = none
 		this.scene.add(this.faceGroup)
 
-		const meshes: Mesh[] = this.getMeshFromGroup(none)
+		const meshes: Mesh[] = getMeshFromGroup(none)
 
 		this.faceMesh = meshes.filter((mesh) => mesh.name == "Mesh_0")[0]
 		this.eyeMesh = meshes.filter((mesh) => mesh.name == "Mesh_1")[0]
@@ -226,9 +261,9 @@ export default class WebGLFace extends WebGLCanvasBase {
 		const faceMaterial: FaceMaterial = new FaceMaterial(faceTexture)
 		this.faceMesh.material = faceMaterial
 
-		const happyGeo: BufferGeometry = this.getMeshFromGroup(happy).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
-		const sadGeo: BufferGeometry = this.getMeshFromGroup(sad).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
-		const blindGeo: BufferGeometry = this.getMeshFromGroup(blind).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
+		const happyGeo: BufferGeometry = getMeshFromGroup(happy).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
+		const sadGeo: BufferGeometry = getMeshFromGroup(sad).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
+		const blindGeo: BufferGeometry = getMeshFromGroup(blind).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
 		this.faceMesh.geometry.setAttribute("happy_position", happyGeo.attributes.position)
 		this.faceMesh.geometry.setAttribute("sad_position", sadGeo.attributes.position)
 		this.faceMesh.geometry.setAttribute("blind_position", blindGeo.attributes.position)
@@ -254,24 +289,6 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.rightEyeMark = eye.clone()
 		this.rightEyeMark.position.set(rightEyePosition.x, rightEyePosition.y, rightEyePosition.z)
 		this.faceGroup.add(this.rightEyeMark)
-	}
-
-	/**
-	 * 再帰的に検索してMeshインスタンスのみを返却
-	 * @param group
-	 * @returns
-	 */
-	private getMeshFromGroup(group: Group | Object3D): Mesh[] {
-		const meshes: Mesh[] = []
-		for(const i in group.children) {
-			if(group.children[i] instanceof Mesh) {
-				meshes.push(group.children[i] as Mesh)
-			} else if ((group.children[i] instanceof Group) || (group.children[i] instanceof Object3D)) {
-				meshes.push(...this.getMeshFromGroup(group.children[i] as Mesh) as Mesh[])
-			}
-
-		}
-		return meshes
 	}
 
 }

@@ -1,4 +1,4 @@
-import { Euler, Group, Object3D, Texture, TextureLoader, Vector3 } from "three";
+import { Euler, Group, Mesh, Object3D, Texture, TextureLoader, Vector3 } from "three";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { EasingFn } from "./interfaces";
@@ -159,4 +159,22 @@ export const getEulerFromAtoB = (a: Vector3, b: Vector3): Euler => {
 	from.position.set(b.x, b.y, b.z)
 	from.lookAt(a)
 	return from.rotation
+}
+
+/**
+ * 再帰的に検索してMeshインスタンスのみを返却
+ * @param group
+ * @returns
+ */
+export const getMeshFromGroup = (group: Group | Object3D): Mesh[] =>{
+	const meshes: Mesh[] = []
+	for(const i in group.children) {
+		if(group.children[i] instanceof Mesh) {
+			meshes.push(group.children[i] as Mesh)
+		} else if ((group.children[i] instanceof Group) || (group.children[i] instanceof Object3D)) {
+			meshes.push(...getMeshFromGroup(group.children[i] as Mesh) as Mesh[])
+		}
+
+	}
+	return meshes
 }
