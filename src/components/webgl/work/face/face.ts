@@ -15,29 +15,29 @@ class Parameters {
 
 export default class WebGLFace extends WebGLCanvasBase {
 
-	private gui: any = null
-	private params: Parameters = null
-	private faceGroup: Group = null
-	private faceMesh: Mesh = null
-	private eyeMesh: Mesh = null
-	private leftEyeMark: Mesh = null
-	private rightEyeMark: Mesh = null
-	private isReadyFace: boolean = false
-	private raycaster: Raycaster = new Raycaster()
-	private lastMousePos: Vector2 = new Vector2()
-	private mouseSpeed: Vector2 = new Vector2(0, 0)
-	private lastMouseSpeed: Vector2 = new Vector2(0, 0)
-	private mouseAcceleration: Vector2 = new Vector2(0, 0)
-	private mouseAmount: Vector2 = new Vector2(0, 0)
-	private isIncreasedMouseSpeed: boolean = false
-	private _emotion: number = 0
-	private abandonedTimer: NodeJS.Timer = null
-	private sulkTween: GSAPTween = null
-	private isSulKing: boolean = false
-	private faceRotationY: number = 0
-	private blinkTween: GSAPTimeline = null
-	private isGrabbingFace: boolean = false
-	private grabStartPos: Vector2 = new  Vector2()
+	private gui: any = null  // .............................. GUI
+	private params: Parameters = null  // .................... params
+	private faceGroup: Group = null  // ...................... 顔メッシュのグループそのもの 回転などはこれに対して行う
+	private faceMesh: Mesh = null  // ........................ グループから顔メッシュを抽出して、シェーダーマテリアルを適用したりする
+	private eyeMesh: Mesh = null  // ......................... グループから抽出した目メッシュ
+	private leftEyeMark: Mesh = null  // ..................... 左目付近の皮膚を動かさないために目安に置くメッシュ uniformで渡される
+	private rightEyeMark: Mesh = null  // .................... 右目付近の皮膚を動かさないために目安に置くメッシュ uniformで渡される
+	private isReadyFace: boolean = false  // ................. 顔が準備できているかどうか
+	private raycaster: Raycaster = new Raycaster()  // ....... レイキャスター
+	private lastMousePos: Vector2 = new Vector2()  // ........ 前回のマウスポジション
+	private mouseSpeed: Vector2 = new Vector2(0, 0)  // ...... マウススピード
+	private lastMouseSpeed: Vector2 = new Vector2(0, 0)  // .. 前回のマウススピード
+	private mouseAcceleration: Vector2 = new Vector2(0, 0)  // マウスの加速度
+	private mouseAmount: Vector2 = new Vector2(0, 0)  // ..... マウスの力
+	private isIncreasedMouseSpeed: boolean = false  // ....... マウススピードが増加したかどうか
+	private _emotion: number = 0  // ......................... 感情度合い sad - none - happy : -1 - 0 - 1
+	private abandonedTimer: NodeJS.Timer = null  // .......... 放置経過時間タイマー
+	private sulkTween: GSAPTween = null  // .................. 拗ねる(sad)表情になるTween
+	private isSulking: boolean = false  // ................... 拗ねている中かどうか
+	private faceRotationY: number = 0  // .................... faceGroupの顔のY角度
+	private blinkTween: GSAPTimeline = null  // .............. まばたきのTween
+	private isGrabbingFace: boolean = false  // .............. 顔を掴まれているかどうか
+	private grabStartPos: Vector2 = new  Vector2()  // ....... grabを開始したスクリーン座標
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas)
@@ -71,7 +71,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 	_onResize(): void {}
 
 	_onUpdate(): void {
-		this.checkFaceRaycastAndProcess()
+		this.processStrokingFace()
 		this.updateMouse()
 		if(this.isReadyFace) {
 			(<FaceMaterial>this.faceMesh.material).uniforms.u_time.value = this.elapsedTime;
@@ -86,13 +86,16 @@ export default class WebGLFace extends WebGLCanvasBase {
 			this.faceRotationY *= 0.9
 			this.faceGroup.rotation.y += this.faceRotationY
 		}
-		if(!this.isSulKing) {
+		if(!this.isSulking) {
 			this.emotion += this.mouseAmount.length()*0.003
 			this.emotion *= 0.9
 		}
 
 	}
 
+	/**
+	 * 感情パラメータ シェーダーの更新を噛ます
+	 */
 	private set emotion(val: number) {
 		this._emotion = val
 		if(this.faceMesh != null) (<FaceMaterial>this.faceMesh.material).uniforms.u_emotion.value = this._emotion
@@ -102,6 +105,9 @@ export default class WebGLFace extends WebGLCanvasBase {
 		return this._emotion
 	}
 
+	/**
+	 * 顔に触れているかどうか Raycastで判断
+	 */
 	private get touchingFaceMesh(): any[] {
 		if(!this.isReadyFace) return []
 		// raycastように-1 ~ 1に変換
@@ -111,33 +117,53 @@ export default class WebGLFace extends WebGLCanvasBase {
 
 	private onMouseDown = (e: any) => {
 		if(!this.isReadyFace) return
-		if(this.touchingFaceMesh.length > 0){
-			const point = this.touchingFaceMesh[0].point;
-			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
-			this.grabStartPos = this.mouse.positionOnCanvas
-			this.isGrabbingFace = true
-		}
+		if(this.touchingFaceMesh.length > 0) this.onGrabFace()
 	}
 
 	private onMouseMove = (e: any) => {
 		if(!this.isReadyFace) return
-		if(this.isGrabbingFace) {
-			this.mouseAmount = this.mouse.positionOnCanvas.clone().sub(this.grabStartPos.clone()).divideScalar(10)
-		}
+		if(this.isGrabbingFace) this.onPullFace()
 	}
 
 	private onMouseUp = (e: any) => {
 		if(!this.isReadyFace) return
-		this.isGrabbingFace = false
-		this.grabStartPos = new Vector2()
+		if(this.isGrabbingFace) this.onReleaseFace()
 	}
 
-	private checkFaceRaycastAndProcess(): void {
+	/**
+	 * 顔をつかんだとき
+	 */
+	private onGrabFace(): void {
+		const point = this.touchingFaceMesh[0].point;
+			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
+			this.grabStartPos = this.mouse.positionOnCanvas
+			this.isGrabbingFace = true
+	}
+
+	/**
+	 * 顔を引っ張ったとき
+	 */
+	private onPullFace(): void {
+		this.mouseAmount = this.mouse.positionOnCanvas.clone().sub(this.grabStartPos.clone()).divideScalar(10)
+	}
+
+	/**
+	 * 顔を離したとき
+	 */
+	private onReleaseFace(): void {
+		this.grabStartPos = new Vector2()
+		this.isGrabbingFace = false
+	}
+
+	/**
+	 * 顔を撫でる
+	 * @returns
+	 */
+	private processStrokingFace(): void {
 		if(!this.isReadyFace) return
 		if(this.isGrabbingFace) return
 
 		if(this.touchingFaceMesh.length > 0) {
-
 			const point = this.touchingFaceMesh[0].point;
 			this.onTouchFace(point)
 		} else {
@@ -145,60 +171,10 @@ export default class WebGLFace extends WebGLCanvasBase {
 		}
 	}
 
-	private onTouchFace(point: Vector3): void {
-		this.careAbout()
-		// スピードが上がっている時の位置を記憶して、その後は更新しない （前回の情報記憶もどき
-		if(this.isIncreasedMouseSpeed) (<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
-	}
-
-	private onDidNotTouchFace(): void {
-		if(this.mouseAmount.length() < 0.1) {
-			// スピードが収まったら衝突位置をぶっ飛ばす
-			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = new Vector3(-999, -999, -999)
-			if(this.abandonedTimer == null) this.abandonedTimer = setTimeout(this.sulk, 2000)
-		}
-	}
-
 	/**
-	 * 相手してあげたとき
-	 * 無視カウント秒数タイマーをクリアする
+	 * マウスパラメータを更新
+	 * @returns
 	 */
-	private careAbout(): void {
-		if(this.abandonedTimer != null) clearTimeout(this.abandonedTimer)
-		this.abandonedTimer = null
-		this.isSulKing = false
-		if(this.sulkTween != null) this.sulkTween.kill()
-	}
-
-	/**
-	 * 拗ねる
-	 */
-	private sulk = (): void => {
-		if(this.sulkTween != null) this.sulkTween.kill()
-		this.sulkTween = gsap.to(this, {emotion: -1, duration: 1, ease: "sine.inOut(2)"})
-		this.isSulKing = true
-	}
-
-	/**
-	 * 再帰的に瞬き処理
-	 */
-	private loopBlink = (): void => {
-		const blinkSpeed: number = Math.random()*0.05 + 0.05
-
-		if(this.blinkTween != null) {
-			// this.blinkTween.pause()
-			this.blinkTween.kill()
-		}
-		this.blinkTween = gsap.timeline()
-			.to((<FaceMaterial>this.faceMesh.material).uniforms.u_blink_amount, {value: 1, duration: blinkSpeed, ease: "sine.inOut"})
-			.to((<FaceMaterial>this.faceMesh.material).uniforms.u_blink_amount, {value: 0, duration: blinkSpeed, ease: "expo.out"})
-
-		const minDelay: number = blinkSpeed*2*1000
-		const delay: number = Math.random() < 0.3 ? Math.random()*50+minDelay : Math.random()*3000+2000
-
-		setTimeout(this.loopBlink, delay)
-	}
-
 	private updateMouse(): void {
 		if(this.isGrabbingFace) return
 		this.mouseSpeed = this.mouse.positionOnCanvas.clone().sub(this.lastMousePos.clone())
@@ -215,6 +191,67 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.lastMousePos = this.mouse.positionOnCanvas
 	}
 
+	/**
+	 * 顔に触れているとき
+	 * @param point
+	 */
+	private onTouchFace(point: Vector3): void {
+		if(this.isSulking) this.careAbout()
+		// スピードが上がっている時の位置を記憶して、その後は更新しない （前回の情報記憶もどき
+		if(this.isIncreasedMouseSpeed) (<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
+	}
+
+	/**
+	 * 顔に触れていないとき
+	 */
+	private onDidNotTouchFace(): void {
+		if(this.mouseAmount.length() < 0.1) {
+			// スピードが収まったら衝突位置をぶっ飛ばす
+			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = new Vector3(-999, -999, -999)
+			if(this.abandonedTimer == null) this.abandonedTimer = setTimeout(this.sulk, 2000)
+		}
+	}
+
+	/**
+	 * 相手してあげたとき
+	 * 無視カウント秒数タイマーをクリアする
+	 */
+	private careAbout(): void {
+		if(this.abandonedTimer != null) clearTimeout(this.abandonedTimer)
+		this.abandonedTimer = null
+		this.isSulking = false
+		if(this.sulkTween != null) this.sulkTween.kill()
+	}
+
+	/**
+	 * 拗ねる
+	 */
+	private sulk = (): void => {
+		if(this.sulkTween != null) this.sulkTween.kill()
+		this.sulkTween = gsap.to(this, {emotion: -1, duration: 1, ease: "sine.inOut(2)"})
+		this.isSulking = true
+	}
+
+	/**
+	 * 再帰的に瞬き処理
+	 */
+	private loopBlink = (): void => {
+		const blinkSpeed: number = Math.random()*0.05 + 0.05
+
+		if(this.blinkTween != null) this.blinkTween.kill()
+		this.blinkTween = gsap.timeline()
+			.to((<FaceMaterial>this.faceMesh.material).uniforms.u_blink_amount, {value: 1, duration: blinkSpeed, ease: "sine.inOut"})
+			.to((<FaceMaterial>this.faceMesh.material).uniforms.u_blink_amount, {value: 0, duration: blinkSpeed, ease: "expo.out"})
+
+		const minDelay: number = blinkSpeed*2*1000
+		const delay: number = Math.random() < 0.3 ? Math.random()*50+minDelay : Math.random()*3000+2000
+
+		setTimeout(this.loopBlink, delay)
+	}
+
+	/**
+	 * 顔モデル初期化
+	 */
 	private async initFace(): Promise<void> {
 		// 顔のテクスチャ
 		let faceTexture: Texture = null
