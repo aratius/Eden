@@ -4,6 +4,7 @@ varying vec2 v_uv;
 uniform float u_time;
 uniform vec3 u_intersect_pos;
 uniform float u_emotion;
+uniform vec2 u_mouse_amount;
 
 // 2D Random
 void main() {
@@ -19,10 +20,10 @@ void main() {
 	float noise = sin(worldPosition.y/30. + u_time*2.) * 50.;
 
 	float dist = distance(u_intersect_pos, worldPosition.xyz);
-	float a = 1. /60.;
+	float a = 1. /100.;
 	float noise_amount = -a * dist + 1.;
 	// noise_amountを0-1の範囲に丸めてnoiseと掛ける
-	worldPosition.x += noise * max(min(noise_amount, 1.), 0.);
+	worldPosition.xy += u_mouse_amount.xy * max(min(noise_amount, 1.), 0.);
 
 	vec4 mvPosition =  viewMatrix * worldPosition;
 	gl_Position = projectionMatrix * mvPosition;

@@ -1,4 +1,4 @@
-import { AmbientLight, BufferGeometry, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, Ray, Raycaster, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
+import { AmbientLight, BufferGeometry, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, Ray, Raycaster, SphereBufferGeometry, SphereGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import { loadGLTF, loadTexture } from "../../utils";
 import WebGLCanvasBase from "../../utils/template/template";
@@ -21,6 +21,12 @@ export default class WebGLFace extends WebGLCanvasBase {
 	private eyeMesh: Mesh = null
 	private isReadyFace: boolean = false
 	private raycaster: Raycaster = new Raycaster()
+	private lastMousePos: Vector2 = new Vector2()
+	private mouseSpeed: Vector2 = new Vector2(0, 0)
+	private lastMouseSpeed: Vector2 = new Vector2(0, 0)
+	private mouseAcceleration: Vector2 = new Vector2(0, 0)
+	private mouseAmount: Vector2 = new Vector2(0, 0)
+	private isIncreasedMouseSpeed: boolean = false
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas)
@@ -51,8 +57,10 @@ export default class WebGLFace extends WebGLCanvasBase {
 	_onResize(): void {}
 
 	_onUpdate(): void {
-		if(this.isReadyFace) (<FaceMaterial>this.faceMesh.material).uniforms.u_time.value = this.elapsedTime
 		this.checkRaycast()
+		this.updateMouse()
+		if(this.isReadyFace) (<FaceMaterial>this.faceMesh.material).uniforms.u_time.value = this.elapsedTime
+		if(this.isReadyFace) (<FaceMaterial>this.faceMesh.material).uniforms.u_mouse_amount.value = this.mouseAmount.clone().multiply(new Vector2(1, -1))
 	}
 
 	private checkRaycast(): void {
@@ -64,10 +72,25 @@ export default class WebGLFace extends WebGLCanvasBase {
 		const intersects = this.raycaster.intersectObject(this.faceMesh)
 		if(intersects.length > 0) {
 			const point = intersects[0].point;
-			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
-		} else {
+			if(this.isIncreasedMouseSpeed) (<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = point
+		} else if(this.mouseAmount.length() < 0.1) {
 			(<FaceMaterial>this.faceMesh.material).uniforms.u_intersect_pos.value = new Vector3(-999, -999, -999)
 		}
+	}
+
+	private updateMouse(): void {
+		this.mouseSpeed = this.mouse.positionOnCanvas.clone().sub(this.lastMousePos.clone())
+
+		const elastically: number = 0.2
+		const friction: number = 0.9
+		this.mouseAcceleration.add(this.mouseSpeed.clone().divideScalar(30))
+		this.mouseAcceleration.sub(this.mouseAmount.clone().multiplyScalar(elastically))
+		this.mouseAmount.add(this.mouseAcceleration.clone())
+		this.mouseAmount.multiplyScalar(friction)
+
+		this.isIncreasedMouseSpeed = Math.abs(this.mouseSpeed.length()) > Math.abs(this.lastMouseSpeed.length())
+		this.lastMouseSpeed = this.mouseSpeed
+		this.lastMousePos = this.mouse.positionOnCanvas
 	}
 
 	private async initFace(): Promise<void> {
