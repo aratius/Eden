@@ -1,13 +1,21 @@
-import { AmbientLight, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, Ray, Raycaster, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
+import { AmbientLight, BufferGeometry, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, Ray, Raycaster, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import { loadGLTF, loadTexture } from "../../utils";
 import WebGLCanvasBase from "../../utils/template/template";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { FaceMaterial } from "../../utils/material/faceMat";
 import { CanvasSize } from "../../config/config";
+const isBrowser = typeof window !== 'undefined';
+const dat = isBrowser ? require("dat.gui") : undefined
+
+class Parameters {
+	emotion: number = 0
+}
 
 export default class WebGLFace extends WebGLCanvasBase {
 
+	private gui: any = null
+	private params: Parameters = null
 	private faceGroup: Group = null
 	private faceMesh: Mesh = null
 	private eyeMesh: Mesh = null
@@ -17,6 +25,15 @@ export default class WebGLFace extends WebGLCanvasBase {
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas)
 
+		const alreadyExists = document.getElementsByClassName("dg")
+		for(let i = 0; i < alreadyExists.length; i++) {
+			alreadyExists[i].remove()
+		}
+		this.gui = new dat.GUI()
+		this.params = new Parameters()
+		this.gui.add(this.params, "emotion", -1, 1).onChange(() => {
+			if(this.faceMesh != null) (<FaceMaterial>this.faceMesh.material).uniforms.u_emotion.value = this.params.emotion
+		})
 	}
 
 	_onInit(): void {
@@ -54,18 +71,49 @@ export default class WebGLFace extends WebGLCanvasBase {
 	}
 
 	private async initFace(): Promise<void> {
-		const gltf: Group = await loadGLTF("/assets/models/face/scene.gltf")
-		this.faceGroup = gltf
+		// 顔のテクスチャ
+		let faceTexture: Texture = null
+		// 無表情
+		let none: Group = null
+		// ハッピー
+		let happy: Group = null
+		// 悲しい
+		let sad: Group = null
+
+		const loadTex: Promise<void> = new Promise<void>(async (res) => {
+			faceTexture = await loadTexture("/assets/models/face/textures/Texture4_baseColor.png")
+			res(null)
+		})
+		const loadNone: Promise<void> = new Promise<void>(async (res) => {
+			none = await loadGLTF("/assets/models/face/none.glb")
+			res(null)
+		})
+		const loadHappy: Promise<void> = new Promise<void>(async (res) => {
+			happy = await loadGLTF("/assets/models/face/happy.glb")
+			res(null)
+		})
+		const loadSad: Promise<void> = new Promise<void>(async (res) => {
+			sad = await loadGLTF("/assets/models/face/sad.glb")
+			res(null)
+		})
+
+		await Promise.all([loadTex, loadNone, loadHappy, loadSad])
+
+		this.faceGroup = none
 		this.scene.add(this.faceGroup)
 
-		const meshes: Mesh[] = this.getMeshFromGroup(gltf)
-		this.faceMesh = meshes.filter((mesh) => mesh.name == "mesh_0")[0]
-		this.eyeMesh = meshes.filter((mesh) => mesh.name == "mesh_1")[0]
+		const meshes: Mesh[] = this.getMeshFromGroup(none)
 
-		const faceTexture: Texture = await loadTexture("/assets/models/face/textures/Texture4_baseColor.png")
+		this.faceMesh = meshes.filter((mesh) => mesh.name == "Mesh_0")[0]
+		this.eyeMesh = meshes.filter((mesh) => mesh.name == "Mesh_1")[0]
+
 		const faceMaterial: FaceMaterial = new FaceMaterial(faceTexture)
-
 		this.faceMesh.material = faceMaterial
+
+		const happyGeo: BufferGeometry = this.getMeshFromGroup(happy).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
+		const sadGeo: BufferGeometry = this.getMeshFromGroup(sad).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
+		this.faceMesh.geometry.setAttribute("happy_position", happyGeo.attributes.position)
+		this.faceMesh.geometry.setAttribute("sad_position", sadGeo.attributes.position)
 
 		this.isReadyFace = true
 	}

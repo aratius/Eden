@@ -11,7 +11,8 @@ export class FaceMaterial extends ShaderMaterial{
 				uniforms: {
 					u_texture: {value: texture},
 					u_time: {value: 0},
-					u_intersect_pos: {value: new Vector3()}
+					u_intersect_pos: {value: new Vector3()},
+					u_emotion: {value: 0}
 				},
 				vertexShader: vertShader,
 				fragmentShader: fragShader
