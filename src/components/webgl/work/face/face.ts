@@ -251,7 +251,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 			.to((<FaceMaterial>this.faceMesh.material).uniforms.u_blink_amount, {value: 0, duration: blinkSpeed, ease: "expo.out"})
 
 		const minDelay: number = blinkSpeed*2*1000
-		const delay: number = Math.random() < 0.3 ? Math.random()*50+minDelay : Math.random()*3000+2000
+		const delay: number = Math.random() < 0.5 ? Math.random()*50+minDelay : Math.random()*3000+2000
 
 		setTimeout(this.loopBlink, delay)
 	}
