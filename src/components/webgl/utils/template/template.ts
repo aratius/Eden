@@ -84,7 +84,9 @@ export default abstract class WebGLCanvasBase extends Group {
 
 		// イベント登録
 		window.addEventListener("resize", this.invokeResizeTimer)
-		window.addEventListener("mousemove", this.onMousemove)
+		window.addEventListener("mousemove", this._onMouseMove, {passive: false})
+		window.addEventListener("touchstart", this._onTouch, {passive: false})
+		window.addEventListener("touchmove", this._onTouch, {passive: false})
 		window.addEventListener("focus", this.onFocus)
 		window.addEventListener("blur", this.onBlur)
 		window.addEventListener("beforeunload", this.deInit)
@@ -100,7 +102,9 @@ export default abstract class WebGLCanvasBase extends Group {
 
 		// イベント解除
 		window.removeEventListener("resize", this.invokeResizeTimer)
-		window.removeEventListener("mousemove", this.onMousemove)
+		window.removeEventListener("mousemove", this._onMouseMove)
+		window.removeEventListener("touchstart", this._onTouch)
+		window.removeEventListener("touchmove", this._onTouch)
 		window.removeEventListener("focus", this.onFocus)
 		window.removeEventListener("blur", this.onBlur)
 		window.removeEventListener("beforeunload", this.deInit)
@@ -134,8 +138,13 @@ export default abstract class WebGLCanvasBase extends Group {
 	 * 中心基準の座標に変換
 	 * @param e
 	 */
-	private onMousemove = (e: MouseEvent): void => {
+	private _onMouseMove = (e: MouseEvent): void => {
+		if(e && e.cancelable) e.preventDefault()
 		this.mouse.setPosition(e.clientX, e.clientY)
+	}
+
+	private _onTouch = (e: TouchEvent): void => {
+		if(e && e.cancelable) e.preventDefault()
 	}
 
 	/**

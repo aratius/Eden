@@ -52,6 +52,10 @@ export default class WebGLFace extends WebGLCanvasBase {
 		window.addEventListener("mousedown", this.onMouseDown)
 		window.addEventListener("mousemove", this.onMouseMove)
 		window.addEventListener("mouseup", this.onMouseUp)
+		window.addEventListener("touchstart", this.onTouchStart)
+		window.addEventListener("touchmove", this.onTouchMove)
+		window.addEventListener("touchend", this.onTouchEnd)
+
 	}
 
 	async _onInit(): Promise<void> {
@@ -130,6 +134,19 @@ export default class WebGLFace extends WebGLCanvasBase {
 	private onMouseUp = (e: any) => {
 		if(!this.isReadyFace) return
 		if(this.isGrabbingFace) this.onReleaseFace()
+	}
+	private onTouchStart = (e: any) => {
+		this.mouse.setPosition(e.touches[0].clientX, e.touches[0].clientY)
+		this.onMouseDown(e)
+	}
+
+	private onTouchMove = (e: any) => {
+		this.mouse.setPosition(e.touches[0].clientX, e.touches[0].clientY)
+		this.onMouseMove(e)
+	}
+
+	private onTouchEnd = (e: any) => {
+		this.onMouseUp(e)
 	}
 
 	/**
