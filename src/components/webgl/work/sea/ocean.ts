@@ -1,10 +1,10 @@
-import { AmbientLight, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, SphereBufferGeometry, Texture, Vector3 } from "three";
+import { AmbientLight, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
 import Water from "./water";
 import { Sky } from "three/examples/jsm/objects/Sky"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { loadTexture } from "../../utils";
+import { loadGLTF, loadTexture } from "../../utils";
 
 export default class WebGLOcean extends WebGLCanvasBase {
 
@@ -12,6 +12,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	private sky: Sky = null
 	private sun: Vector3 = new Vector3()
 	private pmremGenerator: PMREMGenerator = null
+	private woodenBoat: Group = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -22,7 +23,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		const ambient: AmbientLight = new AmbientLight()
 		this.scene.add(ambient)
 
-		this.camera.position.set(0, 10, 0)
+		this.camera.position.set(0, 20, 50)
 		this.camera.rotation.set(0, 0, 0)
 
 		this.pmremGenerator = new PMREMGenerator(this.renderer)
@@ -30,7 +31,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
 		controls.update()
 
-		await Promise.all([this.initWater(),this.initSky()])
+		await Promise.all([this.initWater(),this.initSky(), this.initBoats()])
 		this.updateSun()
 
 	}
@@ -44,9 +45,21 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	}
 
 	_onUpdate(): void {
-		const time: number = this.elapsedTime * 0.001
 
-		if(this.water != null) (<any>this.water.material).uniforms.time.value += 1/60
+		if(this.water != null) (<any>this.water.material).uniforms.time.value = this.elapsedTime
+		if(this.woodenBoat != null) {
+			this.woodenBoat.position.setY(Math.sin(this.elapsedTime*3)*0.4 + Math.sin(this.elapsedTime*3*0.7)*0.2)
+			this.woodenBoat.rotation.y += 0.001
+			this.woodenBoat.position.x -= 0.2
+			if(this.woodenBoat.position.x < -50) this.woodenBoat.position.setX(50)
+		}
+
+	}
+
+	private async initBoats(): Promise<void> {
+		this.woodenBoat = await loadGLTF("/assets/models/ocean/wooden_boat/scene.gltf")
+		this.woodenBoat.scale.set(0.03, 0.03, 0.03)
+		this.scene.add(this.woodenBoat)
 
 	}
 
@@ -59,7 +72,8 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.sun.setFromSphericalCoords(1, phi, theta)
 
 		this.sky.material.uniforms.sunPosition.value.copy(this.sun)
-		this.water.material.uniforms.sunDirection.value.copy(this.sun).normalize();
+		const sunDir: Vector3 = (<ShaderMaterial>this.water.material).uniforms.sunDirection.value
+		sunDir.copy(this.sun)
 
 		this.scene.environment = this.pmremGenerator.fromScene(this.sky as any).texture;
 	}

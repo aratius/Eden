@@ -116,6 +116,7 @@ export default class Water extends Mesh {
 					worldPosition = mirrorCoord.xyzw;
 					mirrorCoord = textureMatrix * mirrorCoord;
 					vec4 mvPosition =  modelViewMatrix * vec4( position, 1.0 );
+                    mvPosition.y += sin(mvPosition.x*0.3+time*3.)*0.3 + sin(mvPosition.z*0.1+time*3.)*0.15;
 					gl_Position = projectionMatrix * mvPosition;
 				#include <beginnormal_vertex>
 				#include <defaultnormal_vertex>
@@ -164,7 +165,7 @@ export default class Water extends Mesh {
 				#include <shadowmask_pars_fragment>
 				void main() {
 					#include <logdepthbuf_fragment>
-					vec4 noise = getNoise( vec2((worldPosition.x * size)+time*30., worldPosition.z * size ));
+					vec4 noise = getNoise( vec2((worldPosition.x * size)+time*100., worldPosition.z * size ));
 					vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );
 					vec3 diffuseLight = vec3(0.0);
 					vec3 specularLight = vec3(0.0);
