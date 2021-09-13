@@ -1,7 +1,7 @@
 import { AmbientLight, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, SphereBufferGeometry, Texture, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
-import { Water } from "three/examples/jsm/objects/Water"
+import Water from "./water";
 import { Sky } from "three/examples/jsm/objects/Sky"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { loadTexture } from "../../utils";
@@ -65,7 +65,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	}
 
 	private async initWater(): Promise<void> {
-		const waterGeometry: PlaneGeometry = new PlaneGeometry(10000, 10000)
+		const waterGeometry: PlaneBufferGeometry = new PlaneBufferGeometry(100, 100, 100, 100)
 
 		const waterNormals: Texture = await loadTexture("/assets/images/ocean/Water_1_M_Normal.jpg")
 
