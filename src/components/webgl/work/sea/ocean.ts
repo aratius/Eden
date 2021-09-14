@@ -1,10 +1,11 @@
-import { AmbientLight, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector3 } from "three";
+import { AmbientLight, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
 import Water from "./water";
 import { Sky } from "three/examples/jsm/objects/Sky"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { loadGLTF, loadTexture } from "../../utils";
+const noise = require('simplenoise')
 
 export default class WebGLOcean extends WebGLCanvasBase {
 
@@ -24,13 +25,14 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		const ambient: AmbientLight = new AmbientLight()
 		this.scene.add(ambient)
 
-		this.camera.position.set(0, 20, 50)
+		this.camera.position.set(0, 3, 0)
+		// this.camera.position.set(0, 20, 50)
 		this.camera.rotation.set(0, 0, 0)
 
 		this.pmremGenerator = new PMREMGenerator(this.renderer)
 
-		const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
-		controls.update()
+		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
+		// controls.update()
 
 		await Promise.all([this.initWater(),this.initSky(), this.initBoats()])
 		this.updateSun()
@@ -46,18 +48,29 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	}
 
 	_onUpdate(): void {
+		// update me (camera & speed boat)
+		this.camera.rotation.y += this.mouse.basedCenterPosition.x*-0.00003
+		this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
+		if(this.speedBoat != null) {
+			this.speedBoat.position.y = noise.simplex2(this.elapsedTime/2, 1)/2
+			// this.speedBoat.rotation.x = noise.simplex2(this.elapsedTime/2, 1)/5
+			this.speedBoat.rotation.z = noise.simplex2(this.elapsedTime/4, 1)/5
+		}
 
-		if(this.water != null) (<any>this.water.material).uniforms.time.value = this.elapsedTime
+		// update wooden boat
 		if(this.woodenBoat != null) {
 			this.woodenBoat.position.setY(Math.sin(this.elapsedTime*3)*0.4 + Math.sin(this.elapsedTime*3*0.7)*0.2)
-			this.woodenBoat.rotation.y += 0.001
-			this.woodenBoat.rotation.x = Math.sin(this.elapsedTime) * 0.1 + Math.sin(this.elapsedTime*2) * 0.05
+			this.woodenBoat.rotation.y += 0.005
+			this.woodenBoat.rotation.x = noise.simplex2(this.elapsedTime/2, 1)/4
 			this.woodenBoat.position.x -= 0.2
 			if(this.woodenBoat.position.x < -50) {
 				this.woodenBoat.position.setX(50)
 				this.woodenBoat.position.setZ(Math.random()*100-50)
 			}
 		}
+
+		// update water uniforms
+		if(this.water != null) (<any>this.water.material).uniforms.time.value = this.elapsedTime
 
 	}
 
@@ -66,7 +79,9 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.woodenBoat.scale.set(0.03, 0.03, 0.03)
 		this.scene.add(this.woodenBoat)
 
-		this.speedBoat = await loadGLTF("/assets/models/ocean/speed_boat/scene.gltf")
+		this.speedBoat = await loadGLTF("/assets/models/ocean/wooden_boat/scene.gltf")
+		this.speedBoat.scale.set(0.05, 0.05, 0.05)
+		this.speedBoat.rotation.y = Math.PI/2
 		this.scene.add(this.speedBoat)
 	}
 
@@ -86,7 +101,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	}
 
 	private async initWater(): Promise<void> {
-		const waterGeometry: PlaneBufferGeometry = new PlaneBufferGeometry(100, 100, 100, 100)
+		const waterGeometry: PlaneBufferGeometry = new PlaneBufferGeometry(1000, 1000, 1000, 1000)
 		const waterNormals: Texture = await loadTexture("/assets/images/ocean/Water_1_M_Normal.jpg")
 
 		waterNormals.wrapS = waterNormals.wrapT = RepeatWrapping
