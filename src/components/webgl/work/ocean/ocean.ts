@@ -1,7 +1,7 @@
-import { AmbientLight, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector3 } from "three";
+import { AmbientLight, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
-import Water from "./water";
+import Water from "./utils/water";
 import { Sky } from "three/examples/jsm/objects/Sky"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { loadGLTF, loadTexture } from "../../utils";
@@ -15,13 +15,15 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	private pmremGenerator: PMREMGenerator = null
 	private woodenBoat: Group = null
 	private speedBoat: Group = null
+	private lastMousePos: Vector2 = new Vector2(0, 0)
+	private mouseSpeed: Vector2 = new Vector2(0, 0)
+	private cameraAmount: number = 0
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
 	}
 
 	async _onInit(): Promise<void> {
-
 		const ambient: AmbientLight = new AmbientLight()
 		this.scene.add(ambient)
 
@@ -48,8 +50,15 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	}
 
 	_onUpdate(): void {
+		this.mouseSpeed = this.mouse.basedCenterPosition.clone().sub(this.lastMousePos)
+
+		// update view rendered from camera
+		this.cameraAmount += -this.mouseSpeed.x*0.0002
+		this.cameraAmount += -this.mouse.basedCenterPosition.x * 0.000002
+		this.cameraAmount *= 0.9
+		this.camera.rotation.y += this.cameraAmount
+
 		// update me (camera & speed boat)
-		this.camera.rotation.y += this.mouse.basedCenterPosition.x*-0.00003
 		this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
 		if(this.speedBoat != null) {
 			this.speedBoat.position.y = noise.simplex2(this.elapsedTime/2, 1)/2
@@ -71,6 +80,13 @@ export default class WebGLOcean extends WebGLCanvasBase {
 
 		// update water uniforms
 		if(this.water != null) (<any>this.water.material).uniforms.time.value = this.elapsedTime
+
+		this.lastMousePos = this.mouse.basedCenterPosition
+		console.log(this.lastMousePos);
+
+	}
+
+	private updateMouse(): void {
 
 	}
 

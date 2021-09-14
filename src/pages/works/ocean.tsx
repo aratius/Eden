@@ -1,7 +1,7 @@
 import { Component, ReactElement } from 'react'
 import styles from '../../styles/layout/top/top.module.scss'
 import _Head from '../../components/next/common/head'
-import WebGLOcean from '../../components/webgl/work/sea/ocean'
+import WebGLOcean from '../../components/webgl/work/ocean/ocean'
 
 interface Props {
 

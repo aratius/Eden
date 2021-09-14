@@ -16,9 +16,9 @@ import {
 	Vector4,
 	WebGLRenderTarget
 } from 'three';
-import MainCamera from '../../utils/template/camera';
-import MainRenderer from '../../utils/template/renderer';
-import MainScene from '../../utils/template/scene';
+import MainCamera from '../../../utils/template/camera';
+import MainRenderer from '../../../utils/template/renderer';
+import MainScene from '../../../utils/template/scene';
 
 /**
  * Work based on :
