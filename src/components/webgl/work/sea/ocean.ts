@@ -13,6 +13,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	private sun: Vector3 = new Vector3()
 	private pmremGenerator: PMREMGenerator = null
 	private woodenBoat: Group = null
+	private speedBoat: Group = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -50,8 +51,12 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		if(this.woodenBoat != null) {
 			this.woodenBoat.position.setY(Math.sin(this.elapsedTime*3)*0.4 + Math.sin(this.elapsedTime*3*0.7)*0.2)
 			this.woodenBoat.rotation.y += 0.001
+			this.woodenBoat.rotation.x = Math.sin(this.elapsedTime) * 0.1 + Math.sin(this.elapsedTime*2) * 0.05
 			this.woodenBoat.position.x -= 0.2
-			if(this.woodenBoat.position.x < -50) this.woodenBoat.position.setX(50)
+			if(this.woodenBoat.position.x < -50) {
+				this.woodenBoat.position.setX(50)
+				this.woodenBoat.position.setZ(Math.random()*100-50)
+			}
 		}
 
 	}
@@ -61,6 +66,8 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.woodenBoat.scale.set(0.03, 0.03, 0.03)
 		this.scene.add(this.woodenBoat)
 
+		this.speedBoat = await loadGLTF("/assets/models/ocean/speed_boat/scene.gltf")
+		this.scene.add(this.speedBoat)
 	}
 
 	private updateSun(): void {
@@ -80,7 +87,6 @@ export default class WebGLOcean extends WebGLCanvasBase {
 
 	private async initWater(): Promise<void> {
 		const waterGeometry: PlaneBufferGeometry = new PlaneBufferGeometry(100, 100, 100, 100)
-
 		const waterNormals: Texture = await loadTexture("/assets/images/ocean/Water_1_M_Normal.jpg")
 
 		waterNormals.wrapS = waterNormals.wrapT = RepeatWrapping
