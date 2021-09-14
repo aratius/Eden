@@ -62,10 +62,10 @@ export default class WebGLOcean extends WebGLCanvasBase {
 			this.woodenBoat.position.setY(Math.sin(this.elapsedTime*3)*0.4 + Math.sin(this.elapsedTime*3*0.7)*0.2)
 			this.woodenBoat.rotation.y += 0.005
 			this.woodenBoat.rotation.x = noise.simplex2(this.elapsedTime/2, 1)/4
-			this.woodenBoat.position.x -= 0.2
-			if(this.woodenBoat.position.x < -50) {
-				this.woodenBoat.position.setX(50)
-				this.woodenBoat.position.setZ(Math.random()*100-50)
+			this.woodenBoat.position.x -= 0.4
+			if(this.woodenBoat.position.x < -100) {
+				this.woodenBoat.position.setX(100)
+				this.woodenBoat.position.setZ(Math.random()*200-100)
 			}
 		}
 
