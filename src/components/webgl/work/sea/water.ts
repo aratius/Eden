@@ -115,8 +115,9 @@ export default class Water extends Mesh {
 					mirrorCoord = modelMatrix * vec4( position, 1.0 );
 					worldPosition = mirrorCoord.xyzw;
 					mirrorCoord = textureMatrix * mirrorCoord;
-					vec4 mvPosition =  modelViewMatrix * vec4( position, 1.0 );
-                    mvPosition.y += sin(mvPosition.x*0.3+time*3.)*0.3 + sin(mvPosition.z*0.1+time*3.)*0.15;
+					vec3 pos = position;
+                    pos.z += sin(pos.x*0.3+time*3.)*0.3 + sin(pos.y*0.1+time*3.)*0.5;
+					vec4 mvPosition =  modelViewMatrix * vec4( pos, 1.0 );
 					gl_Position = projectionMatrix * mvPosition;
 				#include <beginnormal_vertex>
 				#include <defaultnormal_vertex>
