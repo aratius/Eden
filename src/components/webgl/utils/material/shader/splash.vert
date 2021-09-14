@@ -21,6 +21,6 @@ void main() {
 	worldPosition.x += sin(u_time*5. + PI/2. + rand(pos)*5.)*2.;
 	v_worldPosition = worldPosition;
 	vec4 mvPosition =  viewMatrix * worldPosition;
-	gl_PointSize = 100. / distance(u_camera_pos, worldPosition.xyz);
+	gl_PointSize = 200. / distance(u_camera_pos, worldPosition.xyz);
 	gl_Position = projectionMatrix * mvPosition;
 }

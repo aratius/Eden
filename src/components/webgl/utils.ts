@@ -53,6 +53,17 @@ export const exportGLTF = async (target: Object3D): Promise<void> => {
 	})
 }
 
+export const exportJSON = async (json: JSON): Promise<void> => {
+	await new Promise((res, rej) => {
+
+		const output = JSON.stringify( json, null, 2 );
+		console.log( output );
+
+		const name: string = prompt("name ?")
+		confirm("save json?") && saveString( output, name+'.json' );
+	})
+}
+
 
 /**
  * Textureローディング

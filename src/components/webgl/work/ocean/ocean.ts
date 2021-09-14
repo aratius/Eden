@@ -1,11 +1,13 @@
-import { AmbientLight, BufferGeometry, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
+import { AmbientLight, BufferGeometry, Float32BufferAttribute, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
 import Water from "./utils/water";
 import { Sky } from "three/examples/jsm/objects/Sky"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { loadGLTF, loadTexture } from "../../utils";
+import { exportJSON, loadGLTF, loadTexture } from "../../utils";
 import Splash from "./utils/splash";
+import splashAttr from "../../../../../public/assets/json/splash.json"
+
 const noise = require('simplenoise')
 
 export default class WebGLOcean extends WebGLCanvasBase {
@@ -89,11 +91,13 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	}
 
 	private initBoatSplash(): void {
-		const geo: PlaneBufferGeometry = new PlaneBufferGeometry(15, 15, 100, 100)
+		const geo: BufferGeometry = new BufferGeometry()
+		geo.setAttribute("position", new Float32BufferAttribute(splashAttr.position.array, 3))
+
 		this.speedBoatSplash = new Splash(geo)
 		this.speedBoatSplash.position.setY(0.1)
-		this.speedBoatSplash.position.setX(-7)
-		this.speedBoatSplash.rotation.x = -Math.PI/2
+		this.speedBoatSplash.position.setX(-16)
+		this.speedBoatSplash.rotation.y = Math.PI/2
 		this.scene.add(this.speedBoatSplash)
 	}
 
@@ -106,6 +110,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.speedBoat.scale.set(0.05, 0.05, 0.05)
 		this.speedBoat.rotation.y = Math.PI/2
 		this.scene.add(this.speedBoat)
+
 	}
 
 	private updateSun(): void {
