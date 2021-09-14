@@ -1,7 +1,9 @@
 varying vec2 v_uv;
-attribute vec3 otherPos;
-uniform float u_noiseAmount;
-uniform float u_morphAmount;
+varying vec4 v_worldPosition;
+uniform float u_time;
+uniform vec3 u_camera_pos;
+
+const float PI = 3.14159265;
 
 float rand(vec3 co)
 {
@@ -11,18 +13,14 @@ float rand(vec3 co)
 // 2D Random
 void main() {
 	v_uv = uv;
+	vec3 pos = position;
+	pos += rand(pos);
 
-	float am = u_morphAmount;
-	vec3 mPos = position;
-	vec3 oPos = otherPos;
-	vec3 pos = position * am + otherPos * (-am + 1.);
-
-	// 頂点をランダムに揺らしてみる
-	float offset = u_noiseAmount;
-	pos.x += rand(pos)*offset - offset/2.;
-	pos.y += rand(pos)*offset - offset/2.;
-	pos.z += rand(pos)*offset - offset/2.;
 	vec4 worldPosition = modelMatrix * vec4( pos, 1.0 );
+	worldPosition.y = sin(u_time*5. + rand(pos)*5.)*2.;
+	worldPosition.x += sin(u_time*5. + PI/2. + rand(pos)*5.)*2.;
+	v_worldPosition = worldPosition;
 	vec4 mvPosition =  viewMatrix * worldPosition;
+	gl_PointSize = 100. / distance(u_camera_pos, worldPosition.xyz);
 	gl_Position = projectionMatrix * mvPosition;
 }

@@ -1,4 +1,4 @@
-import { ShaderMaterial } from "three";
+import { ShaderMaterial, Texture, Vector3 } from "three";
 import vertShader from "./shader/splash.vert"
 import fragShader from "./shader/splash.frag"
 
@@ -9,9 +9,15 @@ export class SplashMaterial extends ShaderMaterial{
 		super(
 			{
 				uniforms: {
+                    u_texture: {value: new Texture()},
+                    u_time: {value: 0},
+                    u_camera_pos: {value: new Vector3(0, 0, 0)}
 				},
 				vertexShader: vertShader,
-				fragmentShader: fragShader
+				fragmentShader: fragShader,
+                transparent: true,
+                // depthWrite: false,
+                // depthTest: false
 			}
 		)
 	}

@@ -1,10 +1,11 @@
-import { AmbientLight, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
+import { AmbientLight, BufferGeometry, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
 import Water from "./utils/water";
 import { Sky } from "three/examples/jsm/objects/Sky"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { loadGLTF, loadTexture } from "../../utils";
+import Splash from "./utils/splash";
 const noise = require('simplenoise')
 
 export default class WebGLOcean extends WebGLCanvasBase {
@@ -18,6 +19,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	private lastMousePos: Vector2 = new Vector2(0, 0)
 	private mouseSpeed: Vector2 = new Vector2(0, 0)
 	private cameraAmount: number = 0
+	private speedBoatSplash: Splash = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -28,15 +30,15 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.scene.add(ambient)
 
 		this.camera.position.set(0, 3, 0)
-		// this.camera.position.set(0, 20, 50)
+		this.camera.position.set(0, 20, 50)
 		this.camera.rotation.set(0, 0, 0)
 
 		this.pmremGenerator = new PMREMGenerator(this.renderer)
 
-		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
-		// controls.update()
+		const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
+		controls.update()
 
-		await Promise.all([this.initWater(),this.initSky(), this.initBoats()])
+		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash()])
 		this.updateSun()
 
 	}
@@ -56,10 +58,10 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.cameraAmount += -this.mouseSpeed.x*0.0002
 		this.cameraAmount += -this.mouse.basedCenterPosition.x * 0.000002
 		this.cameraAmount *= 0.9
-		this.camera.rotation.y += this.cameraAmount
+		// this.camera.rotation.y += this.cameraAmount
 
 		// update me (camera & speed boat)
-		this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
+		// this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
 		if(this.speedBoat != null) {
 			this.speedBoat.position.y = noise.simplex2(this.elapsedTime/2, 1)/2
 			// this.speedBoat.rotation.x = noise.simplex2(this.elapsedTime/2, 1)/5
@@ -80,14 +82,19 @@ export default class WebGLOcean extends WebGLCanvasBase {
 
 		// update water uniforms
 		if(this.water != null) (<any>this.water.material).uniforms.time.value = this.elapsedTime
+		if(this.speedBoatSplash != null) (<any>this.speedBoatSplash.material).uniforms.u_time.value = this.elapsedTime
+		if(this.speedBoatSplash != null) (<any>this.speedBoatSplash.material).uniforms.u_camera_pos.value = this.camera.position
 
 		this.lastMousePos = this.mouse.basedCenterPosition
-		console.log(this.lastMousePos);
-
 	}
 
-	private updateMouse(): void {
-
+	private initBoatSplash(): void {
+		const geo: PlaneBufferGeometry = new PlaneBufferGeometry(15, 15, 100, 100)
+		this.speedBoatSplash = new Splash(geo)
+		this.speedBoatSplash.position.setY(0.1)
+		this.speedBoatSplash.position.setX(-7)
+		this.speedBoatSplash.rotation.x = -Math.PI/2
+		this.scene.add(this.speedBoatSplash)
 	}
 
 	private async initBoats(): Promise<void> {
