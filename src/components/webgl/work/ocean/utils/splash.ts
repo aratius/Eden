@@ -14,7 +14,7 @@ export default class Splash extends Points {
     }
 
     private async loadTexture(): Promise<void> {
-        // (<SplashMaterial>this.material).uniforms.u_texture.value = await loadTexture("/assets/images/ocean/splash.png")
+        (<SplashMaterial>this.material).uniforms.u_texture.value = await loadTexture("/assets/images/ocean/splash.png")
     }
 
 }

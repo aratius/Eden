@@ -98,7 +98,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.speedBoatSplash.position.setY(0.1)
 		this.speedBoatSplash.position.setX(-16)
 		this.speedBoatSplash.rotation.y = Math.PI/2
-		this.scene.add(this.speedBoatSplash)
+		// this.scene.add(this.speedBoatSplash)
 	}
 
 	private async initBoats(): Promise<void> {

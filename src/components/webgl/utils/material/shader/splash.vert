@@ -14,13 +14,13 @@ float rand(vec3 co)
 void main() {
 	v_uv = uv;
 	vec3 pos = position;
-	pos += rand(pos);
+	pos += rand(position);
 
 	vec4 worldPosition = modelMatrix * vec4( pos, 1.0 );
 	worldPosition.y = sin(u_time*5. + rand(pos)*5.)*2.;
 	worldPosition.x += sin(u_time*5. + PI/2. + rand(pos)*5.)*2.;
 	v_worldPosition = worldPosition;
 	vec4 mvPosition =  viewMatrix * worldPosition;
-	gl_PointSize = 200. / distance(u_camera_pos, worldPosition.xyz);
+	gl_PointSize = 400. / distance(u_camera_pos, worldPosition.xyz) * (rand(position)*3.+2.);
 	gl_Position = projectionMatrix * mvPosition;
 }

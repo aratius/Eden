@@ -16,7 +16,7 @@ export class SplashMaterial extends ShaderMaterial{
 				vertexShader: vertShader,
 				fragmentShader: fragShader,
                 transparent: true,
-                // depthWrite: false,
+                depthWrite: false,
                 // depthTest: false
 			}
 		)
