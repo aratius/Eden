@@ -8,7 +8,7 @@ void main() {
 
 	// 水面より高いものだけ描画
 	float alpha = step(0., v_worldPosition.y);
-	color.a *= alpha * 0.6;
+	color.a *= alpha * 0.2;
 
 	gl_FragColor = color;
 }

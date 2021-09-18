@@ -19,6 +19,7 @@ import {
 import MainCamera from '../../../utils/template/camera';
 import MainRenderer from '../../../utils/template/renderer';
 import MainScene from '../../../utils/template/scene';
+import Splash from './splash';
 
 /**
  * Work based on :
@@ -28,6 +29,8 @@ import MainScene from '../../../utils/template/scene';
  */
 
 export default class Water extends Mesh {
+
+	splashes: Splash[] = []
 
 	constructor( geometry: BufferGeometry, options: any = {} ) {
 
@@ -305,8 +308,12 @@ export default class Water extends Mesh {
 
 			renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 
+			this.removeObjectsBeforeRenderToRt(scene)
+
 			if ( renderer.autoClear === false ) renderer.clear();
 			renderer.render( scene, mirrorCamera );
+
+			this.addObjectsAfterRenderToRt(scene)
 
 			scope.visible = true;
 
@@ -327,6 +334,31 @@ export default class Water extends Mesh {
 
 		};
 
+	}
+
+	/**
+	 * reflectionしたくないオブジェクトを配列に退避してからシーンからremoveする
+	 * @param scene
+	 */
+	removeObjectsBeforeRenderToRt(scene: MainScene): void {
+			//
+			for(const i in scene.children) {
+				if(scene.children[i] instanceof Splash) {
+					this.splashes.push(scene.children[i] as Splash)
+					scene.remove(scene.children[i])
+				}
+			}
+	}
+
+	/**
+	 * 対比したオブジェクトをシーンに追加
+	 * @param scene
+	 */
+	addObjectsAfterRenderToRt(scene: MainScene): void {
+		for(let i = 0; i < this.splashes.length; i++) {
+			scene.add(this.splashes[i])
+			this.splashes.splice(i)
+		}
 	}
 
 }
