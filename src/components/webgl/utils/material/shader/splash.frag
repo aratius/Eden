@@ -22,6 +22,11 @@ float rand(float co) {
 	return fract(sin(dot(vec3(co), vec3(12.9898, 78.233, 56.787))) * 43758.5453);
 }
 
+// 0-1に収める
+float fit_0_1(float val) {
+	return max(min(val, 1.), 0.);
+}
+
 void main() {
 
 	vec2 pos = gl_PointCoord;
@@ -29,7 +34,7 @@ void main() {
 	vec4 color = texture2D(u_texture, getRotatedPos(pos, vec2(0.5, 0.5), u_time*(rand(v_random_val) * 10. - 5.)));
 
 	// 水面より高いものだけ描画
-	float alpha = step(0., v_worldPosition.y);
+	float alpha = fit_0_1(1./0.3 * v_worldPosition.y);
 	color.a *= alpha * 0.3;
 
 	gl_FragColor = color;

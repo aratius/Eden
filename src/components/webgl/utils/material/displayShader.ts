@@ -21,7 +21,7 @@ export const displayShader: DisplayShader = {
 		'u_time': {value: 0},
 		'u_noise_amount': {value: 0},
 		'u_splash_alpha': {value: 0},
-		'u_splash_pos': {value: new Vector2(0, 0.4)},
+		'u_splash_pos': {value: new Vector2(0, 0.)},
 		'u_splash_rot': {value: 0}
 	},
 
@@ -72,7 +72,7 @@ export const displayShader: DisplayShader = {
 		void main(){
 			vec2 pos = vUv;
 			vec2 splash_pos = randPos(pos * vec2(1., 720./1280.), 1., 0.001);
-			vec4 splash = texture2D(u_splash, getRotatedPos(splash_pos, vec2(0.5, 0.5) + u_splash_pos, u_splash_rot));
+			vec4 splash = texture2D(u_splash, getRotatedPos(splash_pos, vec2(0.5, 0.5), u_splash_rot) + u_splash_pos);
 			splash.a *= u_splash_alpha;
 
 			pos.x += splash.a * 0.03;

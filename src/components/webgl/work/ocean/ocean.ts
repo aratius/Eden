@@ -68,6 +68,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		// update view rendered from camera
 		this.cameraAmount.add(this.mouseSpeed.clone().multiplyScalar(-0.0002))
 		this.cameraAmount.add(this.mouse.basedCenterPosition.clone().multiplyScalar(-0.000002))
+		this.cameraAmount.addScalar(noise.simplex2(this.elapsedTime/2, 1)*0.0005)
 		this.cameraAmount.multiplyScalar(0.9)
 		this.camera.rotation.y += this.cameraAmount.x
 
@@ -109,21 +110,27 @@ export default class WebGLOcean extends WebGLCanvasBase {
 
 		// screen noise when status is close
 		if(this.displayShaderPass != null && this.statue != null) {
-			const val: number = (500 - this.camera.position.distanceTo(this.statue.position))/500 * ((noise.simplex2(this.elapsedTime/2, 1)+1)*1+1)
-			this.displayShaderPass.uniforms.u_noise_amount.value = val > 0 ? val : 0
+			let distVal: number = (500 - this.camera.position.distanceTo(this.statue.position))/500
+			distVal = distVal > 0 ? distVal : 0
+			let val: number = distVal * ((noise.simplex2(this.elapsedTime/2, 1)+1)*1+1)
+			val = val > 0 ? val : 0
+			this.displayShaderPass.uniforms.u_noise_amount.value = val
+
+			this.camera.position.setY(3 + Math.random()*0.2 * distVal)
 		}
 
 		this.lastMousePos = this.mouse.basedCenterPosition
 	}
 
 	private loopSplash = ():void => {
-		const outDur: number = Math.random()+2
+		const outDur: number = Math.random()*2+2
+		const waitDur: number = Math.random()*2+1
 		const tl = gsap.timeline({onComplete: () => {
 			setTimeout(this.loopSplash, Math.random() * 3000)
 			this.displayShaderPass.uniforms.u_splash_rot.value = Math.random()*Math.PI*2
 		}})
 		tl.to(this.displayShaderPass.uniforms.u_splash_alpha, {value: 1, duration: 0.6, ease: "sine.out"})
-		tl.to(this.displayShaderPass.uniforms.u_splash_alpha, {value: 0, duration: outDur, delay: 1})
+		tl.to(this.displayShaderPass.uniforms.u_splash_alpha, {value: 0, duration: outDur, delay: waitDur})
 	}
 
 	private async initDisplayShader(): Promise<void> {
@@ -133,7 +140,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.displayShaderPass.uniforms.u_splash.value = splashTex
 		this.displayShaderPass.uniforms.u_noise_amount.value = 0
 		this.displayShaderPass.uniforms.u_splash_alpha.value = 1
-		this.displayShaderPass.uniforms.u_splash_pos.value = new Vector2(0,0.)
+		this.displayShaderPass.uniforms.u_splash_pos.value = new Vector2(0,0.5)
 		this.displayShaderPass.uniforms.u_splash_rot.value = Math.random()*Math.PI*2
 	}
 
