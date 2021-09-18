@@ -1,10 +1,10 @@
-import { AmbientLight, BufferGeometry, Float32BufferAttribute, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, Points, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
+import { AmbientLight, BufferGeometry, Euler, Float32BufferAttribute, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, Object3D, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, Points, Quaternion, Ray, Raycaster, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
 import Water from "./utils/water";
 import { Sky } from "three/examples/jsm/objects/Sky"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { exportJSON, getRandomPositions, loadGLTF, loadTexture } from "../../utils";
+import { exportJSON, getEulerFromAtoB, getRandomPositions, loadGLTF, loadTexture } from "../../utils";
 import Splash from "./utils/splash";
 import splashAttr from "../../../../../public/assets/json/splash.json"
 import cloudPosition from "../../../../../public/assets/json/cloudPosition.json"
@@ -25,7 +25,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	private speedBoat: Group = null
 	private lastMousePos: Vector2 = new Vector2(0, 0)
 	private mouseSpeed: Vector2 = new Vector2(0, 0)
-	private cameraAmount: number = 0
+	private cameraAmount: Vector2 = new Vector2(0, 0)
 	private speedBoatSplash: Splash = null
 	private statue: Group = null
 	private displayShaderPass: ShaderPass = null
@@ -37,7 +37,6 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	async _onInit(): Promise<void> {
 		const ambient: AmbientLight = new AmbientLight()
 		this.scene.add(ambient)
-
 
 		this.camera.position.set(0, 3, 0)
 		// this.camera.position.set(0, 20, 50)
@@ -67,10 +66,10 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.mouseSpeed = this.mouse.basedCenterPosition.clone().sub(this.lastMousePos)
 
 		// update view rendered from camera
-		this.cameraAmount += -this.mouseSpeed.x*0.0002
-		this.cameraAmount += -this.mouse.basedCenterPosition.x * 0.000002
-		this.cameraAmount *= 0.9
-		this.camera.rotation.y += this.cameraAmount
+		this.cameraAmount.add(this.mouseSpeed.clone().multiplyScalar(-0.0002))
+		this.cameraAmount.add(this.mouse.basedCenterPosition.clone().multiplyScalar(-0.000002))
+		this.cameraAmount.multiplyScalar(0.9)
+		this.camera.rotation.y += this.cameraAmount.x
 
 		// update me (camera & speed boat)
 		this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
@@ -105,13 +104,14 @@ export default class WebGLOcean extends WebGLCanvasBase {
 			}
 		}
 
+		// display shader pass
 		if(this.displayShaderPass != null) this.displayShaderPass.uniforms.u_time.value = this.elapsedTime
 
+		// screen noise when status is close
 		if(this.displayShaderPass != null && this.statue != null) {
 			const val: number = (500 - this.camera.position.distanceTo(this.statue.position))/500 * ((noise.simplex2(this.elapsedTime/2, 1)+1)*1+1)
 			this.displayShaderPass.uniforms.u_noise_amount.value = val > 0 ? val : 0
 		}
-
 
 		this.lastMousePos = this.mouse.basedCenterPosition
 	}
@@ -122,7 +122,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 			setTimeout(this.loopSplash, Math.random() * 3000)
 			this.displayShaderPass.uniforms.u_splash_rot.value = Math.random()*Math.PI*2
 		}})
-		tl.to(this.displayShaderPass.uniforms.u_splash_alpha, {value: 1, duration: 0.6})
+		tl.to(this.displayShaderPass.uniforms.u_splash_alpha, {value: 1, duration: 0.6, ease: "sine.out"})
 		tl.to(this.displayShaderPass.uniforms.u_splash_alpha, {value: 0, duration: outDur, delay: 1})
 	}
 
