@@ -11,6 +11,7 @@ import cloudPosition from "../../../../../public/assets/json/cloudPosition.json"
 import fogPosition from "../../../../../public/assets/json/fogPos.json"
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { displayShader } from "../../utils/material/displayShader";
+import gsap from "gsap";
 
 const noise = require('simplenoise')
 
@@ -37,8 +38,6 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		const ambient: AmbientLight = new AmbientLight()
 		this.scene.add(ambient)
 
-		this.displayShaderPass = new ShaderPass(displayShader)
-		this.composer.addPass(this.displayShaderPass)
 
 		this.camera.position.set(0, 3, 0)
 		// this.camera.position.set(0, 20, 50)
@@ -49,8 +48,10 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
 		// controls.update()
 
-		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash(), this.initStatue()])
+		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash(), this.initStatue(), this.initDisplayShader()])
 		this.updateSun()
+
+		setTimeout(this.loopSplash, 3000)
 
 	}
 
@@ -106,8 +107,34 @@ export default class WebGLOcean extends WebGLCanvasBase {
 
 		if(this.displayShaderPass != null) this.displayShaderPass.uniforms.u_time.value = this.elapsedTime
 
+		if(this.displayShaderPass != null && this.statue != null) {
+			const val: number = (500 - this.camera.position.distanceTo(this.statue.position))/500 * ((noise.simplex2(this.elapsedTime/2, 1)+1)*1+1)
+			this.displayShaderPass.uniforms.u_noise_amount.value = val > 0 ? val : 0
+		}
+
 
 		this.lastMousePos = this.mouse.basedCenterPosition
+	}
+
+	private loopSplash = ():void => {
+		const outDur: number = Math.random()+2
+		const tl = gsap.timeline({onComplete: () => {
+			setTimeout(this.loopSplash, Math.random() * 3000)
+			this.displayShaderPass.uniforms.u_splash_rot.value = Math.random()*Math.PI*2
+		}})
+		tl.to(this.displayShaderPass.uniforms.u_splash_alpha, {value: 1, duration: 0.6})
+		tl.to(this.displayShaderPass.uniforms.u_splash_alpha, {value: 0, duration: outDur, delay: 1})
+	}
+
+	private async initDisplayShader(): Promise<void> {
+		this.displayShaderPass = new ShaderPass(displayShader)
+		this.composer.addPass(this.displayShaderPass)
+		const splashTex: Texture = await loadTexture("/assets/images/ocean/screenSplash.png")
+		this.displayShaderPass.uniforms.u_splash.value = splashTex
+		this.displayShaderPass.uniforms.u_noise_amount.value = 0
+		this.displayShaderPass.uniforms.u_splash_alpha.value = 1
+		this.displayShaderPass.uniforms.u_splash_pos.value = new Vector2(0,0.)
+		this.displayShaderPass.uniforms.u_splash_rot.value = Math.random()*Math.PI*2
 	}
 
 	private async initStatue(): Promise<void> {
