@@ -1,0 +1,11 @@
+Model Information:
+* title:	Boat Man
+* source:	https://sketchfab.com/3d-models/boat-man-6137784429d640d3b671e34cd15ee6dc
+* author:	IUPUI University Library (https://sketchfab.com/iupuiul)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Boat Man" (https://sketchfab.com/3d-models/boat-man-6137784429d640d3b671e34cd15ee6dc) by IUPUI University Library (https://sketchfab.com/iupuiul) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

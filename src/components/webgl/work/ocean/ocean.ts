@@ -9,6 +9,8 @@ import Splash from "./utils/splash";
 import splashAttr from "../../../../../public/assets/json/splash.json"
 import cloudPosition from "../../../../../public/assets/json/cloudPosition.json"
 import fogPosition from "../../../../../public/assets/json/fogPos.json"
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
+import { displayShader } from "../../utils/material/displayShader";
 
 const noise = require('simplenoise')
 
@@ -24,6 +26,8 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	private mouseSpeed: Vector2 = new Vector2(0, 0)
 	private cameraAmount: number = 0
 	private speedBoatSplash: Splash = null
+	private statue: Group = null
+	private displayShaderPass: ShaderPass = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -32,6 +36,9 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	async _onInit(): Promise<void> {
 		const ambient: AmbientLight = new AmbientLight()
 		this.scene.add(ambient)
+
+		this.displayShaderPass = new ShaderPass(displayShader)
+		this.composer.addPass(this.displayShaderPass)
 
 		this.camera.position.set(0, 3, 0)
 		// this.camera.position.set(0, 20, 50)
@@ -42,7 +49,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
 		// controls.update()
 
-		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash(), this.initFog()])
+		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash(), this.initStatue()])
 		this.updateSun()
 
 	}
@@ -88,10 +95,26 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		if(this.speedBoatSplash != null) (<any>this.speedBoatSplash.material).uniforms.u_time.value = this.elapsedTime
 		if(this.speedBoatSplash != null) (<any>this.speedBoatSplash.material).uniforms.u_camera_pos.value = this.camera.position
 
+		if(this.statue != null) {
+			this.statue.position.x -= 0.5
+			this.statue.position.setY(-(Math.abs(this.statue.position.x)) * 0.2 - 3 + noise.simplex2(this.elapsedTime/2, 1)*2)
+			if(this.statue.position.x < -1000) {
+				this.statue.position.setX(1000)
+				this.statue.position.setZ(Math.random()*1000-500)
+			}
+		}
+
+		if(this.displayShaderPass != null) this.displayShaderPass.uniforms.u_time.value = this.elapsedTime
+
+
 		this.lastMousePos = this.mouse.basedCenterPosition
 	}
 
-	private initFog(): void {
+	private async initStatue(): Promise<void> {
+		this.statue = await loadGLTF("/assets/models/boat_man/scene.gltf")
+		this.statue.rotation.y = -Math.PI/2
+		this.statue.position.setZ(Math.random()*700-350)
+		this.scene.add(this.statue)
 	}
 
 	private initBoatSplash(): void {

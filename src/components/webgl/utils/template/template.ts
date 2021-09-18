@@ -8,6 +8,8 @@ import Group2D_ish from "./2DGroup_ish"
 import { Group, Vector2 } from "three"
 import { CanvasSize } from "../../config/config"
 import Stats from "stats.js"
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 
 /**
  * Three.jsテンプレート
@@ -15,26 +17,18 @@ import Stats from "stats.js"
  * 汎用性を考えて作ったつもり
  */
 export default abstract class WebGLCanvasBase extends Group {
-	// シーン
-	protected scene: MainScene = null
-	// レンダラ
-	protected renderer: MainRenderer = null
-	// カメラ
-	protected camera: MainCamera = null
-	// 2D風に座標配置するためのGroup
-	protected group2d: Group2D_ish = null
-	// マウス座標 中心基準にこのテンプレートの中で整形される
-	protected mouse: Mouse
-	// Updateのためのフラグ
-	private shouldUpdate: boolean = false
-	// リサイズ処理が走りすぎないようにするためのタイマー
-	private resizeTimer: any = null
-	// initした時間
-	private startTime: number = 0
-	// requestAnimationFrameのID
-	private updateId: number = null
-	// stats
-	private stats: Stats = new Stats()
+
+	protected scene: MainScene = null  // ..... シーン
+	protected renderer: MainRenderer = null  // レンダラ
+	protected camera: MainCamera = null  // ... カメラ
+	protected composer: EffectComposer  // .... エフェクトコンポーザー
+	protected group2d: Group2D_ish = null  // . 2D風に座標配置するためのGroup
+	protected mouse: Mouse  // ................ マウス座標 中心基準にこのテンプレートの中で整形される
+	private shouldUpdate: boolean = false  // . Updateのためのフラグ
+	private resizeTimer: any = null  // ....... リサイズ処理が走りすぎないようにするためのタイマー
+	private startTime: number = 0  // ......... initした時間
+	private updateId: number = null  // ....... requestAnimationFrameのID
+	private stats: Stats = new Stats()  // .... stats
 
 	/**
 	 * コンストラクタ
@@ -48,6 +42,8 @@ export default abstract class WebGLCanvasBase extends Group {
 		this.scene = new MainScene()
 		this.renderer = new MainRenderer(canvas, renderer)
 		this.camera = new MainCamera(camera)
+		this.composer = new EffectComposer(this.renderer)
+		this.composer.addPass(new RenderPass(this.scene, this.camera))
 		this.group2d = new Group2D_ish(this.camera)
 		this.scene.add(this.group2d)
 
@@ -182,7 +178,8 @@ export default abstract class WebGLCanvasBase extends Group {
 		this.stats.begin()
 		this._onUpdate()
 		this.group2d.update()
-		this.renderer.render(this.scene, this.camera)
+		// this.renderer.render(this.scene, this.camera)
+		this.composer.render()
 		this.stats.end()
 	}
 
