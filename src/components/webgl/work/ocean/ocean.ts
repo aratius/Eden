@@ -4,11 +4,11 @@ import WebGLCanvasBase from "../../utils/template/template";
 import Water from "./utils/water";
 import { Sky } from "three/examples/jsm/objects/Sky"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { exportJSON, loadGLTF, loadTexture } from "../../utils";
+import { exportJSON, getRandomPositions, loadGLTF, loadTexture } from "../../utils";
 import Splash from "./utils/splash";
 import splashAttr from "../../../../../public/assets/json/splash.json"
 import cloudPosition from "../../../../../public/assets/json/cloudPosition.json"
-import Cloud from "./utils/cloud";
+import fogPosition from "../../../../../public/assets/json/fogPos.json"
 
 const noise = require('simplenoise')
 
@@ -18,13 +18,12 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	private sky: Sky = null
 	private sun: Vector3 = new Vector3()
 	private pmremGenerator: PMREMGenerator = null
-	private woodenBoat: Group = null
+	private woodenBoats: Group[] = []
 	private speedBoat: Group = null
 	private lastMousePos: Vector2 = new Vector2(0, 0)
 	private mouseSpeed: Vector2 = new Vector2(0, 0)
 	private cameraAmount: number = 0
 	private speedBoatSplash: Splash = null
-	private clouds: Cloud[] = []
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -35,15 +34,15 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.scene.add(ambient)
 
 		this.camera.position.set(0, 3, 0)
-		this.camera.position.set(0, 20, 50)
-		this.camera.rotation.set(0, 0, 0)
+		// this.camera.position.set(0, 20, 50)
+		// this.camera.rotation.set(0, 0, 0)
 
 		this.pmremGenerator = new PMREMGenerator(this.renderer)
 
-		const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
-		controls.update()
+		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
+		// controls.update()
 
-		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash()])
+		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash(), this.initFog()])
 		this.updateSun()
 
 	}
@@ -63,25 +62,24 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.cameraAmount += -this.mouseSpeed.x*0.0002
 		this.cameraAmount += -this.mouse.basedCenterPosition.x * 0.000002
 		this.cameraAmount *= 0.9
-		// this.camera.rotation.y += this.cameraAmount
+		this.camera.rotation.y += this.cameraAmount
 
 		// update me (camera & speed boat)
-		// this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
+		this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
 		if(this.speedBoat != null) {
 			this.speedBoat.position.y = noise.simplex2(this.elapsedTime/2, 1)/2
-			// this.speedBoat.rotation.x = noise.simplex2(this.elapsedTime/2, 1)/5
 			this.speedBoat.rotation.z = noise.simplex2(this.elapsedTime/4, 1)/5
 		}
 
 		// update wooden boat
-		if(this.woodenBoat != null) {
-			this.woodenBoat.position.setY(Math.sin(this.elapsedTime*3)*0.4 + Math.sin(this.elapsedTime*3*0.7)*0.2)
-			this.woodenBoat.rotation.y += 0.005
-			this.woodenBoat.rotation.x = noise.simplex2(this.elapsedTime/2, 1)/4
-			this.woodenBoat.position.x -= 0.4
-			if(this.woodenBoat.position.x < -100) {
-				this.woodenBoat.position.setX(100)
-				this.woodenBoat.position.setZ(Math.random()*200-100)
+		for(let i = 0; i< this.woodenBoats.length; i++) {
+			this.woodenBoats[i].position.setY(Math.sin(this.elapsedTime*3+i)*0.4 + Math.sin(this.elapsedTime*3*0.7+i)*0.2)
+			this.woodenBoats[i].rotation.y += 0.005
+			this.woodenBoats[i].rotation.x = noise.simplex2(this.elapsedTime/2+i, 1)/4
+			this.woodenBoats[i].position.x -= 0.4
+			if(this.woodenBoats[i].position.x < -500) {
+				this.woodenBoats[i].position.setX(500)
+				this.woodenBoats[i].position.setZ(Math.random()*500-250)
 			}
 		}
 
@@ -89,10 +87,11 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		if(this.water != null) (<any>this.water.material).uniforms.time.value = this.elapsedTime
 		if(this.speedBoatSplash != null) (<any>this.speedBoatSplash.material).uniforms.u_time.value = this.elapsedTime
 		if(this.speedBoatSplash != null) (<any>this.speedBoatSplash.material).uniforms.u_camera_pos.value = this.camera.position
-		if(this.clouds.length > 0) for(const i in this.clouds) (<any>this.clouds[i].material).uniforms.u_time.value = this.elapsedTime
-		if(this.clouds.length > 0) for(const i in this.clouds) (<any>this.clouds[i].material).uniforms.u_camera_pos.value = this.camera.position
 
 		this.lastMousePos = this.mouse.basedCenterPosition
+	}
+
+	private initFog(): void {
 	}
 
 	private initBoatSplash(): void {
@@ -109,9 +108,15 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	}
 
 	private async initBoats(): Promise<void> {
-		this.woodenBoat = await loadGLTF("/assets/models/ocean/wooden_boat/scene.gltf")
-		this.woodenBoat.scale.set(0.03, 0.03, 0.03)
-		this.scene.add(this.woodenBoat)
+		const woodenBoat = await loadGLTF("/assets/models/ocean/wooden_boat/scene.gltf")
+		woodenBoat.scale.set(0.03, 0.03, 0.03)
+		for(let i = 0; i < 10; i++) {
+			const boat = woodenBoat.clone()
+			boat.position.setZ(Math.random()*500-250)
+			boat.position.setX(Math.random()*500-250)
+			this.woodenBoats.push(boat)
+			this.scene.add(boat)
+		}
 
 		this.speedBoat = await loadGLTF("/assets/models/ocean/wooden_boat/scene.gltf")
 		this.speedBoat.scale.set(0.05, 0.05, 0.05)
@@ -144,8 +149,8 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.water = new Water(
 			waterGeometry,
 			{
-				textureWidth: 512/10,
-				textureHeight: 512/10,
+				textureWidth: 512/1,
+				textureHeight: 512/1,
 				waterNormals: waterNormals,
 				sunDirection: new Vector3(),
 				sunColor: 0xffffff,
@@ -167,7 +172,6 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.scene.add(this.sky)
 
 		const skyUniforms = this.sky.material.uniforms;
-		console.log(skyUniforms);
 
 		// 濁度
 		skyUniforms[ 'turbidity' ].value = 10;

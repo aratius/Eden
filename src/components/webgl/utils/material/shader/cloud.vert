@@ -21,6 +21,6 @@ void main() {
 	vec4 worldPosition = modelMatrix * vec4( pos, 1.0 );
 	v_worldPosition = worldPosition;
 	vec4 mvPosition =  viewMatrix * worldPosition;
-	gl_PointSize = 2000. + (rand(worldPosition.xyz)*2000.+1.);
+	gl_PointSize = 10.;
 	gl_Position = projectionMatrix * mvPosition;
 }

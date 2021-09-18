@@ -199,3 +199,14 @@ export const getMeshFromGroup = (group: Group | Object3D): Mesh[] =>{
 export const powerVector2 = (p: Vector2, val: number): Vector2 => {
 	return new Vector2(Math.sign(p.x) * Math.pow(Math.abs(p.x), val), Math.sign(p.y) * Math.pow(Math.abs(p.y), val))
 }
+
+export const getRandomPositions = (length: number,range: number): number[] =>{
+	const positions: number[] = []
+	for(let i = 0; i < length; i++) {
+		const x: number = Math.random()-0.5
+		const y: number = Math.random()-0.5
+		const z: number = Math.random()-0.5
+		positions.push(x*range, y*range, z*range)
+	}
+	return positions
+}
