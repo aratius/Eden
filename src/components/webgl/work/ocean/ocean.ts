@@ -1,4 +1,4 @@
-import { AmbientLight, BufferGeometry, Float32BufferAttribute, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
+import { AmbientLight, BufferGeometry, Float32BufferAttribute, Fog, Group, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, PlaneGeometry, PMREMGenerator, Points, RepeatWrapping, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
 import Water from "./utils/water";
@@ -7,6 +7,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { exportJSON, loadGLTF, loadTexture } from "../../utils";
 import Splash from "./utils/splash";
 import splashAttr from "../../../../../public/assets/json/splash.json"
+import cloudPosition from "../../../../../public/assets/json/cloudPosition.json"
+import Cloud from "./utils/cloud";
 
 const noise = require('simplenoise')
 
@@ -22,6 +24,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	private mouseSpeed: Vector2 = new Vector2(0, 0)
 	private cameraAmount: number = 0
 	private speedBoatSplash: Splash = null
+	private clouds: Cloud[] = []
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -32,13 +35,13 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.scene.add(ambient)
 
 		this.camera.position.set(0, 3, 0)
-		// this.camera.position.set(0, 20, 50)
-		// this.camera.rotation.set(0, 0, 0)
+		this.camera.position.set(0, 20, 50)
+		this.camera.rotation.set(0, 0, 0)
 
 		this.pmremGenerator = new PMREMGenerator(this.renderer)
 
-		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
-		// controls.update()
+		const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
+		controls.update()
 
 		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash()])
 		this.updateSun()
@@ -60,10 +63,10 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.cameraAmount += -this.mouseSpeed.x*0.0002
 		this.cameraAmount += -this.mouse.basedCenterPosition.x * 0.000002
 		this.cameraAmount *= 0.9
-		this.camera.rotation.y += this.cameraAmount
+		// this.camera.rotation.y += this.cameraAmount
 
 		// update me (camera & speed boat)
-		this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
+		// this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
 		if(this.speedBoat != null) {
 			this.speedBoat.position.y = noise.simplex2(this.elapsedTime/2, 1)/2
 			// this.speedBoat.rotation.x = noise.simplex2(this.elapsedTime/2, 1)/5
@@ -86,6 +89,8 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		if(this.water != null) (<any>this.water.material).uniforms.time.value = this.elapsedTime
 		if(this.speedBoatSplash != null) (<any>this.speedBoatSplash.material).uniforms.u_time.value = this.elapsedTime
 		if(this.speedBoatSplash != null) (<any>this.speedBoatSplash.material).uniforms.u_camera_pos.value = this.camera.position
+		if(this.clouds.length > 0) for(const i in this.clouds) (<any>this.clouds[i].material).uniforms.u_time.value = this.elapsedTime
+		if(this.clouds.length > 0) for(const i in this.clouds) (<any>this.clouds[i].material).uniforms.u_camera_pos.value = this.camera.position
 
 		this.lastMousePos = this.mouse.basedCenterPosition
 	}
@@ -116,8 +121,8 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	}
 
 	private updateSun(): void {
-		const elevation: number = 2
-		const azimuth: number = 180
+		const elevation: number = 3
+		const azimuth: number = -180
 		const phi: number = MathUtils.degToRad(90 - elevation)
 		const theta: number = MathUtils.degToRad(azimuth)
 
@@ -162,10 +167,14 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.scene.add(this.sky)
 
 		const skyUniforms = this.sky.material.uniforms;
+		console.log(skyUniforms);
+
+		// 濁度
 		skyUniforms[ 'turbidity' ].value = 10;
+		// 錯乱
 		skyUniforms[ 'rayleigh' ].value = 6;
 		skyUniforms[ 'mieCoefficient' ].value = 0.005;
-		skyUniforms[ 'mieDirectionalG' ].value = 0.8;
+		skyUniforms[ 'mieDirectionalG' ].value = 0.5;
 	}
 
 }
