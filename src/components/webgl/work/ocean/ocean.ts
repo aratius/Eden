@@ -32,13 +32,13 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.scene.add(ambient)
 
 		this.camera.position.set(0, 3, 0)
-		// this.camera.position.set(0, 20, 50)
-		// this.camera.rotation.set(0, 0, 0)
+		this.camera.position.set(0, 20, 50)
+		this.camera.rotation.set(0, 0, 0)
 
 		this.pmremGenerator = new PMREMGenerator(this.renderer)
 
-		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
-		// controls.update()
+		const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
+		controls.update()
 
 		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash()])
 		this.updateSun()
@@ -60,10 +60,10 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.cameraAmount += -this.mouseSpeed.x*0.0002
 		this.cameraAmount += -this.mouse.basedCenterPosition.x * 0.000002
 		this.cameraAmount *= 0.9
-		this.camera.rotation.y += this.cameraAmount
+		// this.camera.rotation.y += this.cameraAmount
 
 		// update me (camera & speed boat)
-		this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
+		// this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
 		if(this.speedBoat != null) {
 			this.speedBoat.position.y = noise.simplex2(this.elapsedTime/2, 1)/2
 			// this.speedBoat.rotation.x = noise.simplex2(this.elapsedTime/2, 1)/5
@@ -96,8 +96,10 @@ export default class WebGLOcean extends WebGLCanvasBase {
 
 		this.speedBoatSplash = new Splash(geo)
 		this.speedBoatSplash.position.setY(0.1)
-		this.speedBoatSplash.position.setX(-16)
+		this.speedBoatSplash.position.setX(-18)
+		this.speedBoatSplash.position.setZ(1)
 		this.speedBoatSplash.rotation.y = Math.PI/2
+		this.speedBoatSplash.scale.multiplyScalar(1.2)
 		this.scene.add(this.speedBoatSplash)
 	}
 
