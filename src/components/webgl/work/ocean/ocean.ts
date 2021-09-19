@@ -29,6 +29,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	private speedBoatSplash: Splash = null
 	private statue: Group = null
 	private displayShaderPass: ShaderPass = null
+	private isLoadedRequirements: boolean = false
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -48,6 +49,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		// controls.update()
 
 		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash(), this.initStatue(), this.initDisplayShader()])
+		this.isLoadedRequirements = true
 		this.updateSun()
 
 		setTimeout(this.loopSplash, 3000)
@@ -63,21 +65,21 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	}
 
 	_onUpdate(): void {
+		if(!this.isLoadedRequirements) return
+
 		this.mouseSpeed = this.mouse.basedCenterPosition.clone().sub(this.lastMousePos)
 
 		// update view rendered from camera
 		this.cameraAmount.add(this.mouseSpeed.clone().multiplyScalar(-0.0002))
 		this.cameraAmount.add(this.mouse.basedCenterPosition.clone().multiplyScalar(-0.000002))
-		this.cameraAmount.addScalar(noise.simplex2(this.elapsedTime/2, 1)*0.0005)
+		this.cameraAmount.addScalar(noise.simplex2(this.elapsedTime, 1)*0.0005)
 		this.cameraAmount.multiplyScalar(0.9)
 		this.camera.rotation.y += this.cameraAmount.x
 
 		// update me (camera & speed boat)
 		this.camera.position.y = noise.simplex2(this.elapsedTime/3, 1)/3 + 3
-		if(this.speedBoat != null) {
-			this.speedBoat.position.y = noise.simplex2(this.elapsedTime/2, 1)/2
-			this.speedBoat.rotation.z = noise.simplex2(this.elapsedTime/4, 1)/5
-		}
+		this.speedBoat.position.y = noise.simplex2(this.elapsedTime/2, 1)/2
+		this.speedBoat.rotation.z = noise.simplex2(this.elapsedTime/4, 1)/5
 
 		// update wooden boat
 		for(let i = 0; i< this.woodenBoats.length; i++) {
@@ -92,32 +94,28 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		}
 
 		// update water uniforms
-		if(this.water != null) (<any>this.water.material).uniforms.time.value = this.elapsedTime
-		if(this.speedBoatSplash != null) (<any>this.speedBoatSplash.material).uniforms.u_time.value = this.elapsedTime
-		if(this.speedBoatSplash != null) (<any>this.speedBoatSplash.material).uniforms.u_camera_pos.value = this.camera.position
+		(<any>this.water.material).uniforms.time.value = this.elapsedTime;
+		(<any>this.speedBoatSplash.material).uniforms.u_time.value = this.elapsedTime;
+		(<any>this.speedBoatSplash.material).uniforms.u_camera_pos.value = this.camera.position;
 
-		if(this.statue != null) {
-			this.statue.position.x -= 0.5
-			this.statue.position.setY(-(Math.abs(this.statue.position.x)) * 0.2 - 3 + noise.simplex2(this.elapsedTime/2, 1)*2)
-			if(this.statue.position.x < -1000) {
-				this.statue.position.setX(1000)
-				this.statue.position.setZ(Math.random()*1000-500)
-			}
+		this.statue.position.x -= 0.5
+		this.statue.position.setY(-(Math.abs(this.statue.position.x)) * 0.2 - 3 + noise.simplex2(this.elapsedTime/2, 1)*2)
+		if(this.statue.position.x < -1000) {
+			this.statue.position.setX(1000)
+			this.statue.position.setZ(Math.random()*1000-500)
 		}
 
 		// display shader pass
-		if(this.displayShaderPass != null) this.displayShaderPass.uniforms.u_time.value = this.elapsedTime
+		this.displayShaderPass.uniforms.u_time.value = this.elapsedTime
 
 		// screen noise when status is close
-		if(this.displayShaderPass != null && this.statue != null) {
-			let distVal: number = (500 - this.camera.position.distanceTo(this.statue.position))/500
-			distVal = distVal > 0 ? distVal : 0
-			let val: number = distVal * ((noise.simplex2(this.elapsedTime/2, 1)+1)*1+1)
-			val = val > 0 ? val : 0
-			this.displayShaderPass.uniforms.u_noise_amount.value = val
+		let distVal: number = (500 - this.camera.position.distanceTo(this.statue.position))/500
+		distVal = distVal > 0 ? distVal : 0
+		let val: number = distVal * ((noise.simplex2(this.elapsedTime/2, 1)+1)*1+0.7)
+		val = val > 0 ? val : 0
+		this.displayShaderPass.uniforms.u_noise_amount.value = val
 
-			this.camera.position.setY(3 + Math.random()*0.2 * distVal)
-		}
+		this.camera.position.setY(3 + Math.random()*0.2 * distVal)
 
 		this.lastMousePos = this.mouse.basedCenterPosition
 	}
@@ -206,8 +204,8 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.water = new Water(
 			waterGeometry,
 			{
-				textureWidth: 512/1,
-				textureHeight: 512/1,
+				textureWidth: 512*2,
+				textureHeight: 512*2,
 				waterNormals: waterNormals,
 				sunDirection: new Vector3(),
 				sunColor: 0xffffff,
