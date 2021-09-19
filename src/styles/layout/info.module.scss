@@ -36,7 +36,13 @@
 
 			&__detail {
 				margin-bottom: 20px;
+				text-align: center;
+				line-height: 1.5;
 
+				a {
+					color: white;
+					border-bottom: 1px solid white;
+				}
 			}
 		}
 

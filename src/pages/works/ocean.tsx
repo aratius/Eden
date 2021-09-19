@@ -35,7 +35,42 @@ export default class Index extends Component<Props> {
 						width="1920"
 						height="1080"
 					></canvas>
-					<Info/>
+					<Info
+						title="ocean"
+						details={[
+							[
+								{
+									type: "text",
+									text: "model by"
+								},
+								{
+									type: "link",
+									text: "DJMaesen - Boat",
+									link: "https://sketchfab.com/3d-models/boat-5cdc4fc134e84a8d97fb2d3ffaf5c5fb"
+								},
+								{
+									type: "text",
+									text: "/ CC",
+								}
+							],
+							[
+								{
+									type: "text",
+									text: "model by"
+								},
+								{
+									type: "link",
+									text: "IUPUI University Library - Boat Man",
+									link: "https://sketchfab.com/3d-models/boat-man-6137784429d640d3b671e34cd15ee6dc"
+								},
+								{
+									type: "text",
+									text: "/ CC",
+								}
+							]
+						]}
+						shareText="https://eden.aualrxse.com/works/ocean"
+					/>
 				</div>
 			</>
 		)
