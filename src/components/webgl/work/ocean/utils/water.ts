@@ -196,12 +196,12 @@ export default class Water extends Mesh {
 
 			renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 
-			// this.removeObjectsBeforeRenderToRt(scene)
+			this.removeObjectsBeforeRenderToRt(scene)
 
 			if ( renderer.autoClear === false ) renderer.clear();
 			renderer.render( scene, mirrorCamera );
 
-			// this.addObjectsAfterRenderToRt(scene)
+			this.addObjectsAfterRenderToRt(scene)
 
 			scope.visible = true;
 

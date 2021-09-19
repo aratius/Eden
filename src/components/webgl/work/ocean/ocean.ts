@@ -30,6 +30,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	private statue: Group = null
 	private displayShaderPass: ShaderPass = null
 	private isLoadedRequirements: boolean = false
+	private readonly surfaceSize: Vector2 = new Vector2(1000, 1000)
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -87,9 +88,9 @@ export default class WebGLOcean extends WebGLCanvasBase {
 			this.woodenBoats[i].rotation.y += 0.005
 			this.woodenBoats[i].rotation.x = noise.simplex2(this.elapsedTime/2+i, 1)/4
 			this.woodenBoats[i].position.x -= 0.4
-			if(this.woodenBoats[i].position.x < -500) {
-				this.woodenBoats[i].position.setX(500)
-				this.woodenBoats[i].position.setZ(Math.random()*500-250)
+			if(this.woodenBoats[i].position.x < -this.surfaceSize.x/2) {
+				this.woodenBoats[i].position.setX(this.surfaceSize.x/2)
+				this.woodenBoats[i].position.setZ(Math.random()*this.surfaceSize.y-this.surfaceSize.y/2)
 			}
 		}
 
@@ -100,16 +101,16 @@ export default class WebGLOcean extends WebGLCanvasBase {
 
 		this.statue.position.x -= 0.5
 		this.statue.position.setY(-(Math.abs(this.statue.position.x)) * 0.2 - 3 + noise.simplex2(this.elapsedTime/2, 1)*2)
-		if(this.statue.position.x < -1000) {
-			this.statue.position.setX(1000)
-			this.statue.position.setZ(Math.random()*1000-500)
+		if(this.statue.position.x < -this.surfaceSize.x) {
+			this.statue.position.setX(this.surfaceSize.x)
+			this.statue.position.setZ(Math.random()*400+50)
 		}
 
 		// display shader pass
 		this.displayShaderPass.uniforms.u_time.value = this.elapsedTime
 
 		// screen noise when status is close
-		let distVal: number = (500 - this.camera.position.distanceTo(this.statue.position))/500
+		let distVal: number = (this.surfaceSize.x/2 - this.camera.position.distanceTo(this.statue.position))/this.surfaceSize.x/2
 		distVal = distVal > 0 ? distVal : 0
 		let val: number = distVal * ((noise.simplex2(this.elapsedTime/2, 1)+1)*1+1)
 		val = val > 0 ? val : 0
@@ -167,8 +168,8 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		woodenBoat.scale.set(0.03, 0.03, 0.03)
 		for(let i = 0; i < 10; i++) {
 			const boat = woodenBoat.clone()
-			boat.position.setZ(Math.random()*500-250)
-			boat.position.setX(Math.random()*500-250)
+			boat.position.setZ(Math.random()*this.surfaceSize.x-this.surfaceSize.x/2)
+			boat.position.setX(Math.random()*this.surfaceSize.y-this.surfaceSize.y/2)
 			this.woodenBoats.push(boat)
 			this.scene.add(boat)
 		}
@@ -196,7 +197,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 	}
 
 	private async initWater(): Promise<void> {
-		const waterGeometry: PlaneBufferGeometry = new PlaneBufferGeometry(1000, 1000, 1000, 1000)
+		const waterGeometry: PlaneBufferGeometry = new PlaneBufferGeometry(this.surfaceSize.x, this.surfaceSize.y, 500, 500)
 		const waterNormals: Texture = await loadTexture("/assets/images/ocean/Water_1_M_Normal.jpg")
 
 		waterNormals.wrapS = waterNormals.wrapT = RepeatWrapping
@@ -223,7 +224,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 
 	private initSky(): void {
 		this.sky = new Sky()
-		this.sky.scale.setScalar(10000)
+		this.sky.scale.setScalar(1000)
 		this.scene.add(this.sky)
 
 		const skyUniforms = this.sky.material.uniforms;

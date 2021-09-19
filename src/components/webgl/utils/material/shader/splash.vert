@@ -20,7 +20,7 @@ void main() {
 	v_random_val = random_val;
 
 	vec4 worldPosition = modelMatrix * vec4( pos, 1.0 );
-	float y_range = (pos.z+10.) * 0.05;  // 船の近くが飛沫高くなるように
+	float y_range = (pos.z+10.) * 0.03;  // 船の近くが飛沫高くなるように
 	worldPosition.y = sin(u_time*(random_val+5.) + random_val*5.) * random_val * 2. * y_range;
 	worldPosition.x += sin(u_time*(random_val+5.) + PI/2. + random_val*5.) * random_val * 2.;
 	worldPosition.z += sin(u_time*(random_val+5.) + PI/2. + random_val*5.) * random_val * 2. * -sign(worldPosition.z);
