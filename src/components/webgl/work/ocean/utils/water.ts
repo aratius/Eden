@@ -20,6 +20,10 @@ import MainCamera from '../../../utils/template/camera';
 import MainRenderer from '../../../utils/template/renderer';
 import MainScene from '../../../utils/template/scene';
 import Splash from './splash';
+import fragShader from "../../../utils/material/shader/water.frag"
+import vertShader from "../../../utils/material/shader/water.vert"
+import WaterMaterial from '../../../utils/material/WaterMat';
+
 
 /**
  * Work based on :
@@ -85,123 +89,7 @@ export default class Water extends Mesh {
 
 		}
 
-		const mirrorShader = {
-
-			uniforms: UniformsUtils.merge( [
-				UniformsLib[ 'fog' ],
-				UniformsLib[ 'lights' ],
-				{
-					'normalSampler': { value: null },
-					'mirrorSampler': { value: null },
-					'alpha': { value: 1.0 },
-					'time': { value: 0.0 },
-					'size': { value: 1.0 },
-					'distortionScale': { value: 20.0 },
-					'textureMatrix': { value: new Matrix4() },
-					'sunColor': { value: new Color( 0x7F7F7F ) },
-					'sunDirection': { value: new Vector3( 0.70707, 0.70707, 0 ) },
-					'eye': { value: new Vector3() },
-					'waterColor': { value: new Color( 0x555555 ) }
-				}
-			] ),
-
-			vertexShader: /* glsl */`
-				uniform mat4 textureMatrix;
-				uniform float time;
-				varying vec4 mirrorCoord;
-				varying vec4 worldPosition;
-				#include <common>
-				#include <fog_pars_vertex>
-				#include <shadowmap_pars_vertex>
-				#include <logdepthbuf_pars_vertex>
-				void main() {
-					mirrorCoord = modelMatrix * vec4( position, 1.0 );
-					worldPosition = mirrorCoord.xyzw;
-					mirrorCoord = textureMatrix * mirrorCoord;
-					vec3 pos = position;
-					// 波打つ
-                    pos.z += sin(pos.x*0.3+time*3.)*0.3 + sin(pos.y*0.1+time*3.)*0.5;
-					vec4 mvPosition =  modelViewMatrix * vec4( pos, 1.0 );
-					gl_Position = projectionMatrix * mvPosition;
-				#include <beginnormal_vertex>
-				#include <defaultnormal_vertex>
-				#include <logdepthbuf_vertex>
-				#include <fog_vertex>
-				#include <shadowmap_vertex>
-			}`,
-
-			fragmentShader: /* glsl */`
-				uniform sampler2D mirrorSampler;
-				uniform float alpha;
-				uniform float time;
-				uniform float size;
-				uniform float distortionScale;
-				uniform sampler2D normalSampler;
-				uniform vec3 sunColor;
-				uniform vec3 sunDirection;
-				uniform vec3 eye;
-				uniform vec3 waterColor;
-				varying vec4 mirrorCoord;
-				varying vec4 worldPosition;
-				vec4 getNoise( vec2 uv ) {
-					vec2 uv0 = ( uv / 103.0 ) + vec2(time / 17.0, time / 29.0);
-					vec2 uv1 = uv / 107.0-vec2( time / -19.0, time / 31.0 );
-					vec2 uv2 = uv / vec2( 8907.0, 9803.0 ) + vec2( time / 101.0, time / 97.0 );
-					vec2 uv3 = uv / vec2( 1091.0, 1027.0 ) - vec2( time / 109.0, time / -113.0 );
-					vec4 noise = texture2D( normalSampler, uv0 ) +
-						texture2D( normalSampler, uv1 ) +
-						texture2D( normalSampler, uv2 ) +
-						texture2D( normalSampler, uv3 );
-					return noise * 0.5 - 1.0;
-				}
-				void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float shiny, float spec, float diffuse, inout vec3 diffuseColor, inout vec3 specularColor ) {
-					vec3 reflection = normalize( reflect( -sunDirection, surfaceNormal ) );
-					float direction = max( 0.0, dot( eyeDirection, reflection ) );
-					specularColor += pow( direction, shiny ) * sunColor * spec;
-					diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;
-				}
-				#include <common>
-				#include <packing>
-				#include <bsdfs>
-				#include <fog_pars_fragment>
-				#include <logdepthbuf_pars_fragment>
-				#include <lights_pars_begin>
-				#include <shadowmap_pars_fragment>
-				#include <shadowmask_pars_fragment>
-				void main() {
-					#include <logdepthbuf_fragment>
-					// time*300 = スピード
-					vec4 noise = getNoise( vec2((worldPosition.x * size)+time*300., worldPosition.z * size ));
-					vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );
-					vec3 diffuseLight = vec3(0.0);
-					vec3 specularLight = vec3(0.0);
-					vec3 worldToEye = eye-worldPosition.xyz;
-					vec3 eyeDirection = normalize( worldToEye );
-					sunLight( surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight );
-					float distance = length(worldToEye);
-					vec2 distortion = surfaceNormal.xz * ( 0.001 + 1.0 / distance ) * distortionScale;
-					vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion ) );
-					float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
-					float rf0 = 0.3;
-					float reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );
-					vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;
-					vec3 albedo = mix( ( sunColor * diffuseLight * 0.3 + scatter ) * getShadowMask(), ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance);
-					vec3 outgoingLight = albedo;
-					gl_FragColor = vec4( outgoingLight, alpha );
-					#include <tonemapping_fragment>
-					#include <fog_fragment>
-				}`
-
-		};
-
-		const material = new ShaderMaterial( {
-			fragmentShader: mirrorShader.fragmentShader,
-			vertexShader: mirrorShader.vertexShader,
-			uniforms: UniformsUtils.clone( mirrorShader.uniforms ),
-			lights: true,
-			side: side,
-			fog: fog
-		} );
+		const material = new WaterMaterial(true, side, fog);
 
 		material.uniforms[ 'mirrorSampler' ].value = renderTarget.texture;
 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
@@ -340,7 +228,7 @@ export default class Water extends Mesh {
 	 * reflectionしたくないオブジェクトを配列に退避してからシーンからremoveする
 	 * @param scene
 	 */
-	removeObjectsBeforeRenderToRt(scene: MainScene): void {
+	private removeObjectsBeforeRenderToRt(scene: MainScene): void {
 			//
 			for(const i in scene.children) {
 				if(scene.children[i] instanceof Splash) {
@@ -354,7 +242,7 @@ export default class Water extends Mesh {
 	 * 対比したオブジェクトをシーンに追加
 	 * @param scene
 	 */
-	addObjectsAfterRenderToRt(scene: MainScene): void {
+	private addObjectsAfterRenderToRt(scene: MainScene): void {
 		for(let i = 0; i < this.splashes.length; i++) {
 			scene.add(this.splashes[i])
 			this.splashes.splice(i)

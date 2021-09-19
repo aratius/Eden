@@ -111,7 +111,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		// screen noise when status is close
 		let distVal: number = (500 - this.camera.position.distanceTo(this.statue.position))/500
 		distVal = distVal > 0 ? distVal : 0
-		let val: number = distVal * ((noise.simplex2(this.elapsedTime/2, 1)+1)*1+0.7)
+		let val: number = distVal * ((noise.simplex2(this.elapsedTime/2, 1)+1)*1+1)
 		val = val > 0 ? val : 0
 		this.displayShaderPass.uniforms.u_noise_amount.value = val
 
@@ -204,8 +204,8 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.water = new Water(
 			waterGeometry,
 			{
-				textureWidth: 512*2,
-				textureHeight: 512*2,
+				textureWidth: 512*1,
+				textureHeight: 512*1,
 				waterNormals: waterNormals,
 				sunDirection: new Vector3(),
 				sunColor: 0xffffff,
