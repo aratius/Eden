@@ -10,6 +10,9 @@ import { CanvasSize } from "../../config/config"
 import Stats from "stats.js"
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass"
+import { loadingShader } from "../material/loadingShader"
+import gsap from "gsap"
 
 /**
  * Three.jsテンプレート
@@ -29,6 +32,7 @@ export default abstract class WebGLCanvasBase extends Group {
 	private startTime: number = 0  // ......... initした時間
 	private updateId: number = null  // ....... requestAnimationFrameのID
 	private stats: Stats = new Stats()  // .... stats
+	private loadingShaderPass: ShaderPass = null
 
 	/**
 	 * コンストラクタ
@@ -73,6 +77,9 @@ export default abstract class WebGLCanvasBase extends Group {
 		if(location.hostname === "localhost") document.body.appendChild(this.stats.dom)
 
 		this.startTime = new Date().getTime() / 1000
+
+		this.loadingShaderPass = new ShaderPass(loadingShader)
+		this.composer.addPass(this.loadingShaderPass)
 
 		this._onInit()
 		this.onResize()
@@ -182,6 +189,7 @@ export default abstract class WebGLCanvasBase extends Group {
 		this._onUpdate()
 		this.group2d.update()
 		// this.renderer.render(this.scene, this.camera)
+		if(this.loadingShaderPass != null) this.loadingShaderPass.uniforms.u_time.value = this.elapsedTime
 		this.composer.render()
 		this.stats.end()
 	}
@@ -202,6 +210,12 @@ export default abstract class WebGLCanvasBase extends Group {
 	private onBlur = (): void => {
 		if(!this.shouldUpdate) return
 		// this.onDeInitUpdate()
+	}
+
+	protected endLoading(): void {
+		gsap.to(this.loadingShaderPass.uniforms.u_alpha, {value: 0, duration: 1, onComplete: () => {
+			this.composer.removePass(this.loadingShaderPass)
+		}})
 	}
 
 	/**

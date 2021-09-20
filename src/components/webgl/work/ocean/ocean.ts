@@ -51,6 +51,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 
 		await Promise.all([this.initWater(),this.initSky(), this.initBoats(), this.initBoatSplash(), this.initStatue(), this.initDisplayShader()])
 		this.isLoadedRequirements = true
+		this.endLoading()
 		this.updateSun()
 
 		setTimeout(this.loopSplash, 3000)
