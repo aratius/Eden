@@ -110,7 +110,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.displayShaderPass.uniforms.u_time.value = this.elapsedTime
 
 		// screen noise when status is close
-		let distVal: number = (this.surfaceSize.x/2 - this.camera.position.distanceTo(this.statue.position))/this.surfaceSize.x/2
+		let distVal: number = (this.surfaceSize.x/2*Math.sqrt(2) - this.camera.position.distanceTo(this.statue.position))/this.surfaceSize.x/2*Math.sqrt(2)
 		distVal = distVal > 0 ? distVal : 0
 		let val: number = distVal * ((noise.simplex2(this.elapsedTime/2, 1)+1)*1+1)
 		val = val > 0 ? val : 0
