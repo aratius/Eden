@@ -11,6 +11,10 @@ interface Props {
 
 export default class Index extends Component<Props> {
 
+	private canvas: WebGLFace = null
+	private info: Info = null
+
+
 	constructor(props: Props) {
 		super(props)
 		process.browser && window.addEventListener("wheel", (e) => e.preventDefault(), {passive: false})
@@ -21,8 +25,19 @@ export default class Index extends Component<Props> {
 	 */
 	private onReadyCanvas = (node: HTMLCanvasElement) => {
 		if(node == null) return
-		const canvas = new WebGLFace(node, null, null)
-		canvas.init()
+		this.canvas = new WebGLFace(node, null, null)
+		this.canvas.init()
+	}
+
+	private onReadyInfo = (node: Info): void => {
+		if(!node) return
+		this.info = node
+		this.info.events.on(Info.events.appear, () => {
+			this.canvas.onDeInitUpdate()
+		})
+		this.info.events.on(Info.events.disappear, () => {
+			this.canvas.onInitUpdate()
+		})
 	}
 
 	render (): ReactElement {
@@ -39,6 +54,7 @@ export default class Index extends Component<Props> {
 						height="1080"
 					></canvas>
 					<Info
+						ref={this.onReadyInfo}
 						title="face"
 						details={[
 							[
@@ -55,9 +71,25 @@ export default class Index extends Component<Props> {
 									type: "text",
 									text: "/ Adapted."
 								},
+							],
+							[
+								{
+									type: "text",
+									text: "github"
+								},
+								{
+									type: "link",
+									text: "aratius - Eden",
+									link: "https://github.com/aratius/Eden/tree/develop/src/components/webgl/work/face"
+								},
+								{
+									type: "text",
+									text: "/ CC"
+								},
 							]
 						]}
-						shareText="https://eden.aualrxse.com/works/face"
+						shareText="author @aualrxse"
+						shareUrl="https://eden.aualrxse.com/works/face"
 					/>
 				</div>
 			</>

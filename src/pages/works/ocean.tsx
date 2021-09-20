@@ -33,7 +33,6 @@ export default class Index extends Component<Props> {
 		this.info.events.on(Info.events.appear, () => {
 			this.canvas.onDeInitUpdate()
 		})
-
 		this.info.events.on(Info.events.disappear, () => {
 			this.canvas.onInitUpdate()
 		})
@@ -83,9 +82,25 @@ export default class Index extends Component<Props> {
 									type: "text",
 									text: "/ CC",
 								}
+							],
+							[
+								{
+									type: "text",
+									text: "github"
+								},
+								{
+									type: "link",
+									text: "aratius - Eden",
+									link: "https://github.com/aratius/Eden/tree/develop/src/components/webgl/work/ocean"
+								},
+								{
+									type: "text",
+									text: "/ CC"
+								},
 							]
 						]}
-						shareText="https://eden.aualrxse.com/works/ocean"
+						shareText="author @aualrxse"
+						shareUrl="https://eden.aualrxse.com/works/ocean"
 					/>
 				</div>
 			</>

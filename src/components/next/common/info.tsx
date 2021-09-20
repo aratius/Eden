@@ -10,7 +10,8 @@ interface Props {
 		text: string,
 		link?: string
 	}>[],
-	shareText: string
+	shareText: string,
+	shareUrl: string
 }
 
 export default class Info extends Component<Props> {
@@ -30,6 +31,7 @@ export default class Info extends Component<Props> {
 		this.fadeTween = gsap.timeline()
 		this.fadeTween.to(this.bg, {alpha: 1, duration: 0.3})
 		this.fadeTween.to(this.contents, {alpha: 1, duration: 0.3})
+		this.contents.classList.remove(styles.invisible)
 		this.events.emit(Info.events.appear)
 	}
 
@@ -38,6 +40,7 @@ export default class Info extends Component<Props> {
 		this.fadeTween = gsap.timeline()
 		this.fadeTween.to(this.contents, {alpha: 0, duration: 0.3})
 		this.fadeTween.to(this.bg, {alpha: 0, duration: 0.3})
+		this.contents.classList.add(styles.invisible)
 		this.events.emit(Info.events.disappear)
 	}
 
@@ -51,6 +54,7 @@ export default class Info extends Component<Props> {
 		if(!node) return
 		this.contents = node
 		gsap.set(this.contents, {alpha: 0})
+		this.contents.classList.add(styles.invisible)
 	}
 
 	/**
@@ -94,7 +98,7 @@ export default class Info extends Component<Props> {
 											if(d.type == "text")
 												return <span key={_i}>{d.text}&nbsp;</span>
 											else if (d.type == "link")
-												return <a key={_i} href={d.link}>{d.text}&nbsp;</a>
+												return <a key={_i} href={d.link} target="_blank">{d.text}&nbsp;</a>
 										})}
 									</p>
 								)
@@ -104,7 +108,7 @@ export default class Info extends Component<Props> {
 							<a className={styles.info__twitter__follow} href="https://twitter.com/intent/follow?original_referer=https%3A%2F%2Fpublish.twitter.com%2F&ref_src=twsrc%5Etfw%7Ctwcamp%5Ebuttonembed%7Ctwterm%5Efollow%7Ctwgr%5Eaualrxse&screen_name=aualrxse" target="_blank">
 								<img src="/assets/images/common/ico-tw-wh.svg" alt="twitter" />
 							</a>
-							<a className={styles.info__twitter__share} href={"https://twitter.com/intent/tweet?text="+this.props.shareText} target="_blank">share</a>
+							<a className={styles.info__twitter__share} href={"https://twitter.com/intent/tweet?text="+this.props.shareText+"&url="+this.props.shareUrl} target="_blank">share</a>
 						</div>
 						<footer className={styles.info__footer}>
 							<p>
