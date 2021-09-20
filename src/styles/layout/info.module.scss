@@ -5,7 +5,7 @@
 .container {
 	width: 100vw;
 	min-height: 100vh;
-	background-color: rgb(0, 0, 0, 0.5);
+	background-color: rgb(0, 0, 0, 0.7);
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -51,16 +51,23 @@
 		}
 
 		&__twitter {
+			height: 20px;
 			margin-bottom: 20px;
 			display: flex;
 			align-items: center;
 			position: relative;
 
 			&__follow {
-				width: 30px;
+				height: 100%;
+				img {
+					height: 100%;
+					display: flex;
+					align-items: center;
+				}
 			}
 
 			&__share {
+				height: 100%;
 				font-size: 2rem;
 				color: white;
 			}

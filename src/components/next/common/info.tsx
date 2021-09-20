@@ -108,11 +108,12 @@ export default class Info extends Component<Props> {
 							<a className={styles.info__twitter__follow} href="https://twitter.com/intent/follow?original_referer=https%3A%2F%2Fpublish.twitter.com%2F&ref_src=twsrc%5Etfw%7Ctwcamp%5Ebuttonembed%7Ctwterm%5Efollow%7Ctwgr%5Eaualrxse&screen_name=aualrxse" target="_blank">
 								<img src="/assets/images/common/ico-tw-wh.svg" alt="twitter" />
 							</a>
+							<a className={styles.info__twitter__share} href="https://twitter.com/intent/follow?original_referer=https%3A%2F%2Fpublish.twitter.com%2F&ref_src=twsrc%5Etfw%7Ctwcamp%5Ebuttonembed%7Ctwterm%5Efollow%7Ctwgr%5Eaualrxse&screen_name=aualrxse" target="_blank">follow</a>
 							<a className={styles.info__twitter__share} href={"https://twitter.com/intent/tweet?text="+this.props.shareText+"&url="+this.props.shareUrl} target="_blank">share</a>
 						</div>
 						<footer className={styles.info__footer}>
 							<p>
-								© 2021 / Arata matsumoto All rights reserved.
+								© 2021 / Arata matsumoto
 							</p>
 						</footer>
 					</article>
