@@ -44,6 +44,8 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		// this.camera.position.set(0, 20, 50)
 		// this.camera.rotation.set(0, 0, 0)
 
+		this.renderer.localClippingEnabled = true
+
 		this.pmremGenerator = new PMREMGenerator(this.renderer)
 
 		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)

@@ -68,6 +68,7 @@ export default class WebGLFace extends WebGLCanvasBase {
 		this.scene.add(ambient)
 
 		await this.initFace()
+		this.endLoading()
 		this.loopBlink()
 	}
 
