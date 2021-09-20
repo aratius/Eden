@@ -46,7 +46,7 @@ export default class Index extends Component<Props> {
 				<_Head
 					title="face"
 					ogUrl="https://eden.aualrxse.com/works/face"
-					ogImgPath="https://eden.aualrxse.com/face/og.png"
+					ogImgPath="https://eden.aualrxse.com/og/face/og.png"
 					description="Touch his face and he'll be happy."
 				></_Head>
 				<div className={styles.container}>

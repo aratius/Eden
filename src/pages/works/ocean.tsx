@@ -41,6 +41,12 @@ export default class Index extends Component<Props> {
 	render (): ReactElement {
 		return (
 			<>
+			<_Head
+				title="ocean"
+				ogUrl="https://eden.aualrxse.com/works/ocean"
+				ogImgPath="https://eden.aualrxse.com/og/ocean/og.png"
+				description="isolated cruising."
+			></_Head>
 				<div className={styles.container}>
 					<canvas
 						className={styles.canvas}
