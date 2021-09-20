@@ -1,6 +1,7 @@
 import { Component, ReactElement, SyntheticEvent } from "react";
 import styles from "../../../styles/layout/info.module.scss"
 import gsap from "gsap"
+import { EventEmitter } from "events"
 
 interface Props {
 	title: string,
@@ -14,15 +15,22 @@ interface Props {
 
 export default class Info extends Component<Props> {
 
+	public static events: {[key:string]: string} = {
+		appear: "appear",
+		disappear: "disappear"
+	}
+
 	private bg: HTMLElement = null
 	private contents: HTMLElement = null
 	private fadeTween: GSAPTimeline = null
+	public events: EventEmitter = new EventEmitter()
 
 	public appear(): void {
 		if(this.fadeTween != null) this.fadeTween.kill()
 		this.fadeTween = gsap.timeline()
 		this.fadeTween.to(this.bg, {alpha: 1, duration: 0.3})
 		this.fadeTween.to(this.contents, {alpha: 1, duration: 0.3})
+		this.events.emit(Info.events.appear)
 	}
 
 	public disappear(): void {
@@ -30,6 +38,7 @@ export default class Info extends Component<Props> {
 		this.fadeTween = gsap.timeline()
 		this.fadeTween.to(this.contents, {alpha: 0, duration: 0.3})
 		this.fadeTween.to(this.bg, {alpha: 0, duration: 0.3})
+		this.events.emit(Info.events.disappear)
 	}
 
 	private onReadyBG = (node: HTMLElement): void => {

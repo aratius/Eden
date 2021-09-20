@@ -10,6 +10,9 @@ interface Props {
 
 export default class Index extends Component<Props> {
 
+	private info: Info = null
+	private canvas: WebGLOcean = null
+
 	constructor(props: Props) {
 		super(props)
 		process.browser && window.addEventListener("wheel", (e) => e.preventDefault(), {passive: false})
@@ -18,10 +21,22 @@ export default class Index extends Component<Props> {
     	/**
 	 * canvasセットアップ
 	 */
-	private onReadyCanvas = (node: HTMLCanvasElement) => {
-		if(node == null) return
-		const canvas = new WebGLOcean(node, null, null)
-		canvas.init()
+	private onReadyCanvas = (node: HTMLCanvasElement): void => {
+		if(!node) return
+		this.canvas = new WebGLOcean(node, null, null)
+		this.canvas.init()
+	}
+
+	private onReadyInfo = (node: Info): void => {
+		if(!node) return
+		this.info = node
+		this.info.events.on(Info.events.appear, () => {
+			this.canvas.onDeInitUpdate()
+		})
+
+		this.info.events.on(Info.events.disappear, () => {
+			this.canvas.onInitUpdate()
+		})
 	}
 
 	render (): ReactElement {
@@ -36,6 +51,7 @@ export default class Index extends Component<Props> {
 						height="1080"
 					></canvas>
 					<Info
+						ref={this.onReadyInfo}
 						title="ocean"
 						details={[
 							[
