@@ -1,10 +1,13 @@
 import Head from 'next/head'
 
 interface Props {
-  title: string
+  title: string,
+  ogUrl: string,
+  ogImgPath: string,
+  description: string,
 }
 
-const _Head: React.FC<Props> = ({title}) => {
+const _Head: React.FC<Props> = ({title, ogUrl, ogImgPath, description}) => {
 
   return (
     <Head>
@@ -13,12 +16,12 @@ const _Head: React.FC<Props> = ({title}) => {
       <link rel="preconnect" href="https://fonts.gstatic.com" />
 
       {/* OG */}
-      <meta property="og:url" content="https://eden.aualrxse.com/works/face" />
+      <meta property="og:url" content={ogUrl} />
       <meta property="og:type" content="website" />
-      <meta property="og:title" content="face" />
-      <meta property="og:description" content="Touch his face and he'll be happy." />
-      <meta property="og:site_name" content="face" />
-      <meta property="og:image" key="ogImage" content="https://eden.aualrxse.com/face/og.png" />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:site_name" content="eden" />
+      <meta property="og:image" key="ogImage" content={ogImgPath} />
       <meta name="twitter:card" key="twitterCard" content="summary_large_image" />
       <meta name="twitter:site" content="@aualrxse" />
     </Head>
