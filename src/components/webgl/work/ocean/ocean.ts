@@ -106,7 +106,7 @@ export default class WebGLOcean extends WebGLCanvasBase {
 		this.statue.position.setY(-(Math.abs(this.statue.position.x)) * 0.2 - 3 + noise.simplex2(this.elapsedTime/2, 1)*2)
 		if(this.statue.position.x < -this.surfaceSize.x) {
 			this.statue.position.setX(this.surfaceSize.x)
-			this.statue.position.setZ(Math.random()*400+50)
+			this.statue.position.setZ((Math.random()-0.5)*this.surfaceSize.x)
 		}
 
 		// display shader pass
