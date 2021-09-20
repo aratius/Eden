@@ -31,7 +31,7 @@ export default class Info extends Component<Props> {
 		this.fadeTween = gsap.timeline()
 		this.fadeTween.to(this.bg, {alpha: 1, duration: 0.3})
 		this.fadeTween.to(this.contents, {alpha: 1, duration: 0.3})
-		this.contents.classList.remove(styles.invisible)
+		if(this.contents.classList.contains(styles.invisible)) this.contents.classList.remove(styles.invisible)
 		this.events.emit(Info.events.appear)
 	}
 
@@ -40,7 +40,7 @@ export default class Info extends Component<Props> {
 		this.fadeTween = gsap.timeline()
 		this.fadeTween.to(this.contents, {alpha: 0, duration: 0.3})
 		this.fadeTween.to(this.bg, {alpha: 0, duration: 0.3})
-		this.contents.classList.add(styles.invisible)
+		if(!this.contents.classList.contains(styles.invisible)) this.contents.classList.add(styles.invisible)
 		this.events.emit(Info.events.disappear)
 	}
 

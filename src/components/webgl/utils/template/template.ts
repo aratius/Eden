@@ -147,6 +147,8 @@ export default abstract class WebGLCanvasBase extends Group {
 	 * Update処理開始
 	 */
 	public onInitUpdate(): void {
+		if(this.shouldUpdate) return
+
 		this.shouldUpdate = true;
 		this.onUpdate()
 	}
@@ -155,6 +157,7 @@ export default abstract class WebGLCanvasBase extends Group {
 	 * Update処理終了
 	 */
 	public onDeInitUpdate(): void {
+		if(!this.shouldUpdate) return
 		this.shouldUpdate = false;
 
 		// requestAnimationFrame止める
