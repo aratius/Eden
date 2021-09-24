@@ -1,8 +1,8 @@
 import { ShaderMaterial, Vector3 } from "three";
-import fragShader from "./shader/glowBall.frag"
-import vertShader from "./shader/glowBall.vert"
+import fragShader from "./shader/ball.frag"
+import vertShader from "./shader/ball.vert"
 
-export default class GlowBallMaterial extends ShaderMaterial {
+export default class BallMaterial extends ShaderMaterial {
 
     constructor() {
         super({

@@ -6,7 +6,7 @@ void main() {
 
     // カメラに対してリムライティング
     float intensity = 1.05 - dot(v_normal, normalize(cameraPosition - v_world_pos.xyz));
-    vec3 glowness = vec3(0.3, 0.3, 0.3) * pow(intensity, 1.5);
+    vec3 glow = vec3(0.3, 0.3, 0.3) * pow(intensity, 1.5);
 
-    gl_FragColor = vec4(glowness + vec3(0.7), 1.);
+    gl_FragColor = vec4(glow + vec3(0.5), 1.);
 }
