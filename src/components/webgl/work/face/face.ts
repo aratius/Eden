@@ -3,7 +3,7 @@ import { CameraSettings, RendererSettings } from "../../interfaces";
 import { getMeshFromGroup, loadGLTF, loadTexture, powerVector2 } from "../../utils";
 import WebGLCanvasBase from "../../utils/template/template";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { FaceMaterial } from "../../utils/material/faceMat";
+import { FaceMaterial } from "./utils/material/faceMat";
 import { CanvasSize } from "../../config/config";
 import gsap from "gsap";
 const noise = require('simplenoise')

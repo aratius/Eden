@@ -22,7 +22,7 @@ import MainScene from '../../../utils/template/scene';
 import Splash from './splash';
 import fragShader from "../../../utils/material/shader/water.frag"
 import vertShader from "../../../utils/material/shader/water.vert"
-import WaterMaterial from '../../../utils/material/WaterMat';
+import WaterMaterial from './material/WaterMat';
 
 
 /**

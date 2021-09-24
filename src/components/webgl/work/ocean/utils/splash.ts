@@ -1,6 +1,6 @@
 import { BufferGeometry, Material, Mesh, Points, PointsMaterial } from "three";
 import { loadTexture } from "../../../utils";
-import { SplashMaterial } from "../../../utils/material/splashMat";
+import { SplashMaterial } from "./material/splashMat";
 
 /**
  * 水しぶき
