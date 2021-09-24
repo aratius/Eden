@@ -3,6 +3,9 @@ import BallMaterial from "./material/ballMat";
 import GlowMaterial from "./material/glowMat";
 import GlowBallMaterial from "./material/glowMat";
 
+/**
+ * referred to https://www.youtube.com/watch?v=vM8M4QloVL0
+ */
 export default class GlowBall extends Group {
 
 	private ball: Mesh

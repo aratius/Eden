@@ -42,13 +42,14 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 	}
 
 	private initGlowBalls(): void {
-		const segment: number = 10
+		const segment: number = 15
+		const between: number = 1000/segment
 		for(let x = 0; x < segment; x++) {
 			for(let z = 0; z < segment; z++) {
-				const posX: number = (x-(segment-1)/2) * 100
-				const posZ: number = (z-(segment-1)/2) * 100
+				const posX: number = (x-(segment-1)/2) * between
+				const posZ: number = (z-(segment-1)/2) * between
 				const glowBall: GlowBall = new GlowBall()
-				glowBall.position.set(posX, 0, posZ)
+				glowBall.position.set(posX, 100, posZ)
 				glowBall.scale.set(10, 10, 10)
 				this.scene.add(glowBall)
 				this.glowBalls.push(glowBall)
@@ -57,7 +58,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 	}
 
 	private initGridHelper(): void {
-		const gridHelper: GridHelper = new GridHelper(100, 10)
+		const gridHelper: GridHelper = new GridHelper(100, 15)
 		gridHelper.scale.set(10, 10, 10)
 		this.scene.add(gridHelper)
 	}
