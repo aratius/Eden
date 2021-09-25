@@ -1,8 +1,6 @@
 import { Component, ReactElement } from 'react'
 import styles from '../../styles/layout/top/top.module.scss'
 import _Head from '../../components/next/common/head'
-import WebGLOcean from '../../components/webgl/work/ocean/ocean'
-import Info from '../../components/next/common/info'
 import RayMarching from '../../components/webgl/learning/rayMarching/rayMarching'
 
 interface Props {
@@ -11,7 +9,6 @@ interface Props {
 
 export default class Index extends Component<Props> {
 
-	private info: Info = null
 	private canvas: RayMarching = null
 
 	constructor(props: Props) {
