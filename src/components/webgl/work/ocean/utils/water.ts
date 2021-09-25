@@ -9,9 +9,6 @@ import {
 	PerspectiveCamera,
 	Plane,
 	RGBFormat,
-	ShaderMaterial,
-	UniformsLib,
-	UniformsUtils,
 	Vector3,
 	Vector4,
 	WebGLRenderTarget
@@ -20,8 +17,6 @@ import MainCamera from '../../../utils/template/camera';
 import MainRenderer from '../../../utils/template/renderer';
 import MainScene from '../../../utils/template/scene';
 import Splash from './splash';
-import fragShader from "../../../utils/material/shader/water.frag"
-import vertShader from "../../../utils/material/shader/water.vert"
 import WaterMaterial from './material/WaterMat';
 
 

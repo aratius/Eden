@@ -1,15 +1,18 @@
-import { AmbientLight, GridHelper, Vector2, Vector3 } from "three";
+import { AmbientLight, Color, GridHelper, PlaneBufferGeometry, Vector2, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template"
 import GlowBall from "./utils/glowBall";
 import Human from "./utils/human";
+import { Reflector } from "three/examples/jsm/objects/Reflector"
+import { CanvasSize } from "../../config/config";
 
 export default class WebGLTeresa extends WebGLCanvasBase {
 
    private glowBalls: GlowBall[] = []
    private human: Human = null
    private humanSpeed: Vector3 = new Vector3(1.5, 0, 2)
+   private floorMirror: Reflector = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -18,7 +21,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 
 	async _onInit(): Promise<void> {
 
-		await Promise.all([this.initGlowBalls(), this.initHuman(), this.initGridHelper()])
+		await Promise.all([this.initGlowBalls(), this.initHuman(), this.initMirror(), this.initGridHelper()])
 
 		this.camera.position.set(0, 300, 1000)
 		this.camera.lookAt(new Vector3(0,0,0))
@@ -85,6 +88,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 	private initHuman(): void {
 		this.human = new Human()
 		this.human.scale.set(10, 10, 10)
+		this.human.position.setY(10)
 		this.scene.add(this.human)
 	}
 
@@ -92,6 +96,18 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 		const gridHelper: GridHelper = new GridHelper(100, 15)
 		gridHelper.scale.set(10, 10, 10)
 		this.scene.add(gridHelper)
+	}
+
+	private initMirror(): void {
+		const floorGeo: PlaneBufferGeometry = new PlaneBufferGeometry(1000, 1000, 1, 1)
+		this.floorMirror = new Reflector(floorGeo, {
+			clipBias: 0.003,
+			textureWidth: CanvasSize.size.x,
+			textureHeight: CanvasSize.size.y,
+			color: new Color(0x889999)
+		})
+		this.floorMirror.rotateX(-Math.PI/2)
+		this.scene.add(this.floorMirror)
 	}
 
 }
