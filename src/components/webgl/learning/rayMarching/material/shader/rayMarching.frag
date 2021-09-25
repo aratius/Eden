@@ -24,7 +24,8 @@ void main () {
 	// スクリーンカラー初期化
 	vec3 color = vec3(0.);
 
-	// rayがぶつかるまでちょっとずつ前進していく
+	// rayがぶつかるまでカメラちょっとずつ前進していく
+	// rayが制限回数ループ内でぶつかれば白を描画
 	for(int i = 0; i < 99; i++) {
 		vec3 ray_position = camera_position + ray_direction;
 		float dist = sphere_distance_function(ray_position, sphere_size);
