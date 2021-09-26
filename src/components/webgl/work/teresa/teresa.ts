@@ -160,9 +160,10 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 
 	}
 
-	private initWalls(): void {
+	private async initWalls(): Promise<void> {
 		const wallGeo: PlaneBufferGeometry = new PlaneBufferGeometry(100, 100, 1, 1)
-		const wallMat: MeshPhysicalMaterial = new MeshPhysicalMaterial({color: 0x111111})
+		const wallBump: Texture = await loadTexture("/assets/images/glowBall/wallBump.jpg")
+		const wallMat: MeshPhysicalMaterial = new MeshPhysicalMaterial({color: 0x111111, bumpMap: wallBump})
 
 		const frontWall: Mesh = new Mesh(wallGeo, wallMat)
 		frontWall.rotateY(Math.PI)
