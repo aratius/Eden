@@ -1,4 +1,4 @@
-import { Group, Mesh, SphereBufferGeometry } from "three";
+import { BufferGeometry, Group, Line, LineBasicMaterial, Mesh, PointLight, SphereBufferGeometry, Vector3 } from "three";
 import BallMaterial from "./material/ballMat";
 import GlowMaterial from "./material/glowMat";
 
@@ -24,6 +24,14 @@ export default class GlowBall extends Group {
 		this.glow.scale.multiplyScalar(2)
 		this.add(this.glow)
 
+		const points: Vector3[] = [
+			new Vector3(0, 0, 0),
+			new Vector3(0, 100, 0)
+		]
+		const lineGeo: BufferGeometry = new BufferGeometry().setFromPoints(points)
+		const lineMat: LineBasicMaterial = new LineBasicMaterial({color: 0x444444, transparent: true, opacity: 0.5})
+		const line: Line = new Line(lineGeo, lineMat)
+		this.add(line)
 	}
 
 

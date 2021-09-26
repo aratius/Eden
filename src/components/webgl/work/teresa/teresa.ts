@@ -1,4 +1,4 @@
-import { AmbientLight, BackSide, Color, Fog, GridHelper, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, PlaneBufferGeometry, PointLight, Points, PointsMaterial, Texture, Vector2, Vector3 } from "three";
+import { AmbientLight, BackSide, Color, Fog, GridHelper, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, PlaneBufferGeometry, PointLight, Points, PointsMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template"
@@ -15,7 +15,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 	private human: Human = null
 	private humanSpeed: Vector3 = new Vector3(0.15, 0, 0.2)
 	private floorMirror: Reflector = null
-	private readonly segment: number = 10
+	private readonly segment: number = 15
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -33,7 +33,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 		const ambient: AmbientLight = new AmbientLight()
 		this.scene.add(ambient)
 
-		const pointLight: PointLight = new PointLight(0xffffff, 5, 100)
+		const pointLight: PointLight = new PointLight(0xffffff, 3, 100)
 		pointLight.position.setY(50)
 		this.scene.add(pointLight)
 
@@ -100,6 +100,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 				glowBall.scale.set(1, 1, 1)
 				this.scene.add(glowBall)
 				this.glowBalls.push(glowBall)
+
 			}
 		}
 	}
@@ -128,35 +129,6 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 		})
 		this.floorMirror.rotateX(-Math.PI/2)
 		this.scene.add(this.floorMirror)
-
-		// const leftMirror: Reflector = new Reflector(planeGeo, {
-		// 	clipBias: 0.003,
-		// 	textureWidth: textureSize,
-		// 	textureHeight: textureSize,
-		// 	color: new Color(0xff0000)
-		// })
-		// leftMirror.rotateY(Math.PI/2)
-		// leftMirror.position.set(-50, 50, 0)
-		// this.scene.add(leftMirror)
-
-		// const rightMirror: Reflector = new Reflector(planeGeo, {
-		// 	clipBias: 0.003,
-		// 	textureWidth: textureSize,
-		// 	textureHeight: textureSize,
-		// 	color: new Color(0xff0000)
-		// })
-		// rightMirror.rotateY(-Math.PI/2)
-		// rightMirror.position.set(50, 50, 0)
-		// this.scene.add(rightMirror)
-
-		// const backMirror: Reflector = new Reflector(planeGeo, {
-		// 	clipBias: 0.003,
-		// 	textureWidth: textureSize,
-		// 	textureHeight: textureSize,
-		// 	color: new Color(0xff0000)
-		// })
-		// backMirror.position.set(0, 50, -50)
-		// this.scene.add(backMirror)
 
 	}
 
@@ -188,6 +160,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 		topWall.rotateX(Math.PI/2)
 		topWall.position.setY(100)
 		this.scene.add(topWall)
+
 	}
 
 }
