@@ -10,7 +10,9 @@ export default class BallMaterial extends ShaderMaterial {
                 u_cam_pos: {value: new Vector3()}
             },
             fragmentShader: fragShader,
-            vertexShader: vertShader
+            vertexShader: vertShader,
+            transparent: true
+            // fog: true
         })
     }
 

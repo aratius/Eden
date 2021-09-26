@@ -13,7 +13,9 @@ export default class GlowMaterial extends ShaderMaterial {
             vertexShader: vertShader,
             transparent: true,
             blending: AdditiveBlending,
-            side: BackSide
+            side: BackSide,
+            depthTest: false
+            // fog: true
         })
     }
 
