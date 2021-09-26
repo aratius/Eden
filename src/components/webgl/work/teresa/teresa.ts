@@ -1,4 +1,4 @@
-import { AmbientLight, BackSide, Color, Fog, GridHelper, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, PlaneBufferGeometry, PointLight, Points, PointsMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
+import { AmbientLight, BackSide, Color, Fog, GridHelper, InstancedBufferAttribute, InstancedBufferGeometry, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, PlaneBufferGeometry, PointLight, Points, PointsMaterial, ShaderLib, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template"
@@ -10,7 +10,6 @@ import { loadTexture } from "../../utils";
 
 export default class WebGLTeresa extends WebGLCanvasBase {
 
-	private glowBallsPlane: Points = null
 	private glowBalls: GlowBall[] = []
 	private human: Human = null
 	private humanSpeed: Vector3 = new Vector3(0.15, 0, 0.2)
@@ -76,33 +75,51 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 		}
 	}
 
-	private async initGlowBallsPlane(): Promise<void> {
-		const segment: number = 15
-		const planeGeo: PlaneBufferGeometry = new PlaneBufferGeometry(1, 1, segment, segment)
-		const glowBallTexture: Texture = await loadTexture("/assets/images/glowBall/glowBall.png")
-		const pointMat: PointsMaterial = new PointsMaterial({size: 100, color: 0xffffff, map: glowBallTexture, transparent: true, depthTest: false})
-		this.glowBallsPlane = new Points(planeGeo, pointMat)
-		this.glowBallsPlane.scale.set(1000, 1000, 1000)
-		this.glowBallsPlane.rotateX(-Math.PI/2)
-		this.glowBallsPlane.position.setY(100)
-		this.scene.add(this.glowBallsPlane)
-	}
+	private async initGlowBalls(): Promise<void> {
+		const originSphere: SphereBufferGeometry = new SphereBufferGeometry(1, 40, 25)
+		const geo: InstancedBufferGeometry = new InstancedBufferGeometry()
 
-	private initGlowBalls(): void {
-		const segment: number = this.segment
-		const between: number = 100/segment
-		for(let x = 0; x < segment; x++) {
-			for(let z = 0; z < segment; z++) {
-				const posX: number = (x-(segment-1)/2) * between
-				const posZ: number = (z-(segment-1)/2) * between
-				const glowBall: GlowBall = new GlowBall()
-				glowBall.position.set(posX, 20, posZ)
-				glowBall.scale.set(1, 1, 1)
-				this.scene.add(glowBall)
-				this.glowBalls.push(glowBall)
+		const vertice = originSphere.attributes.position.clone()
+		geo.setAttribute("position", vertice)
 
+		const normal = originSphere.attributes.normal.clone()
+		geo.setAttribute("normals", normal)
+
+		const uv = originSphere.attributes.uv.clone()
+		geo.setAttribute("uv", uv)
+
+		const indices = originSphere.index.clone()
+		geo.setIndex(indices)
+
+		const offsetPos = new InstancedBufferAttribute(new Float32Array(this.segment**2*3), 3)
+		const num = new InstancedBufferAttribute(new Float32Array(this.segment**2*1), 1)
+
+		const between: number = 100/this.segment
+		for(let x = 0; x < this.segment; x++) {
+			for(let z = 0; z < this.segment; z++) {
+				const i: number = x * this.segment + z
+
+				const posX: number = (x-(this.segment-1)/2) * between
+				const posZ: number = (z-(this.segment-1)/2) * between
+
+				offsetPos.setXYZ(i,posX,20,posZ)
+				num.setX(i,i)
 			}
 		}
+
+		geo.setAttribute("offsetPos", offsetPos)
+		geo.setAttribute("num", num)
+
+		geo.attributes.position.needsUpdate = true
+		geo.attributes.normals.needsUpdate = true
+		geo.attributes.uv.needsUpdate = true
+		geo.attributes.offsetPos.needsUpdate = true
+		geo.attributes.num.needsUpdate = true
+
+		const obj = new GlowBall(geo)
+		this.scene.add(obj)
+		console.log(obj);
+
 	}
 
 	private initHuman(): void {

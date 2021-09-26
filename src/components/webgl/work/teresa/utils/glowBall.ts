@@ -1,4 +1,4 @@
-import { BufferGeometry, Group, Line, LineBasicMaterial, Mesh, PointLight, SphereBufferGeometry, Vector3 } from "three";
+import { BufferGeometry, Group, InstancedBufferGeometry, Line, LineBasicMaterial, Mesh, PointLight, SphereBufferGeometry, Vector3 } from "three";
 import BallMaterial from "./material/ballMat";
 import GlowMaterial from "./material/glowMat";
 
@@ -10,10 +10,8 @@ export default class GlowBall extends Group {
 	private ball: Mesh
 	private glow: Mesh
 
-	constructor() {
+	constructor(geo: InstancedBufferGeometry) {
 		super()
-
-		const geo: SphereBufferGeometry = new SphereBufferGeometry(1, 40, 25)
 
 		const ballMat: BallMaterial = new BallMaterial()
 		this.ball = new Mesh(geo, ballMat)
@@ -21,7 +19,7 @@ export default class GlowBall extends Group {
 
 		const glowMat: GlowMaterial = new GlowMaterial()
 		this.glow = new Mesh(geo, glowMat)
-		this.glow.scale.multiplyScalar(2)
+		// this.glow.scale.multiplyScalar(2)
 		this.add(this.glow)
 
 		const points: Vector3[] = [
