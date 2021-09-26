@@ -83,7 +83,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 		geo.setAttribute("position", vertice)
 
 		const normal = originSphere.attributes.normal.clone()
-		geo.setAttribute("normals", normal)
+		geo.setAttribute("normal", normal)
 
 		const uv = originSphere.attributes.uv.clone()
 		geo.setAttribute("uv", uv)
@@ -111,15 +111,13 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 		geo.setAttribute("num", num)
 
 		geo.attributes.position.needsUpdate = true
-		geo.attributes.normals.needsUpdate = true
+		geo.attributes.normal.needsUpdate = true
 		geo.attributes.uv.needsUpdate = true
 		geo.attributes.offsetPos.needsUpdate = true
 		geo.attributes.num.needsUpdate = true
 
 		const obj = new GlowBall(geo)
 		this.scene.add(obj)
-		console.log(obj);
-
 	}
 
 	private initHuman(): void {

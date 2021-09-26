@@ -7,11 +7,10 @@ export default class BallMaterial extends ShaderMaterial {
     constructor() {
         super({
             uniforms: {
-                u_cam_pos: {value: new Vector3()}
             },
             fragmentShader: fragShader,
             vertexShader: vertShader,
-            transparent: true
+            transparent: true,
             // fog: true
         })
     }

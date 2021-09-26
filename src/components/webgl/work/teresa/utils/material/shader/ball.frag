@@ -9,6 +9,5 @@ void main() {
     float intensity = 1.05 - dot(v_normal, normalize(cameraPosition - v_world_pos.xyz));
     vec3 glow = vec3(0.3, 0.3, 0.3) * pow(intensity, 1.5);
 
-    // gl_FragColor = vec4(glow + vec3(0.5), v_alpha);
-    gl_FragColor = vec4(vec3(v_normal), v_alpha);
+    gl_FragColor = vec4(glow + vec3(0.5), v_alpha);
 }
