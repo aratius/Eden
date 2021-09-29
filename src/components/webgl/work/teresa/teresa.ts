@@ -5,7 +5,6 @@ import WebGLCanvasBase from "../../utils/template/template"
 import GlowBall from "./utils/glowBall";
 import Human from "./utils/human";
 import { Reflector } from "three/examples/jsm/objects/Reflector"
-import { CanvasSize } from "../../config/config";
 import { loadTexture } from "../../utils";
 
 export default class WebGLTeresa extends WebGLCanvasBase {
@@ -14,7 +13,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 	private human: Human = null
 	private humanSpeed: Vector3 = new Vector3(0.15, 0, 0.2)
 	private floorMirror: Reflector = null
-	private readonly segment: number = 15
+	private readonly segment: number = 20
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -67,12 +66,6 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 		const maxY: number = 40  // . 最高地点
 		const minY: number = 20  // . 最低地点
 		const far: number = 30  // .. 影響範囲
-		for(const i in this.glowBalls) {
-			const p: Vector3 = this.glowBalls[i].position
-			const distToHuman: number = new Vector2(p.x, p.z).distanceTo(new Vector2(hp.x, hp.z))
-			const y: number = - (maxY/far) * distToHuman + maxY
-			this.glowBalls[i].position.setY(y < minY ? minY : y)
-		}
 	}
 
 	private async initGlowBalls(): Promise<void> {
@@ -102,7 +95,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 				const posX: number = (x-(this.segment-1)/2) * between
 				const posZ: number = (z-(this.segment-1)/2) * between
 
-				offsetPos.setXYZ(i,posX,20,posZ)
+				offsetPos.setXYZ(i,posX,50,posZ)
 				num.setX(i,i)
 			}
 		}

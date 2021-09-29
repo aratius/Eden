@@ -87,7 +87,7 @@ export default class Info extends Component<Props> {
 
 		return (
 			<>
-				<section className={styles.container} ref={this.onReadyBG} onClick={this.onClickBG}>
+				<section className={`${styles.container} ${styles.invisible}`} ref={this.onReadyBG} onClick={this.onClickBG}>
 					<article className={styles.info} ref={this.onReadyContents} onClick={this.onClickContents}>
 						<h2 className={styles.info__title}>{this.props.title}</h2>
 						<div className={styles.info__author}>

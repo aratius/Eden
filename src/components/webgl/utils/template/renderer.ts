@@ -15,14 +15,13 @@ export default class MainRenderer extends WebGLRenderer {
 		const settings = _settings != null ? _settings : MainRenderer.defaultSettings
 		super({canvas: canvas, antialias: settings.antialias})
 		this.setPixelRatio(1);
-		// this.setPixelRatio(window.devicePixelRatio);
 
 		this.setSize(settings.size.x, settings.size.y)
 		this.setClearColor(0xffffff)
 	}
 
 	public setFullScreen(): void {
-		this.setPixelRatio(window.devicePixelRatio);
+		this.setPixelRatio(1);
 		this.setSize(CanvasSize.size.x, CanvasSize.size.y)
 	}
 
