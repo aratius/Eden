@@ -27,7 +27,5 @@ void main(){
 
 	vec4 color = loading + texture;
 
-	color.rgb = vec3(step(sqrt(pow(p.x, 2.) + pow(p.y, 2.)), 0.4));
-
 	gl_FragColor = color;
 }

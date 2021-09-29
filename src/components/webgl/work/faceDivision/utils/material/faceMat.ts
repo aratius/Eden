@@ -13,7 +13,11 @@ export class FaceMaterial extends ShaderMaterial{
 					u_time: {value: 0},
 					u_emotion: {value: 0},
 					u_blink_amount: {value: 0},
-					u_tension: {value: 1}
+					u_tension: {value: 1},
+					u_joint_positions: {value: [0]},
+					u_joint_sizes: {value: [0]},
+					u_joint_length: {value: 1},
+					u_dir: {value: 1}
 				},
 				vertexShader: vertShader,
 				fragmentShader: fragShader,

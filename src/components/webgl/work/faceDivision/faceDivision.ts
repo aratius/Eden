@@ -4,6 +4,7 @@ import { getMeshFromGroup, loadGLTF, loadTexture, powerVector2 } from "../../uti
 import WebGLCanvasBase from "../../utils/template/template";
 import { FaceMaterial } from "./utils/material/faceMat";
 import gsap from "gsap";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 const noise = require('simplenoise')
 const isBrowser = typeof window !== 'undefined';
 const dat = isBrowser ? require("dat.gui") : undefined
@@ -16,10 +17,10 @@ export default class WebGLFaceDivision extends WebGLCanvasBase {
 
 	private gui: any = null  // .............................. GUI
 	private params: Parameters = null  // .................... params
-	private faceGroup1: Group = null  // ...................... 顔メッシュのグループそのもの 回転などはこれに対して行う
-	private faceGroup2: Group = null  // ...................... 顔メッシュのグループそのもの 回転などはこれに対して行う
+	private faceGroups: Group[] = []  // ...................... 顔メッシュのグループそのもの 回転などはこれに対して行う
 	private faceMesh: Mesh = null  // ........................ グループから顔メッシュを抽出して、シェーダーマテリアルを適用したりする
-	private jointPoints: Vector3[] = []
+	private faceMaterials: FaceMaterial[] = []
+	private jointPoints: number[] = []
 	private jointSizes: number[] = []
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
@@ -31,29 +32,42 @@ export default class WebGLFaceDivision extends WebGLCanvasBase {
 		}
 		this.gui = new dat.GUI()
 		this.params = new Parameters()
-		// this.gui.add(this.params, "faceX", -300, 0).onChange(() => {
-		// 	if(this.faceGroup1 != null) this.faceGroup1.position.setX(this.params.faceX)
-		// 	if(this.faceGroup2 != null) this.faceGroup2.position.setX(-this.params.faceX)
+		this.gui.add(this.params, "faceX", -300, 0).onChange(() => {
+			for(let i = 0; i < this.faceGroups.length; i++) {
+				const sign: number = i % 2 == 0 ? 1 : -1
+				this.faceGroups[i].position.setX(this.params.faceX * sign)
+			}
 
-		// })
+		})
 
 	}
 
 	async _onInit(): Promise<void> {
-		// this.renderer.setClearColor(0x000000)
+		this.renderer.setClearColor(0x000000)
 
-		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
-		// controls.update()
+		const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
+		controls.update()
 
-		// const ambient: AmbientLight = new AmbientLight()
-		// this.scene.add(ambient)
+		const ambient: AmbientLight = new AmbientLight()
+		this.scene.add(ambient)
 
-		// this.initJoint()
+		await this.initJoint()
 
-		// this.faceGroup1 = await (await this.initFace()).clone()
-		// this.faceGroup2 = await (await this.initFace()).clone()
-		// this.scene.add(this.faceGroup1, this.faceGroup2)
-		// this.endLoading()
+		for(let i = 0; i < 2; i++) {
+			const face: Group = await this.initFace()
+			this.faceGroups.push(face)
+			this.scene.add(face)
+		}
+
+		for(let i = 0; i < this.faceMaterials.length; i++) {
+			this.faceMaterials[i].uniforms.u_joint_positions.value = this.jointPoints
+			this.faceMaterials[i].uniforms.u_joint_sizes.value = this.jointSizes
+			this.faceMaterials[i].uniforms.u_joint_length.value = this.jointPoints.length
+			this.faceMaterials[i].uniforms.u_dir.value = i % 2 == 0 ? 1 : -1
+
+		}
+
+		this.endLoading()
 	}
 
 	_onDeInit(): void {}
@@ -105,6 +119,8 @@ export default class WebGLFaceDivision extends WebGLCanvasBase {
 		const faceMesh: Mesh = meshes.filter((mesh) => mesh.name == "Mesh_0")[0]
 
 		const faceMaterial: FaceMaterial = new FaceMaterial(faceTexture)
+		this.faceMaterials.push(faceMaterial)
+
 		faceMesh.material = faceMaterial
 
 		const happyGeo: BufferGeometry = getMeshFromGroup(happy).filter((mesh) => mesh.name == "Mesh_0")[0].geometry
@@ -122,23 +138,23 @@ export default class WebGLFaceDivision extends WebGLCanvasBase {
 	 * ２つの顔の繋ぎ目部分のめやすになるデータを準備
 	 */
 	private initJoint(): void {
-
-		let pointNum: number = 10
+		let pointNum: number = 20
 		for(let i = 0; i < pointNum; i++) {
-			const size: number = Math.random() * 30 + 10
+			const size: number = Math.random() * 50 + 20
 			const position: Vector3 = new Vector3(
-				(Math.random()-0.5) * 50,
+				(Math.random()-0.5) * 100,
 				(Math.random()-0.5) * 400,
-				(Math.random()-0.5) * 50
+				(Math.random()-0.5) * 100
 			)
 			const geometry: SphereGeometry = new SphereGeometry(size, 20, 10)
 			const material: MeshStandardMaterial = new MeshStandardMaterial({color: 0xff0000})
 			const mesh: Mesh = new Mesh(geometry, material)
 			mesh.position.add(position)
-			this.scene.add(mesh)
-			this.jointPoints.push(position)
+			// this.scene.add(mesh)
+			this.jointPoints.push(position.x, position.y, position.z)
 			this.jointSizes.push(size)
 		}
+
 	}
 
 }
