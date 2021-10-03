@@ -62,7 +62,7 @@ export default class Index extends Component<Props> {
 						title="kinds of cell"
 						details={[]}
 						shareText="author @aualrxse"
-						shareUrl="https://eden.aualrxse.com/works/face"
+						shareUrl="https://eden.aualrxse.com/works/cell"
 					/>
 				</div>
 			</>
