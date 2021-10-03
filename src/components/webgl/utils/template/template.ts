@@ -74,7 +74,7 @@ export default abstract class WebGLCanvasBase extends Group {
 	 * 共通の初期化処理あればここで
 	 */
 	public init(): void {
-		if(location.hostname === "localhost") document.body.appendChild(this.stats.dom)
+		// if(location.hostname === "localhost") document.body.appendChild(this.stats.dom)
 
 		this.startTime = new Date().getTime() / 1000
 

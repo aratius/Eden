@@ -1,4 +1,4 @@
-import { Mesh, MeshBasicMaterial, Quaternion, SphereBufferGeometry, Vector3 } from "three";
+import { Mesh, MeshBasicMaterial, Quaternion, SphereBufferGeometry, Vector3, Vector2 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
@@ -17,10 +17,13 @@ export default class WebGLDotAnimation extends WebGLCanvasBase {
 	async _onInit(): Promise<void> {
 
 		this.renderer.setClearColor(0x000000)
-		this.camera.position.set(0,0,0)
+		this.camera.position.set(0,0,0.1)
 
-		// const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
-		// controls.update()
+		const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
+		controls.enableDamping = true
+		controls.rotateSpeed = 0.2
+		controls.enableZoom = false
+		controls.update()
 
 		await Promise.all([this.initSphere()])
 
@@ -48,7 +51,7 @@ export default class WebGLDotAnimation extends WebGLCanvasBase {
 	private initSphere(): void {
 		const geo: SphereBufferGeometry = new SphereBufferGeometry(10, 100, 50)
 		for(const i in fragShaders) {
-				this.sphereMaterials.push(new BigSphereMaterial(i))
+				this.sphereMaterials.push(new BigSphereMaterial(i, new Vector2(100, 50)))
 		}
 		this.sphere = new Mesh(geo, this.sphereMaterials[this.materialIndex])
 		this.scene.add(this.sphere)

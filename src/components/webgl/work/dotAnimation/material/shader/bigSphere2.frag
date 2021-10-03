@@ -1,8 +1,7 @@
 varying vec2 v_uv;
 uniform float u_time;
+uniform vec2 u_segments;
 
-const float x_segment = 100.;
-const float y_segment = 50.;
 
 float random (in vec2 st) {
     return fract(sin(dot(st.xy,
@@ -23,6 +22,8 @@ float noise(vec2 st) {
 }
 
 void main() {
+    float x_segment = u_segments.x;
+    float y_segment = u_segments.y;
 
     vec2 p = v_uv * vec2(x_segment, y_segment) +  + vec2(-u_time, 0.);
     vec2 mod_p = vec2(mod(p.x, 1.), mod(p.y, 1.));

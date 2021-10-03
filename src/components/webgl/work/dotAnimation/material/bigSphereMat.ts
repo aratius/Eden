@@ -1,4 +1,4 @@
-import { BackSide, ShaderMaterial } from "three";
+import { BackSide, ShaderMaterial, Vector2 } from "three";
 import vertShader from "./shader/bigSphere.vert"
 import fragShader from "./shader/bigSphere.frag"
 import fragShader1 from "./shader/bigSphere1.frag"
@@ -31,10 +31,11 @@ export const fragShaders = [
 export default class BigSphereMaterial extends ShaderMaterial {
 
 
-	constructor(i: number) {
+	constructor(i: number, segments: Vector2) {
 		super({
 			uniforms: {
 				u_time: {value: 0},
+				u_segments: {value: segments}
 			},
 			vertexShader: vertShader,
 			fragmentShader: fragShaders[i],
