@@ -50,7 +50,7 @@ export default class WebGLDotAnimation extends WebGLCanvasBase {
 
 	private initSphere(): void {
 		const geo: SphereBufferGeometry = new SphereBufferGeometry(10, 100, 50)
-		for(const i in fragShaders) {
+		for(let i = 0; i < fragShaders.length; i++) {
 				this.sphereMaterials.push(new BigSphereMaterial(i, new Vector2(100, 50)))
 		}
 		this.sphere = new Mesh(geo, this.sphereMaterials[this.materialIndex])
