@@ -48,9 +48,7 @@ void main() {
         )*4.+2.;  // 2 ~ 6
     color.rgb += vec3(length(mod_p-vec2(0.5, 0.5)) * radius_mul);
 
-    color.r = floor(color.r*6.)/6.;
-    color.b = floor(color.b*3.)/3.;
-    color.g = floor(color.g*2.)/2.;
+    color.rgb = floor(color.rgb*3.)/3.;
 
     gl_FragColor = color;
 }

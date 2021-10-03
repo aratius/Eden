@@ -2,11 +2,13 @@ import { Mesh, MeshBasicMaterial, Quaternion, SphereBufferGeometry, Vector3 } fr
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
-import BigSphereMaterial from "./material/bigSphereMat";
+import BigSphereMaterial, { fragShaders } from "./material/bigSphereMat";
 
 export default class WebGLDotAnimation extends WebGLCanvasBase {
 
 	private sphere: Mesh = null
+	private sphereMaterials: BigSphereMaterial[] = []
+	private materialIndex: number = 6
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -22,6 +24,12 @@ export default class WebGLDotAnimation extends WebGLCanvasBase {
 
 		await Promise.all([this.initSphere()])
 
+		setInterval(() => {
+			this.sphere.material = this.sphereMaterials[this.materialIndex]
+			this.materialIndex ++
+			if(this.materialIndex >= this.sphereMaterials.length) this.materialIndex = 0
+		}, 3000)
+
 		this.endLoading()
 	}
 
@@ -34,13 +42,15 @@ export default class WebGLDotAnimation extends WebGLCanvasBase {
 	}
 
 	_onUpdate(): void {
-		this.camera.rotation.y += 0.002
+		(<BigSphereMaterial>this.sphere.material).uniforms.u_time.value = this.elapsedTime
 	}
 
 	private initSphere(): void {
 		const geo: SphereBufferGeometry = new SphereBufferGeometry(10, 100, 50)
-		const mat: BigSphereMaterial = new BigSphereMaterial()
-		this.sphere = new Mesh(geo, mat)
+		for(const i in fragShaders) {
+				this.sphereMaterials.push(new BigSphereMaterial(i))
+		}
+		this.sphere = new Mesh(geo, this.sphereMaterials[this.materialIndex])
 		this.scene.add(this.sphere)
 	}
 
