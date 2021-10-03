@@ -59,7 +59,7 @@ export default class Index extends Component<Props> {
 					></canvas>
 					<Info
 						ref={this.onReadyInfo}
-						title="face"
+						title="dot"
 						details={[]}
 						shareText="author @aualrxse"
 						shareUrl="https://eden.aualrxse.com/works/face"
