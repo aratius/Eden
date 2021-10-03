@@ -2,7 +2,7 @@ import { Component, ReactElement } from 'react'
 import styles from '../../styles/layout/top/top.module.scss'
 import _Head from '../../components/next/common/head'
 import Info from '../../components/next/common/info'
-import WebGLDotAnimation from '../../components/webgl/work/dotAnimation/dotAnimation'
+import WebGLDotAnimation from '../../components/webgl/work/cell/dotAnimation'
 
 interface Props {
 
@@ -59,7 +59,7 @@ export default class Index extends Component<Props> {
 					></canvas>
 					<Info
 						ref={this.onReadyInfo}
-						title="dot"
+						title="kinds of cell"
 						details={[]}
 						shareText="author @aualrxse"
 						shareUrl="https://eden.aualrxse.com/works/face"

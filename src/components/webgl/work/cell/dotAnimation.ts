@@ -21,7 +21,7 @@ export default class WebGLDotAnimation extends WebGLCanvasBase {
 
 		const controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement)
 		controls.enableDamping = true
-		controls.rotateSpeed = 0.2
+		controls.rotateSpeed = 0.3
 		controls.enableZoom = false
 		controls.update()
 
