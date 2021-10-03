@@ -2,7 +2,7 @@ import { Component, ReactElement } from 'react'
 import styles from '../../styles/layout/top/top.module.scss'
 import _Head from '../../components/next/common/head'
 import Info from '../../components/next/common/info'
-import WebGLDotAnimation from '../../components/webgl/work/cell/dotAnimation'
+import WebGLCellAnimation from '../../components/webgl/work/cell/cell'
 
 interface Props {
 
@@ -10,7 +10,7 @@ interface Props {
 
 export default class Index extends Component<Props> {
 
-	private canvas: WebGLDotAnimation = null
+	private canvas: WebGLCellAnimation = null
 	private info: Info = null
 
 
@@ -24,7 +24,7 @@ export default class Index extends Component<Props> {
 	 */
 	private onReadyCanvas = (node: HTMLCanvasElement) => {
 		if(node == null) return
-		this.canvas = new WebGLDotAnimation(node, null, null)
+		this.canvas = new WebGLCellAnimation(node, null, null)
 		this.canvas.init()
 	}
 

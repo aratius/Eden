@@ -4,7 +4,7 @@ import { CameraSettings, RendererSettings } from "../../interfaces";
 import WebGLCanvasBase from "../../utils/template/template";
 import BigSphereMaterial, { fragShaders } from "./material/bigSphereMat";
 
-export default class WebGLDotAnimation extends WebGLCanvasBase {
+export default class WebGLCellAnimation extends WebGLCanvasBase {
 
 	private sphere: Mesh = null
 	private sphereMaterials: BigSphereMaterial[] = []
