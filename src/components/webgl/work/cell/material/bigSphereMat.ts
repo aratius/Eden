@@ -39,7 +39,8 @@ export default class BigSphereMaterial extends ShaderMaterial {
 			},
 			vertexShader: vertShader,
 			fragmentShader: fragShaders[i],
-			side: BackSide
+			side: BackSide,
+			transparent: true
 		})
 		this.uniformsNeedUpdate = true
 	}
