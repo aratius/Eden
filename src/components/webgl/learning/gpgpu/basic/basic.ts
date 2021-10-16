@@ -7,7 +7,7 @@ import computeShaderPosition from "./material/shader/computeShaderPosition.frag"
 
 export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 
-	private readonly size: Vector2 = new Vector2(500, 500)
+	private readonly size: Vector2 = new Vector2(100, 100)
 	private readonly particleNum: number = this.size.x * this.size.y
 	private particlePlane: Points = null
 	private gpuCompute: GPUComputationRenderer = new GPUComputationRenderer(this.size.x, this.size.y, this.renderer)
@@ -56,7 +56,7 @@ export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 		for(let k = 0, kl = posArray.length; k < kl; k+=4) {
 			let x, y, z
 			x = Math.random() * 500 - 250
-			y = 0
+			y = Math.random() * 500 - 250
 			z = Math.random() * 500 - 250
 
 			// posArrayの形式=一次元配列に変換
