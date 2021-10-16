@@ -4,14 +4,16 @@ import WebGLCanvasBase from "../../../utils/template/template";
 import ParticlePlaneMaterial from "./material/particlePlaneMat";
 import { GPUComputationRenderer, Variable } from "three/examples/jsm/misc/GPUComputationRenderer"
 import computeShaderPosition from "./material/shader/computeShaderPosition.frag"
+import computeShaderVelocity from "./material/shader/computeShaderVelocity.frag"
 
 export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 
-	private readonly size: Vector2 = new Vector2(100, 100)
+	private readonly size: Vector2 = new Vector2(500, 500)
 	private readonly particleNum: number = this.size.x * this.size.y
 	private particlePlane: Points = null
 	private gpuCompute: GPUComputationRenderer = new GPUComputationRenderer(this.size.x, this.size.y, this.renderer)
 	private positionVariable: Variable = null
+	private velocityVariable: Variable = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -40,7 +42,8 @@ export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 		// 計算
 		this.gpuCompute.compute();
 
-		(<ParticlePlaneMaterial>this.particlePlane.material).uniforms.u_texture_position.value = this.gpuCompute.getCurrentRenderTarget(this.positionVariable).texture
+		// pointsの頂点シェーダーに頂点位置計算テクスチャを渡す (速度テクスチャは位置計算テクスチャの中で消費されているのでここでは使用する必要なし)
+		(<ParticlePlaneMaterial>this.particlePlane.material).uniforms.u_texture_position.value = (<any>this.gpuCompute.getCurrentRenderTarget(this.positionVariable)).texture
 
 	}
 
@@ -49,9 +52,10 @@ export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 	 * NOTE: 最初の一回だけ？
 	 * @param texturePosition
 	 */
-	private fillTexture(texturePosition: DataTexture): void {
+	private fillTexture(texturePosition: DataTexture, textureVelocity: DataTexture): void {
 		// テクスチャのイメージデータを一旦取り出す
 		const posArray: Uint8ClampedArray = texturePosition.image.data
+		const velArray: Uint8ClampedArray = textureVelocity.image.data
 
 		for(let k = 0, kl = posArray.length; k < kl; k+=4) {
 			let x, y, z
@@ -65,6 +69,13 @@ export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 			posArray[k+2] = z
 			posArray[k+3] = 0
 
+			// 移動する方向はとりあえずランダムに決めてみる。
+			// これでランダムな方向にとぶパーティクルが出来上がるはず。
+			velArray[ k + 0 ] = Math.random()*2-1;
+			velArray[ k + 1 ] = Math.random()*2-1;
+			velArray[ k + 2 ] = Math.random()*2-1;
+			velArray[ k + 3 ] = Math.random()*2-1;
+
 		}
 	}
 
@@ -75,13 +86,17 @@ export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 
 		// 移動方向を保存するテクスチャ
 		const dtPosition: DataTexture = this.gpuCompute.createTexture()
-		this.fillTexture(dtPosition)
+		const dtVelocity: DataTexture = this.gpuCompute.createTexture()
+
+		this.fillTexture(dtPosition, dtVelocity)
 
 		// shaderプログラムのアタッチ
 		this.positionVariable = this.gpuCompute.addVariable("texturePosition", computeShaderPosition, dtPosition)
+		this.velocityVariable = this.gpuCompute.addVariable("textureVelocity", computeShaderPosition, dtVelocity)
 
-		// 関係性を構築する
-		this.gpuCompute.setVariableDependencies(this.positionVariable, [this.positionVariable])
+		// 依存関係を構築する 依存し指定した変数はシェーダー内から参照可能
+		this.gpuCompute.setVariableDependencies(this.positionVariable, [this.positionVariable, this.velocityVariable])
+		this.gpuCompute.setVariableDependencies(this.velocityVariable, [this.velocityVariable, this.positionVariable])
 
 		this.gpuCompute.init()
 	}

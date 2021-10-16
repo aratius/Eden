@@ -3,8 +3,6 @@ uniform sampler2D u_texture_position;
 varying vec2 v_uv;
 uniform float radius;
 
-
-
 void main() {
     vec4 pos_tmp = texture2D( u_texture_position, uv );
     vec3 pos = pos_tmp.xyz;

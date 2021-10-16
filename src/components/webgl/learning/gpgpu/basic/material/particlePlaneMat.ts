@@ -8,7 +8,7 @@ export default class ParticlePlaneMaterial extends ShaderMaterial {
     super({
       uniforms: {
         u_resolution: {value: new Vector2(1,1)},
-        u_texture_position: {value: new Texture()}
+        u_texture_position: {value: new Texture()},
       },
       fragmentShader: fragShader,
       vertexShader: vertShader
