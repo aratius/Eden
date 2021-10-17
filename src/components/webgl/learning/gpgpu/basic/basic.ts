@@ -23,7 +23,6 @@ export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 	_onInit(): void {
 		this.renderer.setClearColor(0x000000)
 
-		// this.initParticle()
 		this.initComputationRenderer()
 		this.initParticle()
 
@@ -39,12 +38,14 @@ export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 	}
 
 	_onUpdate(): void {
+		this.velocityVariable.material.uniforms.u_time = {value: this.elapsedTime}
+		this.velocityVariable.material.uniforms.u_mouse_position = {value: this.mouse.basedCenterPosition}
+
 		// 計算
 		this.gpuCompute.compute();
 
 		// pointsの頂点シェーダーに頂点位置計算テクスチャを渡す (速度テクスチャは位置計算テクスチャの中で消費されているのでここでは使用する必要なし)
 		(<ParticlePlaneMaterial>this.particlePlane.material).uniforms.u_texture_position.value = (<any>this.gpuCompute.getCurrentRenderTarget(this.positionVariable)).texture
-
 	}
 
 	/**
@@ -59,9 +60,9 @@ export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 
 		for(let k = 0, kl = posArray.length; k < kl; k+=4) {
 			let x, y, z
-			x = Math.random() * 500 - 250
-			y = Math.random() * 500 - 250
-			z = Math.random() * 500 - 250
+			x = Math.sin(Math.random() * 10) * 300
+			y = Math.cos(Math.random() * 10) * 300
+			z = Math.sin(Math.random() * 10) * 300
 
 			// posArrayの形式=一次元配列に変換
 			posArray[k+0] = x
@@ -71,10 +72,10 @@ export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 
 			// 移動する方向はとりあえずランダムに決めてみる。
 			// これでランダムな方向にとぶパーティクルが出来上がるはず。
-			velArray[ k + 0 ] = Math.random()*2-1;
-			velArray[ k + 1 ] = Math.random()*2-1;
-			velArray[ k + 2 ] = Math.random()*2-1;
-			velArray[ k + 3 ] = Math.random()*2-1;
+			velArray[ k + 0 ] = 0;
+			velArray[ k + 1 ] = 0;
+			velArray[ k + 2 ] = 0;
+			velArray[ k + 3 ] = 0;
 
 		}
 	}
@@ -92,7 +93,7 @@ export default class WebGLGPGPUBasic extends WebGLCanvasBase {
 
 		// shaderプログラムのアタッチ
 		this.positionVariable = this.gpuCompute.addVariable("texturePosition", computeShaderPosition, dtPosition)
-		this.velocityVariable = this.gpuCompute.addVariable("textureVelocity", computeShaderPosition, dtVelocity)
+		this.velocityVariable = this.gpuCompute.addVariable("textureVelocity", computeShaderVelocity, dtVelocity)
 
 		// 依存関係を構築する 依存し指定した変数はシェーダー内から参照可能
 		this.gpuCompute.setVariableDependencies(this.positionVariable, [this.positionVariable, this.velocityVariable])
