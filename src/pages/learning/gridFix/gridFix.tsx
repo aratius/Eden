@@ -1,7 +1,7 @@
 import { Component, ReactElement } from 'react'
 import styles from '../../../styles/layout/top/top.module.scss'
 import _Head from '../../../components/next/common/head'
-import WebGLGPGPUBasic from '../../../components/webgl/learning/gpgpu/basic/basic'
+import WebGLGridFix from '../../../components/webgl/learning/gridFix/gridFix'
 
 interface Props {
 
@@ -9,7 +9,7 @@ interface Props {
 
 export default class Index extends Component<Props> {
 
-	private canvas: WebGLGPGPUBasic = null
+	private canvas: WebGLGridFix = null
 
 	constructor(props: Props) {
 		super(props)
@@ -21,7 +21,7 @@ export default class Index extends Component<Props> {
 	 */
 	private onReadyCanvas = (node: HTMLCanvasElement): void => {
 		if(!node) return
-		this.canvas = new WebGLGPGPUBasic(node, null, null)
+		this.canvas = new WebGLGridFix(node, null, null)
 		this.canvas.init()
 	}
 

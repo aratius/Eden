@@ -186,6 +186,7 @@ export default abstract class WebGLCanvasBase extends Group {
 	 */
 	public update(): void {
 		this.stats.begin()
+		this.composer.render()
 		this._onUpdate()
 		this.group2d.update()
 		// this.renderer.render(this.scene, this.camera)
