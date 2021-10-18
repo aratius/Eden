@@ -48,13 +48,13 @@ export default class Info extends Component<Props> {
 		if(!node) return
 		this.bg = node
 		gsap.set(this.bg, {alpha: 0})
+		this.bg.classList.add(styles.invisible)
 	}
 
 	private onReadyContents = (node: HTMLElement): void => {
 		if(!node) return
 		this.contents = node
 		gsap.set(this.contents, {alpha: 0})
-		this.contents.classList.add(styles.invisible)
 	}
 
 	/**

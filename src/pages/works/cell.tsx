@@ -43,9 +43,9 @@ export default class Index extends Component<Props> {
 		return (
 			<>
 				<_Head
-					title="dotAnimation"
-					ogUrl="https://eden.aualrxse.com/works/dotAnimation"
-					ogImgPath="https://eden.aualrxse.com/og/face/og.png"
+					title="kinds of cell"
+					ogUrl="https://eden.aualrxse.com/works/cell"
+					ogImgPath="https://eden.aualrxse.com/og/cell/og.png"
 					description=""
 				></_Head>
 				<div className={styles.container}>
@@ -62,7 +62,7 @@ export default class Index extends Component<Props> {
 						title="kinds of cell"
 						details={[]}
 						shareText="author @aualrxse"
-						shareUrl="https://eden.aualrxse.com/works/face"
+						shareUrl="https://eden.aualrxse.com/works/cell"
 					/>
 				</div>
 			</>
