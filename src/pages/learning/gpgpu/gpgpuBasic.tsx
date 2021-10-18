@@ -28,12 +28,12 @@ export default class Index extends Component<Props> {
 	render (): ReactElement {
 		return (
 			<>
-                <_Head
+                {/* <_Head
                     title="gpgpu"
                     ogUrl="https://eden.aualrxse.com/learning/gpgpu/basic"
                     ogImgPath="https://eden.aualrxse.com/og/ocean/og.png"
                     description=""
-                ></_Head>
+                ></_Head> */}
 				<div className={styles.container}>
 					<canvas
 						className={styles.canvas}
