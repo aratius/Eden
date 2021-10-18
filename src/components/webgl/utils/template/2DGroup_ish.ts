@@ -16,9 +16,7 @@ export default class Group2D_ish extends Group {
 	}
 
 	/**
-	 * カメラからみて正面にある座標を変換してを返す
-	 * 2Dっぽく写すための
-	 * ここの計算きれいにしたい
+	 * NOTE: Vec3 positions got from raycast at decided distance
 	 */
 	 private get getPositionBasedOnCamera(): Vector3 {
 		// カメラの位置, 回転角, 基本のperspectiveをみて位置決定
@@ -39,7 +37,7 @@ export default class Group2D_ish extends Group {
 	}
 
 	/**
-	 * カメラに正対するオイラー角
+	 * NOTE: Euler angles to face to face camera
 	 * @returns
 	 */
 	private get getRotationBasedOnCamera(): Euler {
@@ -47,7 +45,7 @@ export default class Group2D_ish extends Group {
 	}
 
 	/**
-	 * Groupの座標を更新
+	 * NOTE: update group position to act like 2d screen
 	 */
 	public update(): void {
 		const pos: Vector3 = this.getPositionBasedOnCamera

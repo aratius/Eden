@@ -1,6 +1,8 @@
-import { AmbientLight, DirectionalLight, GridHelper, LineBasicMaterial, Mesh, MeshBasicMaterial, MeshStandardMaterial, SphereGeometry } from "three";
+import { AmbientLight, DirectionalLight, GridHelper, LineBasicMaterial, Mesh, MeshBasicMaterial, MeshStandardMaterial, Scene, SphereGeometry } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CameraSettings, RendererSettings } from "../../interfaces";
+import Group2D_ish from "../../utils/template/2DGroup_ish";
+import MainScene from "../../utils/template/scene";
 import WebGLCanvasBase from "../../utils/template/template";
 
 /**
@@ -12,8 +14,17 @@ import WebGLCanvasBase from "../../utils/template/template";
  */
 export default class WebGLGridFix extends WebGLCanvasBase {
 
+  // prepare another scene to render foreground
+  private foreGroundScene: Scene = new MainScene()
+  // this group act like 2d screen (process inside)
+  private foreGroundGroup2d: Group2D_ish = new Group2D_ish(this.camera)
+
   constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
     super(canvas, renderer, camera)
+
+    this.foreGroundScene.add(this.foreGroundGroup2d)
+    // if u want to render two scenes at the same frame, u should write this
+    this.renderer.autoClear = false
   }
 
   _onInit(): void {
@@ -44,7 +55,10 @@ export default class WebGLGridFix extends WebGLCanvasBase {
   }
 
   _onUpdate(): void {
-
+    // NOTE: "ground2d.update()" processes to keep distance between group2d and camera, and keep rotation to face to face camera
+    this.foreGroundGroup2d.update()
+    this.renderer.clearDepth()
+    this.renderer.render(this.foreGroundScene, this.camera)
   }
 
   private initGridHelper(): void {
@@ -54,7 +68,7 @@ export default class WebGLGridFix extends WebGLCanvasBase {
 
 		gridHelper.scale.set(Math.max(window.innerWidth, window.innerHeight), Math.max(window.innerWidth, window.innerHeight), Math.max(window.innerWidth, window.innerHeight))
     gridHelper.rotateX(Math.PI/2)
-		this.group2d.add(gridHelper)
+		this.foreGroundGroup2d.add(gridHelper)
 
   }
 
