@@ -55,9 +55,9 @@ export default class WebGLMorphBasic extends WebGLCanvasBase {
 
 	private morphingLoop(): void {
 		const tl: GSAPTimeline = gsap.timeline({repeat: -1})
-		tl.to(this.sphere.material.uniforms.u_morph_amount, {value: 0, duration: 1})
-		tl.to(this.sphere.material.uniforms.u_morph_amount, {value: 1, duration: 1})
-		tl.to(this.sphere.material.uniforms.u_morph_amount, {value: 0, duration: 1})
+		tl.to((<MorphSphereMaterial>this.sphere.material).uniforms.u_morph_amount, {value: 0, duration: 1})
+		tl.to((<MorphSphereMaterial>this.sphere.material).uniforms.u_morph_amount, {value: 1, duration: 1})
+		tl.to((<MorphSphereMaterial>this.sphere.material).uniforms.u_morph_amount, {value: 0, duration: 1})
 	}
 
 	private async initSphere(): Promise<void> {
@@ -73,11 +73,11 @@ export default class WebGLMorphBasic extends WebGLCanvasBase {
 		// 空のGeometryの箱
 		const geo: BufferGeometry = new BufferGeometry()
 		// GLBから頂点情報だけを抜き出してBufferGeometryのattributeにセット vert shader内で attributeとして使える
-		console.log(models[0].children[0].geometry.attributes.position.array);
+		console.log((<Mesh>models[0].children[0]).geometry.attributes.position.array);
 
-		geo.setAttribute("position_before", new BufferAttribute(models[0].children[0].geometry.attributes.position.array, 3))
-		geo.setAttribute("position_after", new BufferAttribute(models[1].children[0].geometry.attributes.position.array, 3))
-		geo.setIndex(models[0].children[0].geometry.index)
+		geo.setAttribute("position_before", new BufferAttribute((<Mesh>models[0].children[0]).geometry.attributes.position.array, 3))
+		geo.setAttribute("position_after", new BufferAttribute((<Mesh>models[1].children[0]).geometry.attributes.position.array, 3))
+		geo.setIndex((<Mesh>models[0].children[0]).geometry.index)
 
 		const mat: MorphSphereMaterial = new MorphSphereMaterial()
 
