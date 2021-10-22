@@ -1,5 +1,6 @@
 import { AmbientLight, DirectionalLight, GridHelper, LineBasicMaterial, Mesh, MeshBasicMaterial, MeshStandardMaterial, Scene, SphereGeometry } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { CameraSettings, RendererSettings } from "../../interfaces";
 import Group2D_ish from "../../utils/template/2DGroup_ish";
 import MainScene from "../../utils/template/scene";
