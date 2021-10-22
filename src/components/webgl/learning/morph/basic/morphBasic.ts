@@ -10,11 +10,7 @@ import WebGLCanvasBase from "../../../utils/template/template";
 import MorphSphereMaterial from "./material/morphSphereMat";
 
 /**
- * [read here Gandhi (Sorry for my bad English)]
- * 3d objects can zoom in out, and 2d objects is fixed by the scene camera
- * group2d is extend a Group class and it updates to fix position facing to camera and hold distance decided at first
- * if u want to fix grid to foreground, i think u need to add Scene to add only grid, and do render process in order to 3d -> 2d(have grid)
- * code group2d is see here "src/components/webgl/utils/template/2DGroup_ish.ts"
+ *
  */
 export default class WebGLMorphBasic extends WebGLCanvasBase {
 
