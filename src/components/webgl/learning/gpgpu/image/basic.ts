@@ -4,6 +4,7 @@ import WebGLCanvasBase from "../../../utils/template/template";
 import ParticlePlaneMaterial from "./material/particlePlaneMat";
 import { GPUComputationRenderer, Variable } from "three/examples/jsm/misc/GPUComputationRenderer"
 import computeShaderPosition from "./material/shader/computeShaderPosition.frag"
+import computeShaderVelocity from "./material/shader/computeShaderVelocity.frag"
 import { loadTexture } from "../../../utils";
 
 export default class WebGLGPGPUImage extends WebGLCanvasBase {
@@ -13,6 +14,7 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 	private particlePlane: Points = null
 	private gpuCompute: GPUComputationRenderer = new GPUComputationRenderer(this.size.x, this.size.y, this.renderer)
 	private positionVariable: Variable = null
+	private velocityVariable: Variable = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -37,6 +39,8 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 	}
 
 	_onUpdate(): void {
+		this.velocityVariable.material.uniforms.u_time = {value: this.elapsedTime}
+		this.velocityVariable.material.uniforms.u_mouse_position = {value: this.mouse.basedCenterPosition}
 
 		// 計算
 		this.gpuCompute.compute();
@@ -54,6 +58,7 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 	private fillTexture(texturePosition: DataTexture, textureVelocity: DataTexture): void {
 		// テクスチャのイメージデータを一旦取り出す
 		const posArray: Uint8ClampedArray = texturePosition.image.data
+		const velArray: Uint8ClampedArray = textureVelocity.image.data
 
 		for(let k = 0, kl = posArray.length; k < kl; k+=4) {
 			let x, y, z
@@ -69,6 +74,12 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 			posArray[k+2] = 0
 			posArray[k+3] = 0
 
+			// 移動する方向はとりあえずランダムに決めてみる。
+			// これでランダムな方向にとぶパーティクルが出来上がるはず。
+			velArray[ k + 0 ] = 0;
+			velArray[ k + 1 ] = 0;
+			velArray[ k + 2 ] = 0;
+			velArray[ k + 3 ] = 0;
 		}
 	}
 
@@ -85,9 +96,11 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 
 		// shaderプログラムのアタッチ
 		this.positionVariable = this.gpuCompute.addVariable("texturePosition", computeShaderPosition, dtPosition)
+		this.velocityVariable = this.gpuCompute.addVariable("textureVelocity", computeShaderVelocity, dtVelocity)
 
 		// 依存関係を構築する 依存し指定した変数はシェーダー内から参照可能
-		this.gpuCompute.setVariableDependencies(this.positionVariable, [this.positionVariable])
+		this.gpuCompute.setVariableDependencies(this.positionVariable, [this.positionVariable, this.velocityVariable])
+		this.gpuCompute.setVariableDependencies(this.velocityVariable, [this.positionVariable, this.velocityVariable])
 
 		this.gpuCompute.init()
 
