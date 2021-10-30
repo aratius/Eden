@@ -1,16 +1,15 @@
 import { Component, ReactElement } from 'react'
 import styles from '../../../styles/layout/top/top.module.scss'
 import _Head from '../../../components/next/common/head'
-import Info from '../../../components/next/common/info'
-import WebGLTextureMapping from '../../../components/webgl/learning/texture/textureMapping/textureMapping'
+import WebGLFluid from '../../../components/webgl/learning/texture/fluid/fluid'
 
 interface Props {
 
 }
 
-export default class Index extends Component<Props> {
+export default class Fluid extends Component<Props> {
 
-	private canvas: WebGLTextureMapping = null
+	private canvas: WebGLFluid = null
 
 	constructor(props: Props) {
 		super(props)
@@ -22,7 +21,7 @@ export default class Index extends Component<Props> {
 	 */
 	private onReadyCanvas = (node: HTMLCanvasElement) => {
 		if(node == null) return
-		this.canvas = new WebGLTextureMapping(node, null, null)
+		this.canvas = new WebGLFluid(node, null, null)
 		this.canvas.init()
 	}
 

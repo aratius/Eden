@@ -1,9 +1,9 @@
 import { DoubleSide, MeshBasicMaterial, PlaneBufferGeometry, Texture, Vector2 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { CameraSettings, RendererSettings } from "../../interfaces";
-import { loadTexture } from "../../utils";
-import Plane2D_ish from "../../utils/object/2DPlane_ish";
-import WebGLCanvasBase from "../../utils/template/template";
+import { CameraSettings, RendererSettings } from "../../../interfaces";
+import { loadTexture } from "../../../utils";
+import Plane2D_ish from "../../../utils/object/2DPlane_ish";
+import WebGLCanvasBase from "../../../utils/template/template";
 import PlaneMaterial from "./material/planeMat";
 
 export default class WebGLTextureMapping extends WebGLCanvasBase {
