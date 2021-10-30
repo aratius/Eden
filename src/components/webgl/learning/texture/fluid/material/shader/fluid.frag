@@ -11,11 +11,8 @@ float ease_in_out_quad(float x) {
   }
 }
 
-float ease_in_back(float x) {
-  float c1 = 1.70158;
-  float c3 = c1 + 1.;
-
-  return c3 * x * x * x - c1 * x * x;
+float ease_in_cubic(float x) {
+  return pow(x, 3.);
 }
 
 void main() {
@@ -24,12 +21,12 @@ void main() {
 
   float dist = length(u_mouse_pos - pos);
 
-  float touch_threshold = length(u_mouse_speed) / 500.;
+  float touch_threshold = length(u_mouse_speed) / 100.;
 
   if(dist < touch_threshold && touch_threshold < 0.5) {
     float normScale = 1./touch_threshold;
     float dist = (1. - dist*normScale);
-    pos += ease_in_back(dist)/(normScale) * u_mouse_speed/100.;
+    pos += ease_in_cubic(dist)/(normScale) * u_mouse_speed/100.;
   }
 
   vec4 tex = texture2D(u_texture_last_frame, pos);
