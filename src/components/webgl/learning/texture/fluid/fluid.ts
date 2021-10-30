@@ -65,8 +65,10 @@ export default class WebGLFluid extends WebGLCanvasBase {
       // planeの上で0-1のマウス座標
       const normalizedMousePositionBasedCenter: Vector2 = this.mouse.basedCenterPosition.clone().divideScalar(this.rtPlane1.scale.x).addScalar(0.5);
       (<FluidMaterial>this.rtPlane1.material).uniforms.u_mouse_pos.value = normalizedMousePositionBasedCenter;
-      (<FluidMaterial>this.rtPlane1.material).uniforms.u_mouse_speed.value = this.mouse.clone().sub(this.lastMousePos);
+      (<FluidMaterial>this.rtPlane1.material).uniforms.u_mouse_speed.value = this.mouse.clone().sub(this.lastMousePos).multiply(new Vector2(-1, 1));
     }
+
+    const tex: Texture = new Texture()
 
     // まずrt1のテクスチャをrt2に移す
     if(this.rtPlane1 != null && this.rtPlane2 != null) {
@@ -98,6 +100,9 @@ export default class WebGLFluid extends WebGLCanvasBase {
     this.rtTarget2.texture.needsUpdate = true
   }
 
+  /**
+   *
+   */
   private async createRtPlane(): Promise<void> {
     const geo: PlaneBufferGeometry = new PlaneBufferGeometry(1, 1, 10, 10)
     const initialTexture: Texture = await loadTexture("/assets/images/gpgpu/face.png")
