@@ -1,8 +1,8 @@
 import { Component, ReactElement } from 'react'
-import styles from '../../styles/layout/top/top.module.scss'
-import _Head from '../../components/next/common/head'
-import Info from '../../components/next/common/info'
-import WebGLTextureMapping from '../../components/webgl/learning/textureMapping/textureMapping'
+import styles from '../../../styles/layout/top/top.module.scss'
+import _Head from '../../../components/next/common/head'
+import Info from '../../../components/next/common/info'
+import WebGLTextureMapping from '../../../components/webgl/learning/texture/textureMapping'
 
 interface Props {
 
