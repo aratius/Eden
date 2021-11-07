@@ -1,12 +1,11 @@
-import { MathUtils, PlaneBufferGeometry, RepeatWrapping, Texture, Vector2, Vector3 } from "three";
+import { DoubleSide, MathUtils, PlaneBufferGeometry, RepeatWrapping, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../../interfaces";
 import { loadTexture } from "../../../utils";
 import WebGLCanvasBase from "../../../utils/template/template";
 import Water from "./utils/water"
 import { Sky } from "three/examples/jsm/objects/Sky"
 import EffectController from "./utils/effectController";
-const isBrowser = typeof window !== 'undefined';
-const dat = isBrowser ? require("dat.gui") : undefined
+import gsap from "gsap"
 
 export default class WebGLDepth_0 extends WebGLCanvasBase {
 
@@ -14,6 +13,7 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 	private sky: Sky = null
 	private sun: Vector3 = null
 	private readonly surfaceSize: Vector2 = new Vector2(1000, 1000)
+	private cameraTween: GSAPTimeline = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -25,6 +25,8 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 		this.initWater()
 		this.initSky()
 		this.endLoading()
+
+		setTimeout(() => this.fall(), 1000)
 	}
 	_onDeInit(): void {}
 	_onResize(): void {}
@@ -32,14 +34,19 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 		if(this.water != null) {
 			(<any>this.water.material).uniforms.time.value = this.elapsedTime;
 		}
+	}
 
+	private fall(): void {
+		if(this.cameraTween != null) this.cameraTween.kill()
+		this.cameraTween = gsap.timeline()
+		this.cameraTween.to(this.camera.position, {y: -3, duration: 2, ease: "back.inOut"})
 	}
 
 	private initSky() {
 
 		// Add Sky
 		this.sky = new Sky();
-		this.sky.scale.setScalar( 450000 );
+		this.sky.scale.setScalar( 45000 );
 		this.scene.add( this.sky );
 
 		this.sun = new Vector3();
@@ -72,8 +79,9 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 				sunColor: 0xffffff,
 				waterColor: 0x001e0f,
 				distortionScale: 3.7,
-				fog: this.scene.fog !== undefined
-			}
+				fog: this.scene.fog !== undefined,
+				side: DoubleSide
+			},
 		)
 		this.water.rotation.x = - Math.PI / 2
 		this.scene.add(this.water)
