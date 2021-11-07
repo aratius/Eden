@@ -31,6 +31,11 @@ export default class WebGLFluid extends WebGLCanvasBase {
   private rtScene2: MainScene = new MainScene()
   private rtCamera2: OrthographicCamera = new OrthographicCamera(-300, 300, 300, -300)
 
+  private mousePos: Vector2 = new Vector2(0, 0)
+  private mouseSpeed: Vector2 = new Vector2(0, 0)
+  private mousePosTween: GSAPTween = null
+  private mouseSpeedTween: GSAPTween = null
+
   constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
     super(canvas, renderer, camera)
   }
@@ -64,8 +69,15 @@ export default class WebGLFluid extends WebGLCanvasBase {
     if(this.rtPlane1 != null && this.rtPlane2 != null) {
       // planeの上で0-1のマウス座標
       const normalizedMousePositionBasedCenter: Vector2 = this.mouse.basedCenterPosition.clone().divideScalar(this.rtPlane1.scale.x).addScalar(0.5);
-      (<FluidMaterial>this.rtPlane1.material).uniforms.u_mouse_pos.value = normalizedMousePositionBasedCenter;
-      (<FluidMaterial>this.rtPlane1.material).uniforms.u_mouse_speed.value = this.mouse.clone().sub(this.lastMousePos).multiply(new Vector2(-1, 1));
+      if(this.mousePosTween != null) this.mousePosTween.kill()
+      this.mousePosTween = gsap.to(this.mousePos, {x: normalizedMousePositionBasedCenter.x, y: normalizedMousePositionBasedCenter.y, duration: 0.1, onUpdate: () => {
+        (<FluidMaterial>this.rtPlane1.material).uniforms.u_mouse_pos.value = this.mousePos;
+      }});
+      const mouseSpeed: Vector2 = this.mouse.clone().sub(this.lastMousePos).multiply(new Vector2(-1, 1));
+      if(this.mouseSpeedTween != null) this.mouseSpeedTween.kill()
+      this.mouseSpeedTween = gsap.to(this.mouseSpeed, {x: mouseSpeed.x, y: mouseSpeed.y, duration: 0.1, onUpdate: () => {
+        (<FluidMaterial>this.rtPlane1.material).uniforms.u_mouse_speed.value = this.mouseSpeed
+      }})
     }
 
     const tex: Texture = new Texture()
