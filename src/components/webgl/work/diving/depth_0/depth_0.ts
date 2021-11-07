@@ -1,34 +1,62 @@
-import { PlaneBufferGeometry, RepeatWrapping, Texture, Vector2, Vector3 } from "three";
+import { MathUtils, PlaneBufferGeometry, RepeatWrapping, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../../interfaces";
 import { loadTexture } from "../../../utils";
 import WebGLCanvasBase from "../../../utils/template/template";
 import Water from "./utils/water"
+import { Sky } from "three/examples/jsm/objects/Sky"
+import EffectController from "./utils/effectController";
+const isBrowser = typeof window !== 'undefined';
+const dat = isBrowser ? require("dat.gui") : undefined
 
 export default class WebGLDepth_0 extends WebGLCanvasBase {
 
-  private water: Water = null
+	private water: Water = null
+	private sky: Sky = null
+	private sun: Vector3 = null
 	private readonly surfaceSize: Vector2 = new Vector2(1000, 1000)
 
-  constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
-    super(canvas, renderer, camera)
-  }
+	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
+		super(canvas, renderer, camera)
+	}
 
-  _onInit(): void {
+	_onInit(): void {
 		this.camera.position.set(0, 3, 0)
 
-    this.initWater()
-    this.endLoading()
-  }
-  _onDeInit(): void {}
-  _onResize(): void {}
-  _onUpdate(): void {
-    if(this.water != null) {
-      (<any>this.water.material).uniforms.time.value = this.elapsedTime;
-    }
+		this.initWater()
+		this.initSky()
+		this.endLoading()
+	}
+	_onDeInit(): void {}
+	_onResize(): void {}
+	_onUpdate(): void {
+		if(this.water != null) {
+			(<any>this.water.material).uniforms.time.value = this.elapsedTime;
+		}
 
-  }
+	}
 
-  private async initWater(): Promise<void> {
+	private initSky() {
+
+		// Add Sky
+		this.sky = new Sky();
+		this.sky.scale.setScalar( 450000 );
+		this.scene.add( this.sky );
+
+		this.sun = new Vector3();
+
+		new EffectController(this.sky, this.sun, this.renderer, {
+			turbidity: 1.5,
+			rayleigh: 0.339,
+			mieCoefficient: 0.004,
+			mieDirectionalG: 0.128,
+			elevation: 3.7,
+			azimuth: 180,
+			exposure: this.renderer.toneMappingExposure
+		})
+
+	}
+
+	private async initWater(): Promise<void> {
 		const waterGeometry: PlaneBufferGeometry = new PlaneBufferGeometry(this.surfaceSize.x, this.surfaceSize.y, 500, 500)
 		const waterNormals: Texture = await loadTexture("/assets/images/ocean/Water_1_M_Normal.jpg")
 
