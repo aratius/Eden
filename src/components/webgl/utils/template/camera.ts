@@ -14,7 +14,7 @@ export default class MainCamera extends PerspectiveCamera {
 		return {
 			fov: (180 * (2 * Math.atan(CanvasSize.size.y / 2 / perspective))) / Math.PI,
 			aspect: CanvasSize.size.x / CanvasSize.size.y,
-			near: 1,
+			near: 0.001,
 			far: 2000,
 			pos: new Vector3(0, 0, perspective)
 		}
