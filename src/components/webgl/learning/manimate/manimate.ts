@@ -25,22 +25,22 @@ export default class WebGLMAnimate extends WebGLCanvasBase {
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
-		this.renderer.setClearColor("black")
+		// this.renderer.setClearColor("black")
 
 		this.group2d.add(this.animation1)
 	}
 
-  async _onInit() {
+	async _onInit() {
 
-	await this.animation1.init()
-	this.animation1.set(basePositions)
+		await this.animation1.init()
+		this.animation1.set(basePositions)
 
-	setTimeout(() => {
-		this.doAnimation()
-	}, 1000)
+		setTimeout(() => {
+			this.doAnimation()
+		}, 1000)
 
-	this.endLoading()
-}
+		this.endLoading()
+	}
 
 	doAnimation() {
 

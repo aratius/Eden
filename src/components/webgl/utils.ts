@@ -159,6 +159,18 @@ export class Easing {
 		}
 	}
 
+	static easeInExpo: EasingFn = (x: number) => {
+		return x === 0  ? 0 : Math.pow(2, 10 * x - 10)
+	}
+
+	static easeOutQuad: EasingFn = (x: number) => {
+		return 1 - (1 - x) * (1 - x)
+	}
+
+	static easeOutExpo: EasingFn = (x: number) => {
+		return x == 1 ? 1 : 1 - Math.pow(2, -10*x)
+	}
+
 	static linear: EasingFn = (x: number) => {
 		return x
 	}

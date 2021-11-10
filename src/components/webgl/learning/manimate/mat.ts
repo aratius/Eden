@@ -73,7 +73,7 @@ export default class MyMat extends ShaderMaterial {
                     } else if (u_anim_type == 3.) {
                         vec2 r = vec2(1419., 892.);
                         vec2 p = (gl_FragCoord.xy * 2.0 - r) / min(r.x, r.y);
-                        float back_l = 1./(length(p+vec2(0.5, 0.4)) * 5.);
+                        float back_l = 1./(length(p+vec2(0.18, -0.43)) * 7.);
                         back_l *= (1. - u_appear);
 
                         vec4 tex = texture2D(u_tex, v_uv);
