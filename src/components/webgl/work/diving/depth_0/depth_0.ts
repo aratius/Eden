@@ -1,4 +1,4 @@
-import { DoubleSide, MathUtils, PlaneBufferGeometry, RepeatWrapping, Texture, Vector2, Vector3 } from "three";
+import { BackSide, BoxGeometry, Color, DoubleSide, MathUtils, Mesh, MeshBasicMaterial, PlaneBufferGeometry, RepeatWrapping, SphereGeometry, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../../interfaces";
 import { loadTexture } from "../../../utils";
 import WebGLCanvasBase from "../../../utils/template/template";
@@ -6,27 +6,34 @@ import Water from "./utils/water"
 import { Sky } from "three/examples/jsm/objects/Sky"
 import EffectController from "./utils/effectController";
 import gsap from "gsap"
+import Bubbles from "./utils/bubbles";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 export default class WebGLDepth_0 extends WebGLCanvasBase {
 
 	private water: Water = null
 	private sky: Sky = null
 	private sun: Vector3 = null
+	private bubbles: Bubbles = null
 	private readonly surfaceSize: Vector2 = new Vector2(1000, 1000)
 	private cameraTween: GSAPTimeline = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
+
+		new OrbitControls(this.camera, this.renderer.domElement)
 	}
 
 	_onInit(): void {
-		this.camera.position.set(0, 3, 0)
+		this.camera.position.set(0, 3, 10)
 
 		this.initWater()
 		this.initSky()
+		this.initUnderWater()
+		this.initBubbles()
 		this.endLoading()
 
-		setTimeout(() => this.fall(), 1000)
+		setTimeout(() => this.fall(), 2000)
 	}
 	_onDeInit(): void {}
 	_onResize(): void {}
@@ -34,12 +41,18 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 		if(this.water != null) {
 			(<any>this.water.material).uniforms.time.value = this.elapsedTime;
 		}
+		if(this.bubbles != null) {
+			// (<BubbelMaterial>this.bubbles.material).uniforms.u_time.value = this.elapsedTime;
+			// (<BubbelMaterial>this.bubbles.material).needsUpdate = true
+		}
 	}
 
 	private fall(): void {
 		if(this.cameraTween != null) this.cameraTween.kill()
 		this.cameraTween = gsap.timeline()
-		this.cameraTween.to(this.camera.position, {y: -3, duration: 2, ease: "back.inOut"})
+		this.cameraTween.to(this.camera.position, {y: -3, duration: 2, ease: "circ.in"}, 0)
+		this.cameraTween.to(this.camera.position, {z: 0, duration: 2, ease: "circ.in"}, 0)
+		this.cameraTween.to(this.camera.rotation, {x: -Math.PI/2, duration: 2, ease: "circ.in"}, 0)
 	}
 
 	private initSky() {
@@ -88,6 +101,25 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 
 		const waterUniforms = (<any>this.water.material).uniforms
 		waterUniforms.size.value = 10
+	}
+
+	private initUnderWater(): void {
+		const geo: SphereGeometry = new SphereGeometry(1, 10, 5, 0, Math.PI)
+		const mat: MeshBasicMaterial = new MeshBasicMaterial({color: new Color(0,0, 0.1), transparent: true, opacity: 0.9, side: BackSide})
+		const mesh: Mesh = new Mesh(geo, mat)
+		mesh.position.setY(-4)
+		mesh.scale.set(1000, 1000, 1000)
+		mesh.rotateX(Math.PI/2)
+		this.scene.add(mesh)
+	}
+
+	private initBubbles(): void {
+
+		const [geo, mat] = Bubbles.create()
+
+		const bubbles = new Bubbles(geo, mat)
+		bubbles.position.set(0, -4, 0)
+		this.scene.add(bubbles)
 	}
 
 }
