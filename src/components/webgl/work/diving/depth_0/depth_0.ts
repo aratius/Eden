@@ -8,13 +8,15 @@ import EffectController from "./utils/effectController";
 import gsap from "gsap"
 import Bubbles from "./utils/bubbles";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { displayShader } from "./utils/material/displayShader";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 
 export default class WebGLDepth_0 extends WebGLCanvasBase {
 
 	private water: Water = null
 	private sky: Sky = null
 	private sun: Vector3 = null
-	private bubbles: Bubbles = null
 	private readonly surfaceSize: Vector2 = new Vector2(1000, 1000)
 	private cameraTween: GSAPTimeline = null
 
@@ -30,20 +32,17 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 		this.initWater()
 		this.initSky()
 		this.initUnderWater()
-		this.initBubbles()
 		this.endLoading()
 
-		setTimeout(() => this.fall(), 2000)
+		this.composer.addPass(new ShaderPass(displayShader))
+
+		// setTimeout(() => this.fall(), 2000)
 	}
 	_onDeInit(): void {}
 	_onResize(): void {}
 	_onUpdate(): void {
 		if(this.water != null) {
 			(<any>this.water.material).uniforms.time.value = this.elapsedTime;
-		}
-		if(this.bubbles != null) {
-			// (<BubbelMaterial>this.bubbles.material).uniforms.u_time.value = this.elapsedTime;
-			// (<BubbelMaterial>this.bubbles.material).needsUpdate = true
 		}
 	}
 
@@ -111,15 +110,6 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 		mesh.scale.set(1000, 1000, 1000)
 		mesh.rotateX(Math.PI/2)
 		this.scene.add(mesh)
-	}
-
-	private initBubbles(): void {
-
-		const [geo, mat] = Bubbles.create()
-
-		const bubbles = new Bubbles(geo, mat)
-		bubbles.position.set(0, -4, 0)
-		this.scene.add(bubbles)
 	}
 
 }

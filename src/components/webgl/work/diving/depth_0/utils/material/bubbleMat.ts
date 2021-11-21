@@ -72,7 +72,7 @@ class Shader {
 			// ノイズでモニョモニョさせる
 			float freq = .6;
 			modelPos.xyz += normalize(position) * noise(vec2(p.x*10. + u_time, p.z*10.+index/10.) * vec2(freq)) * 0.5;
-			float floating_pow = mod(u_time + index/100., 1.);
+			float floating_pow = mod(u_time*2.*(sin(index*3.)+1.2) + index/100., 1.);
 			modelPos.y -= floating_pow * 5.;
 
 			// ワールド座標

@@ -4,11 +4,9 @@ import WebGLCanvasBase from "../../utils/template/template";
 import Water from "./utils/water";
 import { Sky } from "three/examples/jsm/objects/Sky"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { exportJSON, getEulerFromAtoB, getRandomPositions, loadGLTF, loadTexture } from "../../utils";
+import { loadGLTF, loadTexture } from "../../utils";
 import Splash from "./utils/splash";
 import splashAttr from "../../../../../public/assets/json/splash.json"
-import cloudPosition from "../../../../../public/assets/json/cloudPosition.json"
-import fogPosition from "../../../../../public/assets/json/fogPos.json"
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { displayShader } from "../../utils/material/displayShader";
 import gsap from "gsap";

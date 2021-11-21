@@ -9,7 +9,7 @@ export default class Bubbles extends Mesh {
 
   public static create(): [InstancedBufferGeometry, BubbleMaterial] {
     const mat: BubbleMaterial = new BubbleMaterial()
-    const originGeo: SphereBufferGeometry = new SphereBufferGeometry(0.03, 20, 12)
+    const originGeo: SphereBufferGeometry = new SphereBufferGeometry(0.02, 20, 12)
 
     const instances: number = 500
 
