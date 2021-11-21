@@ -46,6 +46,7 @@ class Shader {
       // 近接セルを考える
       for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++) {
+          // 自身(i_pos)の近隣
           vec2 neighbor = vec2(float(x), float(y));
 
           vec2 point = random2(i_pos + neighbor);
@@ -53,8 +54,8 @@ class Shader {
           // animate
           point = 0.5 + 0.5*sin(u_time + 6.2831*point);
 
+          // ここがよくわからん
           vec2 diff = neighbor + point - f_pos;
-
           float dist = length(diff);
 
           min_dist = min(min_dist, dist);
