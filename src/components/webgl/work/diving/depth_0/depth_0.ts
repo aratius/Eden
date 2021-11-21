@@ -22,7 +22,6 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
-		new OrbitControls(this.camera, this.renderer.domElement)
 	}
 
 	_onInit(): void {

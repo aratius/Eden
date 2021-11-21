@@ -23,8 +23,10 @@ void main() {
 	vec3 pos = position;
 	// 波打つ
 	float end = min(max(-10. * length(uv-vec2(0.5)) + 4., 0.), 1.);
-	pos.z += (sin(pos.x*0.3+time*speed)*wave_h +
-		sin(pos.y*0.1+time*speed)*wave_h * fit_0_1(((100.-distFromCenter)/100.))) * end;
+	pos.z += (
+		sin(pos.x*0.3+time*speed)*wave_h +
+		sin(pos.y*0.1+time*speed)*wave_h * fit_0_1((100.-distFromCenter)/100.)
+	) * end;
 	vec4 mvPosition =  modelViewMatrix * vec4( pos, 1.0 );
 	gl_Position = projectionMatrix * mvPosition;
 #include <beginnormal_vertex>
