@@ -27,15 +27,16 @@ class Shader {
 
     void main() {
       vec2 pos = v_uv;
+      pos = pos * 2. - 1.;
 
       vec4 color = vec4(0., 0., 0., 1.);
 
       vec2 points[5];
-      points[0] = vec2(sin(u_time), cos(u_time)) /2. + 0.5;
+      points[0] = vec2(sin(u_time), cos(u_time));
       points[1] = vec2(0., 0.2);
-      points[2] = vec2(0.4, 0.9);
-      points[3] = vec2(0.9, 0.3);
-      points[4] = vec2(0.9, 0.8);
+      points[2] = vec2(-0.4, 0.9);
+      points[3] = vec2(0.9, -0.3);
+      points[4] = vec2(0.9, -0.8);
 
       // 最短距離を記憶
       float min_dist = 1.;
