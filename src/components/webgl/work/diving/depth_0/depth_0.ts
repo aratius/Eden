@@ -33,6 +33,7 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 
 		this.composer.addPass(new ShaderPass(displayShader))
 
+		this.fall()
 	}
 	_onDeInit(): void {}
 	_onResize(): void {}
