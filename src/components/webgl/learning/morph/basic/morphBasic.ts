@@ -68,7 +68,6 @@ export default class WebGLMorphBasic extends WebGLCanvasBase {
 			loadGLTF(modelBeforeSrc),
 			loadGLTF(modelAfterSrc)
 		])
-		console.log(models);
 
 		// 空のGeometryの箱
 		const geo: BufferGeometry = new BufferGeometry()
@@ -77,6 +76,7 @@ export default class WebGLMorphBasic extends WebGLCanvasBase {
 
 		geo.setAttribute("position_before", new BufferAttribute((<Mesh>models[0].children[0]).geometry.attributes.position.array, 3))
 		geo.setAttribute("position_after", new BufferAttribute((<Mesh>models[1].children[0]).geometry.attributes.position.array, 3))
+		geo.setAttribute("normal", new BufferAttribute((<Mesh>models[1].children[0]).geometry.attributes.normal.array, 3))
 		geo.setIndex((<Mesh>models[0].children[0]).geometry.index)
 
 		const mat: MorphSphereMaterial = new MorphSphereMaterial()

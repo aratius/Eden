@@ -79,7 +79,7 @@ export default abstract class WebGLCanvasBase extends Group {
 		this.startTime = new Date().getTime() / 1000
 
 		this.loadingShaderPass = new ShaderPass(loadingShader)
-		this.composer.addPass(this.loadingShaderPass)
+		// this.composer.addPass(this.loadingShaderPass)
 
 		this._onInit()
 		this.onResize()
