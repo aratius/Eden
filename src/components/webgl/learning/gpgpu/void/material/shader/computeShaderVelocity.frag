@@ -1,4 +1,4 @@
-uniform float u_time;
+uniform float u_size;
 // 移動方向についていろいろ計算できるシェーダー。
 // 今回はなにもしてない。
 // ここでVelのx y zについて情報を上書きすると、それに応じて移動方向が変わる
