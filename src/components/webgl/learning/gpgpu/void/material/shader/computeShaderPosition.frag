@@ -10,5 +10,20 @@ void main() {
 
     // 移動する方向に速度を掛け合わせた数値を現在地に加える。
     pos += vel * delta;
+
+    float end = 300.;
+    if(pos.x > end) {
+        pos.x = -end;
+    }
+    if(pos.x < -end) {
+        pos.x = end;
+    }
+    if(pos.y > end) {
+        pos.y = -end;
+    }
+    if(pos.y < -end) {
+        pos.y = end;
+    }
+
     gl_FragColor = vec4( pos, 1.0 );
 }

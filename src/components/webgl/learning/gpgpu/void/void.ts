@@ -6,6 +6,7 @@ import { GPUComputationRenderer, Variable } from "three/examples/jsm/misc/GPUCom
 import computeShaderPosition from "./material/shader/computeShaderPosition.frag"
 import computeShaderVelocity from "./material/shader/computeShaderVelocity.frag"
 import { isModuleNamespaceObject } from "util/types";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 
@@ -19,6 +20,7 @@ export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
 
+		new OrbitControls(this.camera, this.renderer.domElement)
 	}
 
 	_onInit(): void {
@@ -73,9 +75,9 @@ export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 
 			// 移動する方向はとりあえずランダムに決めてみる。
 			// これでランダムな方向にとぶパーティクルが出来上がるはず。
-			velArray[ k + 0 ] = 0;
-			velArray[ k + 1 ] = 0;
-			velArray[ k + 2 ] = 0;
+			velArray[ k + 0 ] = (Math.random()-0.5) * 100;
+			velArray[ k + 1 ] = (Math.random()-0.5) * 100;
+			velArray[ k + 2 ] = (Math.random()-0.5) * 100;
 			velArray[ k + 3 ] = 0;
 
 		}
@@ -137,7 +139,7 @@ export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 		this.particlePlane.matrixAutoUpdate = false
 		this.particlePlane.updateMatrix()
 
-		this.group2d.add(this.particlePlane)
+		this.scene.add(this.particlePlane)
 	}
 
 }
