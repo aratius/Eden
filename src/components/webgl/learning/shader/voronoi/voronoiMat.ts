@@ -50,7 +50,8 @@ class Shader {
 
           vec2 point = random2(i_pos + neighbor);
 
-          // TODO: animate
+          // animate
+          point = 0.5 + 0.5*sin(u_time + 6.2831*point);
 
           vec2 diff = neighbor + point - f_pos;
 
