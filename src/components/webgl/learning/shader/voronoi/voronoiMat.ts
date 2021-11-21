@@ -35,7 +35,9 @@ class Shader {
       pos *= 3.;
 
       // タイルスペース
+      // 各セルごと一様な値
       vec2 i_pos = floor(pos);
+      // 各セル内の0-1座標
       vec2 f_pos = fract(pos);
 
       vec4 color = vec4(0., 0., 0., 1.);
@@ -43,10 +45,10 @@ class Shader {
       // 最短距離を記憶
       float min_dist = 1.;
 
-      // 近接セルを考える
+      // 近接セルを考える 0 = 自分？
       for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++) {
-          // 自身(i_pos)の近隣
+          // 自身(i_pos)の近隣 自分のときもある
           vec2 neighbor = vec2(float(x), float(y));
 
           vec2 point = random2(i_pos + neighbor);
@@ -55,7 +57,10 @@ class Shader {
           point = 0.5 + 0.5*sin(u_time + 6.2831*point);
 
           // ここがよくわからん
-          vec2 diff = neighbor + point - f_pos;
+          // neighbor = 最短を探す際のハンデ（なので正） いっこ隣にずれたとしても最短なら最短にしてあげるイメージ
+          // point = 点の位置
+          // f_pos = セル内の座標 point - f_posが基本の距離
+          vec2 diff = neighbor + (point - f_pos);  // ハンデ + 距離
           float dist = length(diff);
 
           min_dist = min(min_dist, dist);
