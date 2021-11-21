@@ -1,5 +1,3 @@
-import { Texture, Vector2 } from "three";
-
 interface DisplayShader {
 	uniforms: {
 		[key: string]: {

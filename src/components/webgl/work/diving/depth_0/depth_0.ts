@@ -22,7 +22,6 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
-
 		new OrbitControls(this.camera, this.renderer.domElement)
 	}
 
@@ -31,12 +30,10 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 
 		this.initWater()
 		this.initSky()
-		this.initUnderWater()
 		this.endLoading()
 
 		this.composer.addPass(new ShaderPass(displayShader))
 
-		// setTimeout(() => this.fall(), 2000)
 	}
 	_onDeInit(): void {}
 	_onResize(): void {}
@@ -100,16 +97,6 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 
 		const waterUniforms = (<any>this.water.material).uniforms
 		waterUniforms.size.value = 10
-	}
-
-	private initUnderWater(): void {
-		const geo: SphereGeometry = new SphereGeometry(1, 10, 5, 0, Math.PI)
-		const mat: MeshBasicMaterial = new MeshBasicMaterial({color: new Color(0,0, 0.1), transparent: true, opacity: 0.9, side: BackSide})
-		const mesh: Mesh = new Mesh(geo, mat)
-		mesh.position.setY(-4)
-		mesh.scale.set(1000, 1000, 1000)
-		mesh.rotateX(Math.PI/2)
-		this.scene.add(mesh)
 	}
 
 }
