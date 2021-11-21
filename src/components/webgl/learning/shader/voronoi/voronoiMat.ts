@@ -25,32 +25,44 @@ class Shader {
 
     const vec2 r = vec2(500., 500.);
 
+    vec2 random2( vec2 p ) {
+      return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
+  }
+
     void main() {
       vec2 pos = v_uv;
       pos = pos * 2. - 1.;
+      pos *= 3.;
+
+      // タイルスペース
+      vec2 i_pos = floor(pos);
+      vec2 f_pos = fract(pos);
 
       vec4 color = vec4(0., 0., 0., 1.);
-
-      vec2 points[5];
-      points[0] = vec2(sin(u_time), cos(u_time));
-      points[1] = vec2(0., 0.2);
-      points[2] = vec2(-0.4, 0.9);
-      points[3] = vec2(0.9, -0.3);
-      points[4] = vec2(0.9, -0.8);
 
       // 最短距離を記憶
       float min_dist = 1.;
 
-      for(int i = 0; i < 5; i++) {
-        // 各ピクセルから一番近いpositionをさがす
-        float dist = distance(pos, points[i]);
-        // 最短距離を更新
-        min_dist = min(min_dist, dist);
+      // 近接セルを考える
+      for(int y = -1; y <= 1; y++) {
+        for(int x = -1; x <= 1; x++) {
+          vec2 neighbor = vec2(float(x), float(y));
+
+          vec2 point = random2(i_pos + neighbor);
+
+          // TODO: animate
+
+          vec2 diff = neighbor + point - f_pos;
+
+          float dist = length(diff);
+
+          min_dist = min(min_dist, dist);
+        }
       }
 
       color += min_dist;
 
-      // color = vec4(vec3(pos.y), 1.);
+      // color = vec4(vec3(f_pos, 1.), 1.);
 
       gl_FragColor = color;
     }
