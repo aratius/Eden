@@ -16,6 +16,7 @@ export default class WebGLDepth_10 extends WebGLCanvasBase {
 	_onInit(): void {
 		this.initSeaBox()
 		this.initGodRay()
+
 		this.endLoading()
 	}
 
@@ -31,6 +32,9 @@ export default class WebGLDepth_10 extends WebGLCanvasBase {
 		if(this.seaBox != null) {
 			(<SeaBoxMaterial>this.seaBox.material).uniforms.u_time.value = this.elapsedTime
 		}
+		if(this.godRay != null) {
+			(<GodRayMaterial>this.godRay.material).uniforms.u_time.value = this.elapsedTime
+		}
 	}
 
 	private initSeaBox(): void {
@@ -45,7 +49,7 @@ export default class WebGLDepth_10 extends WebGLCanvasBase {
 
 	private initGodRay(): void {
 
-		const geo: ConeBufferGeometry = new ConeBufferGeometry(100, 300, 30)
+		const geo: ConeBufferGeometry = new ConeBufferGeometry(500, 1500, 30)
 		const mat: GodRayMaterial = new GodRayMaterial()
 
 		this.godRay = new Mesh(geo, mat)

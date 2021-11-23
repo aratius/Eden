@@ -1,4 +1,4 @@
-import { BackSide, Color, ShaderMaterial } from "three";
+import { BackSide, Color, DoubleSide, ShaderMaterial } from "three";
 import ShaderUtils, { frag, fragType, vert, vertType } from "../../../../utils/material/shaderUtils";
 
 export default class GodRayMaterial extends ShaderMaterial {
@@ -8,7 +8,7 @@ export default class GodRayMaterial extends ShaderMaterial {
 			vertexShader: Shader.vert,
 			fragmentShader: Shader.frag,
 			transparent: true,
-			side: BackSide,
+			side: DoubleSide,
 			uniforms: {
 				u_time: {value: 0},
 			}
@@ -40,7 +40,10 @@ class Shader {
 		${ShaderUtils.func.noise}
 
 		void main() {
-			vec4 color = vec4(1., 1., 0., 1.);
+			vec4 color = vec4(0.);
+
+			color.rgb += noise(vec2(v_uv.x+u_time/10.)*10.) * 5.;
+			color.a += noise(vec2(v_uv.x+u_time/10.)*10.) * 0.3;
 
 			gl_FragColor = color;
 		}
