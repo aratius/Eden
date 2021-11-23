@@ -15,8 +15,6 @@ export default class GodRayMaterial extends ShaderMaterial {
 		})
 	}
 
-
-
 }
 
 class Shader {
@@ -43,7 +41,7 @@ class Shader {
 			vec4 color = vec4(0.);
 
 			color.rgb += noise(vec2(v_uv.x, u_time/10.)*10.) * 5.;
-			color.a += noise(vec2(v_uv.x, u_time/10.)*10.) * 0.1;
+			color.a += noise(vec2(v_uv.x, u_time/10.)*10.) * 0.05;
 
 			// uv座標がバチッと変わる0, 1付近のみちょっと消す
 			color.a *= min(v_uv.x*50., 1.);
@@ -51,7 +49,6 @@ class Shader {
 
 			gl_FragColor = color;
 		}
-
 	`
 
 }

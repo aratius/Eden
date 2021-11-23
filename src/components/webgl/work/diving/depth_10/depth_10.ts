@@ -53,6 +53,7 @@ export default class WebGLDepth_10 extends WebGLCanvasBase {
 		const mat: GodRayMaterial = new GodRayMaterial()
 
 		this.godRay = new Mesh(geo, mat)
+		this.godRay.rotateZ(Math.PI/20)
 		this.scene.add(this.godRay)
 	}
 
