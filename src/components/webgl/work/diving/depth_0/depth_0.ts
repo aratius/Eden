@@ -46,11 +46,11 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 
 	private fall(): void {
 		if(this.cameraTween != null) this.cameraTween.kill()
-		this.cameraTween = gsap.timeline()
+		this.cameraTween = gsap.timeline({yoyo: true, repeat: -1})
 		this.cameraTween.to(this.camera.position, {y: -3, duration: 2, ease: "circ.in"}, 0)
 		this.cameraTween.to(this.camera.position, {z: 0, duration: 2, ease: "circ.in"}, 0)
 		this.cameraTween.to(this.camera.rotation, {x: -Math.PI/2, duration: 2, ease: "circ.in"}, 0)
-		this.cameraTween.to(this.effectController.effects, {rayleigh: 0, mieCoefficient: 0, duration: 2, ease: "sine.out", onUpdate: () => this.effectController.onChangedParams()}, 0)
+		this.cameraTween.to(this.effectController.effects, {rayleigh: 0, mieCoefficient: 0, duration: 2, ease: "sine.inOut", onUpdate: () => this.effectController.onChangedParams()}, 0)
 	}
 
 	private initSky() {
