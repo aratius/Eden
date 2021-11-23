@@ -1,11 +1,13 @@
-import { BackSide, BoxBufferGeometry, Mesh, MeshBasicMaterial, SphereBufferGeometry } from "three";
+import { BackSide, BoxBufferGeometry, ConeBufferGeometry, Mesh, MeshBasicMaterial, SphereBufferGeometry } from "three";
 import { CameraSettings, RendererSettings } from "../../../interfaces";
 import WebGLCanvasBase from "../../../utils/template/template";
+import GodRayMaterial from "./utils/godRayMat";
 import SeaBoxMaterial from "./utils/seaBoxMat";
 
 export default class WebGLDepth_10 extends WebGLCanvasBase {
 
 	private seaBox: Mesh = null
+	private godRay: Mesh = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -13,6 +15,7 @@ export default class WebGLDepth_10 extends WebGLCanvasBase {
 
 	_onInit(): void {
 		this.initSeaBox()
+		this.initGodRay()
 		this.endLoading()
 	}
 
@@ -38,6 +41,15 @@ export default class WebGLDepth_10 extends WebGLCanvasBase {
 		this.seaBox = new Mesh(geo, mat)
 		this.scene.add(this.seaBox)
 
+	}
+
+	private initGodRay(): void {
+
+		const geo: ConeBufferGeometry = new ConeBufferGeometry(100, 300, 30)
+		const mat: GodRayMaterial = new GodRayMaterial()
+
+		this.godRay = new Mesh(geo, mat)
+		this.scene.add(this.godRay)
 	}
 
 }

@@ -1,0 +1,50 @@
+import { BackSide, Color, ShaderMaterial } from "three";
+import ShaderUtils, { frag, fragType, vert, vertType } from "../../../../utils/material/shaderUtils";
+
+export default class GodRayMaterial extends ShaderMaterial {
+
+	constructor() {
+		super({
+			vertexShader: Shader.vert,
+			fragmentShader: Shader.frag,
+			transparent: true,
+			side: BackSide,
+			uniforms: {
+				u_time: {value: 0},
+			}
+		})
+	}
+
+
+
+}
+
+class Shader {
+
+	static vert: vertType = vert`
+		varying vec2 v_uv;
+
+		void main () {
+			v_uv = uv;
+
+			vec4 worldPosition = modelMatrix * vec4(position, 1.);
+			gl_Position = projectionMatrix * viewMatrix * worldPosition;
+		}
+	`
+
+	static frag: fragType = frag`
+		varying vec2 v_uv;
+		uniform vec3 u_base_color;
+		uniform float u_time;
+
+		${ShaderUtils.func.noise}
+
+		void main() {
+			vec4 color = vec4(1., 1., 0., 1.);
+
+			gl_FragColor = color;
+		}
+
+	`
+
+}
