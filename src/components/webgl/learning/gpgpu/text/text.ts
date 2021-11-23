@@ -9,7 +9,7 @@ import { loadTexture } from "../../../utils";
 
 export default class WebGLGPGPUImage extends WebGLCanvasBase {
 
-	private readonly size: Vector2 = new Vector2(500, 500)
+	private readonly size: Vector2 = new Vector2(500, 300)
 	private readonly particleNum: number = this.size.x * this.size.y
 	private particlePlane: Points = null
 	private gpuCompute: GPUComputationRenderer = new GPUComputationRenderer(this.size.x, this.size.y, this.renderer)
@@ -63,10 +63,12 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 		for(let k = 0, kl = posArray.length; k < kl; k+=4) {
 			let x, y, z
 			let i: number = k/4
+			// 本来の座標
 			x = i % 500 - 250
-			// x = (Math.random()-0.5) * 500
-			y = Math.floor(i/500) - 250
-			// z = Math.sin(Math.random() * 10) * 300
+			y = Math.floor(i / 500) - 150
+
+			x += (Math.random()-0.5) * 200.
+			y += (Math.random()-0.5) * 200.
 
 			// posArrayの形式=一次元配列に変換
 			posArray[k+0] = x
@@ -124,8 +126,8 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 		const uvs: Float32Array = new Float32Array(this.particleNum * 2)
 		p = 0
 		for(let i = 0; i < this.size.x; i++) {
-			for(let j = 0; j < this.size.x; j++) {
-				uvs[p++] = j / (this.size.x - 1)
+			for(let j = 0; j < this.size.y; j++) {
+				uvs[p++] = j / (this.size.y - 1)
 				uvs[p++] = i / (this.size.x - 1)
 			}
 		}
