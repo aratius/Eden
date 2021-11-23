@@ -14,11 +14,9 @@ void main() {
 	vec4 tmpPos = texture2D( texturePosition, uv );
 	vec3 pos = tmpPos.xyz;
 
-// ほぼ止まってしまったやつにはthreshold大きい値をかける
-	float threshold_multiply = 1.;
-	if(length(vel) < 0.1) {
-		threshold_multiply = 3.;
-	}
+	// ほぼ止まってしまったやつには新しく初速度を与える
+	if(length(vel) < 0.5) vel = -pos;
+
 
 	vec3 other_pos = vec3(0.);
 	vec3 dir = vec3(0.);
@@ -40,13 +38,13 @@ void main() {
 			if(dist < 0.0001) continue;  // 自分自身
 
 			// 近いと離れる
-			float threshold_1 = 80. * threshold_multiply;
+			float threshold_1 = 80.;
 			if(dist < threshold_1) {
 				float dist_effect = (threshold_1 - dist)/(threshold_1 + 1e-4);
 				reflect_sum += - normalize(dir) * dist_effect;
 			}
 			// 周りと同じ方向（速度）に
-			float threshold_2 = 50. * threshold_multiply;
+			float threshold_2 = 50.;
 			if(dist < threshold_2) {
 				float dist_effect = (threshold_2 - dist)/(threshold_2 + 1e-4);
 				other_vel = texture2D(textureVelocity, ref).xyz;
@@ -56,7 +54,7 @@ void main() {
 				}
 			}
 			// 周りの位置の平均に
-			float threshold_3 = 60. * threshold_multiply;
+			float threshold_3 = 60.;
 			if(dist < threshold_3) {
 				float dist_effect = (threshold_3 - dist)/(threshold_3 + 1e-4);
 				pos_sum += other_pos * dist_effect;
@@ -66,9 +64,9 @@ void main() {
 		}
 	}
 
-	vel += reflect_sum * 1. * threshold_multiply;
-	if(dir_cnt >= 1.) vel += normalize(dir_sum/dir_cnt) * 1.5 * 2. * threshold_multiply;
-	if(pos_cnt >= 1.) vel += normalize(pos_sum/pos_cnt - pos) * 1.5 * 2. * threshold_multiply;
+	vel += reflect_sum * 1.;
+	if(dir_cnt >= 1.) vel += normalize(dir_sum/dir_cnt) * 1.5 * 2.;
+	if(pos_cnt >= 1.) vel += normalize(pos_sum/pos_cnt - pos) * 1.5 * 2.;
 
 	vel.xyz *= 0.99;
 

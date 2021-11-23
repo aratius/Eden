@@ -1,11 +1,10 @@
-import { BufferAttribute, BufferGeometry, DataTexture, Mesh, MeshBasicMaterial, PlaneBufferGeometry, Points, PointsMaterial, SphereBufferGeometry, Vector2 } from "three";
+import { BufferAttribute, BufferGeometry, DataTexture, Points, Vector2 } from "three";
 import { CameraSettings, RendererSettings } from "../../../interfaces";
 import WebGLCanvasBase from "../../../utils/template/template";
 import ParticlePlaneMaterial from "./material/particlePlaneMat";
 import { GPUComputationRenderer, Variable } from "three/examples/jsm/misc/GPUComputationRenderer"
 import computeShaderPosition from "./material/shader/computeShaderPosition.frag"
 import computeShaderVelocity from "./material/shader/computeShaderVelocity.frag"
-import { isModuleNamespaceObject } from "util/types";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 export default class WebGLGPGPUVoid extends WebGLCanvasBase {
