@@ -30,14 +30,14 @@ export type vertType = string
 export type shaderType = glslType|fragType|vertType|glslifyType
 
 // シェーダー形式のテンプレートリテラルをパースする関数
-type glslifyType = (code: TemplateStringsArray, ...values: string[]) => string
+type glslifyType = (code: TemplateStringsArray, ...values: (string|shaderType)[]) => string
 
 /**
  * boyswan.glsl-literal （vscode拡張）
  * これをインストールすると(frag|vert|glsl|glslify)のテンプレートリテラルタグに対してシンタックスハイライトが効くようになります
  * https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Template_literals#tagged_templates
  */
-const glslify: glslifyType = (code: TemplateStringsArray, ...values: string[]) => {
+const glslify: glslifyType = (code: TemplateStringsArray, ...values: (string|shaderType)[]) => {
 	return values.map((value: string, i: number) => {
 		return code[i] + value
 	}).concat(code.slice(values.length)).join("")
