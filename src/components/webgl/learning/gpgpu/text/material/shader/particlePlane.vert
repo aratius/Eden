@@ -17,15 +17,13 @@ void main() {
     vec3 pos = pos_tmp.xyz;
 
     // 前のランダムなポジション
-    // vec3 rand_offset = vec3(rand(pos + vec3(1.)), rand(pos + vec3(2.)), rand(pos + vec3(3.))) * 100.;
-    // pos += max(rand_offset * (-u_time * 1./2. + 1.), 0.);
 
     vec4 tex = texture2D(u_texture_face, uv);
     v_color = tex.rgba;
 
     // ポイントのサイズを決定
     vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
-    gl_PointSize = 8.;
+    gl_PointSize = 10.;
 
     // uv情報の引き渡し
     v_uv = uv;

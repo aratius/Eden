@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, DataTexture, PlaneBufferGeometry, Points, PointsMaterial, Texture, Vector2 } from "three";
+import { BufferAttribute, BufferGeometry, DataTexture, PlaneBufferGeometry, Points, PointsMaterial, Texture, Vector2, Vector3 } from "three";
 import { CameraSettings, RendererSettings } from "../../../interfaces";
 import WebGLCanvasBase from "../../../utils/template/template";
 import ParticlePlaneMaterial from "./material/particlePlaneMat";
@@ -15,6 +15,7 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 	private gpuCompute: GPUComputationRenderer = new GPUComputationRenderer(this.size.x, this.size.y, this.renderer)
 	private positionVariable: Variable = null
 	private velocityVariable: Variable = null
+	private lastMousePosition: Vector2 = new Vector2(0, 0)
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -26,6 +27,8 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 
 		this.initComputationRenderer()
 		this.initParticle()
+
+		this.lastMousePosition = this.mouse.basedCenterPosition.clone()
 
 		this.endLoading()
 	}
@@ -41,6 +44,10 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 	_onUpdate(): void {
 		this.velocityVariable.material.uniforms.u_time = {value: this.elapsedTime}
 		this.velocityVariable.material.uniforms.u_mouse_position = {value: this.mouse.basedCenterPosition}
+
+		const mouseSpeed: Vector2 = this.mouse.basedCenterPosition.clone().sub(this.lastMousePosition.clone())
+		this.velocityVariable.material.uniforms.u_mouse_speed = {value: mouseSpeed}
+		this.lastMousePosition = this.mouse.basedCenterPosition.clone()
 
 		// 計算
 		this.gpuCompute.compute();
@@ -67,6 +74,7 @@ export default class WebGLGPGPUImage extends WebGLCanvasBase {
 			x = i % 500 - 250
 			y = Math.floor(i / 500) - 150
 
+			// 初期位置バラすためにここでバラす
 			x += (Math.random()-0.5) * 200.
 			y += (Math.random()-0.5) * 200.
 
