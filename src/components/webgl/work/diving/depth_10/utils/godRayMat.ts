@@ -42,8 +42,12 @@ class Shader {
 		void main() {
 			vec4 color = vec4(0.);
 
-			color.rgb += noise(vec2(v_uv.x+u_time/10.)*10.) * 5.;
-			color.a += noise(vec2(v_uv.x+u_time/10.)*10.) * 0.1;
+			color.rgb += noise(vec2(v_uv.x, u_time/10.)*10.) * 5.;
+			color.a += noise(vec2(v_uv.x, u_time/10.)*10.) * 0.1;
+
+			// uv座標がバチッと変わる0, 1付近のみちょっと消す
+			color.a *= min(v_uv.x*50., 1.);
+			color.a *= min((1.-v_uv.x)*50., 1.);
 
 			gl_FragColor = color;
 		}
