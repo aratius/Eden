@@ -54,7 +54,14 @@ void main() {
     vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;
     vec3 albedo = mix( ( sunColor * diffuseLight * 0.3 + scatter ) * getShadowMask(), ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance);
     vec3 outgoingLight = albedo;
-    gl_FragColor = vec4( outgoingLight, alpha );
+
+    vec4 color = vec4( outgoingLight, alpha );
+
+    // カメラから見て水面近くは透明にする
+    float dist = length(worldPosition.xyz - cameraPosition)/3.;
+    color.a *= min(dist, 1.);
+
+    gl_FragColor = color;
     #include <tonemapping_fragment>
     #include <fog_fragment>
 }

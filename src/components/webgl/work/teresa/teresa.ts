@@ -108,6 +108,7 @@ export default class WebGLTeresa extends WebGLCanvasBase {
 		geo.attributes.uv.needsUpdate = true
 		geo.attributes.offsetPos.needsUpdate = true
 		geo.attributes.num.needsUpdate = true
+		console.log(geo);
 
 		const obj = new GlowBall(geo)
 		this.scene.add(obj)

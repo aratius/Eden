@@ -19,6 +19,7 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 	private sun: Vector3 = null
 	private readonly surfaceSize: Vector2 = new Vector2(1000, 1000)
 	private cameraTween: GSAPTimeline = null
+	private effectController: EffectController = null
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
@@ -49,6 +50,7 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 		this.cameraTween.to(this.camera.position, {y: -3, duration: 2, ease: "circ.in"}, 0)
 		this.cameraTween.to(this.camera.position, {z: 0, duration: 2, ease: "circ.in"}, 0)
 		this.cameraTween.to(this.camera.rotation, {x: -Math.PI/2, duration: 2, ease: "circ.in"}, 0)
+		this.cameraTween.to(this.effectController.effects, {rayleigh: 0, mieCoefficient: 0, duration: 2, ease: "sine.out", onUpdate: () => this.effectController.onChangedParams()}, 0)
 	}
 
 	private initSky() {
@@ -60,7 +62,7 @@ export default class WebGLDepth_0 extends WebGLCanvasBase {
 
 		this.sun = new Vector3();
 
-		new EffectController(this.sky, this.sun, this.renderer, {
+		this.effectController = new EffectController(this.sky, this.sun, this.renderer, {
 			turbidity: 1.5,
 			rayleigh: 0.339,
 			mieCoefficient: 0.004,

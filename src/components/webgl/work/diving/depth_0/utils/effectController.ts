@@ -16,11 +16,11 @@ interface Effects {
 
 export default class EffectController {
 
-  private sky: Sky = null
-  private sun: Vector3 = null
-  private renderer: MainRenderer = null
+	private sky: Sky = null
+	private sun: Vector3 = null
+	private renderer: MainRenderer = null
 
-  private effects: Effects = {
+	public effects: Effects = {
 		turbidity: 10,
 		rayleigh: 3,
 		mieCoefficient: 0.005,
@@ -30,26 +30,26 @@ export default class EffectController {
 		exposure: 0
 	};
 
-  constructor(sky: Sky, sun: Vector3, renderer: MainRenderer, effects: Effects) {
-    this.sky = sky
-    this.sun = sun
-    this.renderer = renderer
-    this.effects = effects
+	constructor(sky: Sky, sun: Vector3, renderer: MainRenderer, effects: Effects) {
+		this.sky = sky
+		this.sun = sun
+		this.renderer = renderer
+		this.effects = effects
 
-    const gui: dat.GUI = new dat.GUI();
+		const gui: dat.GUI = new dat.GUI();
 
-		gui.add( this.effects, 'turbidity', 0.0, 20.0, 0.1 ).onChange( this.guiChanged );
-		gui.add( this.effects, 'rayleigh', 0.0, 4, 0.001 ).onChange( this.guiChanged );
-		gui.add( this.effects, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( this.guiChanged );
-		gui.add( this.effects, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( this.guiChanged );
-		gui.add( this.effects, 'elevation', 0, 90, 0.1 ).onChange( this.guiChanged );
-		gui.add( this.effects, 'azimuth', - 180, 180, 0.1 ).onChange( this.guiChanged );
-		gui.add( this.effects, 'exposure', 0, 1, 0.0001 ).onChange( this.guiChanged );
+			gui.add( this.effects, 'turbidity', 0.0, 20.0, 0.1 ).onChange( this.onChangedParams );
+			gui.add( this.effects, 'rayleigh', 0.0, 4, 0.001 ).onChange( this.onChangedParams );
+			gui.add( this.effects, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( this.onChangedParams );
+			gui.add( this.effects, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( this.onChangedParams );
+			gui.add( this.effects, 'elevation', 0, 90, 0.1 ).onChange( this.onChangedParams );
+			gui.add( this.effects, 'azimuth', - 180, 180, 0.1 ).onChange( this.onChangedParams );
+			gui.add( this.effects, 'exposure', 0, 1, 0.0001 ).onChange( this.onChangedParams );
 
-		this.guiChanged();
-  }
+			this.onChangedParams();
+	}
 
-	private guiChanged = (): void => {
+	public onChangedParams = (): void => {
 		/// GUI
 
 		const uniforms = this.sky.material.uniforms;

@@ -28,7 +28,8 @@ export default class WaterMaterial extends ShaderMaterial {
 			fragmentShader: fragShader,
 			lights: true,
 			side: side,
-			fog: fog
+			fog: fog,
+			transparent: true
         })
     }
 

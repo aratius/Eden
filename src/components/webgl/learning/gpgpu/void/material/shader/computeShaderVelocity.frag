@@ -3,7 +3,6 @@ uniform float u_size;
 // 今回はなにもしてない。
 // ここでVelのx y zについて情報を上書きすると、それに応じて移動方向が変わる
 // NOTE: こっちで速度計算されると舞い計算ごとにテクスチャが更新されるので擬似的に前フレームの状態を抜き出すことができる
-#include <common>
 
 void main() {
 	vec2 uv = gl_FragCoord.xy / resolution.xy;

@@ -38,8 +38,8 @@ export const displayShader: DisplayShader = {
 		void main(){
 			vec4 color = texture2D(tDiffuse, v_uv);
 
-      float grayColor = dot(color.rgb, monochromeScale);
-      color = vec4(vec3(grayColor), 1.0);
+			// float grayColor = dot(color.rgb, monochromeScale);
+			// color = vec4(vec3(grayColor), 1.0);
 
 			gl_FragColor = color;
 		}`
