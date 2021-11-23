@@ -43,7 +43,7 @@ class Shader {
 			vec4 color = vec4(0.);
 
 			color.rgb += noise(vec2(v_uv.x+u_time/10.)*10.) * 5.;
-			color.a += noise(vec2(v_uv.x+u_time/10.)*10.) * 0.3;
+			color.a += noise(vec2(v_uv.x+u_time/10.)*10.) * 0.1;
 
 			gl_FragColor = color;
 		}

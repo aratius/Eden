@@ -49,7 +49,7 @@ export default class WebGLDepth_10 extends WebGLCanvasBase {
 
 	private initGodRay(): void {
 
-		const geo: ConeBufferGeometry = new ConeBufferGeometry(500, 1500, 30)
+		const geo: ConeBufferGeometry = new ConeBufferGeometry(500, 1500, 300)
 		const mat: GodRayMaterial = new GodRayMaterial()
 
 		this.godRay = new Mesh(geo, mat)
