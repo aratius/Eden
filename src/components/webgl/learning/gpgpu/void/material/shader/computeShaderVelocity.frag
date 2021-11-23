@@ -14,12 +14,11 @@ void main() {
 	vec4 tmpPos = texture2D( texturePosition, uv );
 	vec3 pos = tmpPos.xyz;
 
-    if(pos.z > 300.) {
-        vel.z *= -1.;
-    }
-    if(pos.z < -300.) {
-		vel.z *= -1.;
-    }
+// ほぼ止まってしまったやつにはthreshold大きい値をかける
+	float threshold_multiply = 1.;
+	if(length(vel) < 0.1) {
+		threshold_multiply = 3.;
+	}
 
 	vec3 other_pos = vec3(0.);
 	vec3 dir = vec3(0.);
@@ -30,8 +29,8 @@ void main() {
 	float dir_cnt = 0.001;
 	vec3 pos_sum = vec3(0.);
 	float pos_cnt = 0.001;
-	for(float x = 0.; x < 30.; x++) {
-		for(float y = 0.; y < 30.; y++) {
+	for(float x = 0.; x < 60.; x++) {
+		for(float y = 0.; y < 60.; y++) {
 			vec2 ref = vec2(x + 0.5, y + 0.5) / resolution.xy;
 			other_pos = texture2D(texturePosition, ref).xyz;
 
@@ -41,13 +40,15 @@ void main() {
 			if(dist < 0.0001) continue;  // 自分自身
 
 			// 近いと離れる
-			if(dist < 70.) {
-				float dist_effect = (70. - dist)/(70. + 1e-4);
+			float threshold_1 = 80. * threshold_multiply;
+			if(dist < threshold_1) {
+				float dist_effect = (threshold_1 - dist)/(threshold_1 + 1e-4);
 				reflect_sum += - normalize(dir) * dist_effect;
 			}
 			// 周りと同じ方向（速度）に
-			if(dist < 60.) {
-				float dist_effect = (60. - dist)/(60. + 1e-4);
+			float threshold_2 = 50. * threshold_multiply;
+			if(dist < threshold_2) {
+				float dist_effect = (threshold_2 - dist)/(threshold_2 + 1e-4);
 				other_vel = texture2D(textureVelocity, ref).xyz;
 				if(length(other_vel) != 0.) {
 					dir_sum += normalize(other_vel) * dist_effect;
@@ -55,8 +56,9 @@ void main() {
 				}
 			}
 			// 周りの位置の平均に
-			if(dist < 60.) {
-				float dist_effect = (60. - dist)/(60. + 1e-4);
+			float threshold_3 = 60. * threshold_multiply;
+			if(dist < threshold_3) {
+				float dist_effect = (threshold_3 - dist)/(threshold_3 + 1e-4);
 				pos_sum += other_pos * dist_effect;
 				pos_cnt += 1.;
 			}
@@ -64,9 +66,9 @@ void main() {
 		}
 	}
 
-	vel += reflect_sum * 1.0;
-	if(dir_cnt >= 1.) vel += normalize(dir_sum/dir_cnt) * 1.5;
-	if(pos_cnt >= 1.) vel += normalize(pos_sum/pos_cnt - pos) * 1.5;
+	vel += reflect_sum * 1. * threshold_multiply;
+	if(dir_cnt >= 1.) vel += normalize(dir_sum/dir_cnt) * 1.5 * 2. * threshold_multiply;
+	if(pos_cnt >= 1.) vel += normalize(pos_sum/pos_cnt - pos) * 1.5 * 2. * threshold_multiply;
 
 	vel.xyz *= 0.99;
 

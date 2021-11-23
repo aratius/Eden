@@ -10,7 +10,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 
-	private readonly size: Vector2 = new Vector2(30, 30)
+	private readonly size: Vector2 = new Vector2(60, 60)
 	private readonly particleNum: number = this.size.x * this.size.y
 	private particlePlane: Points = null
 	private gpuCompute: GPUComputationRenderer = new GPUComputationRenderer(this.size.x, this.size.y, this.renderer)
