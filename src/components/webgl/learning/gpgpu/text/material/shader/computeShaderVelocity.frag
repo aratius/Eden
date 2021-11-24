@@ -34,7 +34,7 @@ void main() {
 	}
 
 	// マウスに追随
-	vel += vec3(u_mouse_speed, 0.) * 30./length(vec3(u_mouse_position, 0.) - pos);
+	vel += vec3(u_mouse_speed, 0.) * 30./(length(vec3(u_mouse_position, 0.) - pos)+0.5);
 
 	vel *= vec3(0.95);
 
