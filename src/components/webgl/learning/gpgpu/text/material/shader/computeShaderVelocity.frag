@@ -26,17 +26,18 @@ void main() {
 	vec3 defalt_pos = vec3((uv.x-0.5) * r.x, (uv.y-0.5) * r.y, 0.);
 
 	if(u_time > 10.) {
-		vel.y += rand(vec3(uv, 1.)) * 3. + 0.1;
-		vel.x += (rand(vec3(uv, 2.))-0.5) * 1.;
+		vel.y += rand(vec3(uv, 1.)) * 6. + 2.;
+		vel.x += (rand(vec3(uv, 2.))-0.5) * 2.;
+		vel *= vec3(0.91);
 	} else {
 		// デフォルトの位置に戻ろうとする動き
-		vel += normalize(defalt_pos - pos) * 0.05 * length(defalt_pos - pos);
+		vel += normalize(defalt_pos - pos) * 0.15 * length(defalt_pos - pos);
+		vel *= vec3(0.9);
 	}
 
 	// マウスに追随
-	vel += vec3(u_mouse_speed, 0.) * 30./(length(vec3(u_mouse_position, 0.) - pos)+0.5);
+	vel += vec3(u_mouse_speed, 0.) * 30./(length(vec3(u_mouse_position, 0.) - pos)+1.);
 
-	vel *= vec3(0.95);
 
 	gl_FragColor = vec4( vel.xyz, 1.0 );
 }

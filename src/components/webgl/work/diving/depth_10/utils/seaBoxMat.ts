@@ -43,8 +43,8 @@ class Shader {
 		void main() {
 			vec4 color = vec4(u_base_color, 1.);
 
-			color.r -= noise(v_uv*5. + vec2(u_time*0.2)) * 0.2;
-			color.g -= noise(v_uv*5. + vec2(-u_time*0.2)) * 0.2;
+			color.r -= noise(v_uv*5. + vec2(u_time*0.2)) * 0.1;
+			color.g -= noise(v_uv*5. + vec2(-u_time*0.2)) * 0.1;
 
 			gl_FragColor = color;
 		}
