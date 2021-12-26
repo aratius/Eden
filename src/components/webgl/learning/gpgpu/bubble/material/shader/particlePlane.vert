@@ -1,6 +1,5 @@
 #include <common>
 uniform sampler2D u_texture_position;
-uniform sampler2D u_texture_face;
 varying vec2 v_uv;
 varying vec4 v_color;
 uniform float u_time;
@@ -18,12 +17,11 @@ void main() {
 
     // 前のランダムなポジション
 
-    vec4 tex = texture2D(u_texture_face, uv);
-    v_color = tex.rgba;
+    v_color = vec4(1.);
 
     // ポイントのサイズを決定
     vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
-    gl_PointSize = 5.;
+    gl_PointSize = 10.;
 
     // uv情報の引き渡し
     v_uv = uv;
