@@ -6,10 +6,11 @@ import { GPUComputationRenderer, Variable } from "three/examples/jsm/misc/GPUCom
 import computeShaderPosition from "./material/shader/computeShaderPosition.frag"
 import computeShaderVelocity from "./material/shader/computeShaderVelocity.frag"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
+import { AfterimagePass } from "three/examples/jsm/postprocessing/AfterimagePass"
 
 export default class WebGLGPGPUBubble extends WebGLCanvasBase {
 
-	private readonly size: Vector2 = new Vector2(100, 100)
+	private readonly size: Vector2 = new Vector2(50, 50)
 	private readonly particleNum: number = this.size.x * this.size.y
 	private particlePlane: Points = null
 	private gpuCompute: GPUComputationRenderer = new GPUComputationRenderer(this.size.x, this.size.y, this.renderer)
@@ -34,6 +35,8 @@ export default class WebGLGPGPUBubble extends WebGLCanvasBase {
 		bloomPass.strength = 1.5
 		bloomPass.radius == 0
 		this.composer.addPass(bloomPass)
+
+		this.composer.addPass(new AfterimagePass(0.7))
 
 		this.endLoading()
 	}

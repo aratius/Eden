@@ -20,7 +20,7 @@ void main() {
 
     // ポイントのサイズを決定
     vec4 worldPosition = modelMatrix * vec4( pos, 1.0 );
-    gl_PointSize = 20000. / distance(worldPosition.xyz, cameraPosition);
+    gl_PointSize = 5000. / distance(worldPosition.xyz, cameraPosition);
     v_color = vec4(1.);
     v_color.a = 500. / distance(worldPosition.xyz, cameraPosition);;
 
