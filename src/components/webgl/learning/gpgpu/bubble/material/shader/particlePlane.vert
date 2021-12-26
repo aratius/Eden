@@ -17,15 +17,16 @@ void main() {
 
     // 前のランダムなポジション
 
-    v_color = vec4(1.);
 
     // ポイントのサイズを決定
-    vec4 mPosition = modelMatrix * vec4( pos, 1.0 );
-    gl_PointSize = 20000. / distance(mPosition.xyz, cameraPosition);
+    vec4 worldPosition = modelMatrix * vec4( pos, 1.0 );
+    gl_PointSize = 20000. / distance(worldPosition.xyz, cameraPosition);
+    v_color = vec4(1.);
+    v_color.a = 500. / distance(worldPosition.xyz, cameraPosition);;
 
     // uv情報の引き渡し
     v_uv = uv;
 
     // 変換して格納
-    gl_Position = projectionMatrix * viewMatrix * mPosition;
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
 }

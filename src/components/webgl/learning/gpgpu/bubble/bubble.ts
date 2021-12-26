@@ -5,7 +5,7 @@ import ParticlePlaneMaterial from "./material/particlePlaneMat";
 import { GPUComputationRenderer, Variable } from "three/examples/jsm/misc/GPUComputationRenderer"
 import computeShaderPosition from "./material/shader/computeShaderPosition.frag"
 import computeShaderVelocity from "./material/shader/computeShaderVelocity.frag"
-import { loadTexture } from "../../../utils";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 
 export default class WebGLGPGPUBubble extends WebGLCanvasBase {
 
@@ -19,7 +19,6 @@ export default class WebGLGPGPUBubble extends WebGLCanvasBase {
 
 	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
 		super(canvas, renderer, camera)
-
 	}
 
 	_onInit(): void {
@@ -29,6 +28,12 @@ export default class WebGLGPGPUBubble extends WebGLCanvasBase {
 		this.initParticle()
 
 		this.lastMousePosition = this.mouse.basedCenterPosition.clone()
+
+		const bloomPass: UnrealBloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85)
+		bloomPass.threshold = 0
+		bloomPass.strength = 1.5
+		bloomPass.radius == 0
+		this.composer.addPass(bloomPass)
 
 		this.endLoading()
 	}
