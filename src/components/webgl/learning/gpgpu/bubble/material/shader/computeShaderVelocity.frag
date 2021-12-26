@@ -22,21 +22,7 @@ void main() {
 	vec4 tmpPos = texture2D( texturePosition, uv );
 	vec3 pos = tmpPos.xyz;
 
-	// デフォルトの位置を記憶
-	vec3 defalt_pos = vec3((uv.x-0.5) * r.x, (uv.y-0.5) * r.y, 0.);
-
-	vel += normalize(defalt_pos - pos) * 0.05 * length(defalt_pos - pos);
-	// vel += normalize(defalt_pos - pos) * 0.05 * length(defalt_pos - pos);
-	// vel += normalize(defalt_pos - pos);
-
-	vec2 mouse_speed = u_mouse_speed;
-	if(length(mouse_speed) < 0.01) mouse_speed = vec2(0.01);
-
-	// マウスに追随
-	float len = length(vec3(u_mouse_position, 0.) - pos)+0.5;
-	vel += vec3(mouse_speed + vec2(0.01, 0.01), 0.) * 30./ max(len, 5.);  // 分母がちっちゃくなりすぎるとぶっ飛ぶので
-
-	vel *= vec3(0.97);
+	vel.y = 50.;
 
 	gl_FragColor = vec4( vel.xyz, 1.0 );
 }

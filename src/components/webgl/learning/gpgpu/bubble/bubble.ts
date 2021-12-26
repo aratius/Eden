@@ -71,17 +71,15 @@ export default class WebGLGPGPUBubble extends WebGLCanvasBase {
 			let x, y, z
 			let i: number = k/4
 			// 本来の座標
-			x = i % 500 - 250
-			y = Math.floor(i / 500) - 150
-
 			// 初期位置バラすためにここでバラす
-			x += (Math.random()-0.5) * 200.
-			y += (Math.random()-0.5) * 200.
+			x = (Math.random()-0.5) * 1000.
+			y = (Math.random()-0.5) * 1000.
+			z = (Math.random()-0.5) * 3000.
 
 			// posArrayの形式=一次元配列に変換
 			posArray[k+0] = x
 			posArray[k+1] = y
-			posArray[k+2] = 0
+			posArray[k+2] = z
 			posArray[k+3] = 0
 
 			// 移動する方向はとりあえずランダムに決めてみる。

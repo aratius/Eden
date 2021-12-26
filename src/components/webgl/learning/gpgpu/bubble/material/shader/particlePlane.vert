@@ -20,12 +20,12 @@ void main() {
     v_color = vec4(1.);
 
     // ポイントのサイズを決定
-    vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
-    gl_PointSize = 10.;
+    vec4 mPosition = modelMatrix * vec4( pos, 1.0 );
+    gl_PointSize = 20000. / distance(mPosition.xyz, cameraPosition);
 
     // uv情報の引き渡し
     v_uv = uv;
 
     // 変換して格納
-    gl_Position = projectionMatrix * mvPosition;
+    gl_Position = projectionMatrix * viewMatrix * mPosition;
 }
