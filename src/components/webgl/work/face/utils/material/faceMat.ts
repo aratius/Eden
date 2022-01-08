@@ -19,7 +19,7 @@ export class FaceMaterial extends ShaderMaterial{
 				},
 				vertexShader: vertShader,
 				fragmentShader: fragShader,
-				side: DoubleSide,
+				// side: DoubleSide,
 				// wireframe: true
 			}
 		)
