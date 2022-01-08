@@ -10,7 +10,7 @@ import { AfterimagePass } from "three/examples/jsm/postprocessing/AfterimagePass
 
 export default class WebGLGPGPUBubble extends WebGLCanvasBase {
 
-	private readonly size: Vector2 = new Vector2(50, 50)
+	private readonly size: Vector2 = new Vector2(20, 20)
 	private readonly particleNum: number = this.size.x * this.size.y
 	private particlePlane: Points = null
 	private gpuCompute: GPUComputationRenderer = new GPUComputationRenderer(this.size.x, this.size.y, this.renderer)
@@ -82,7 +82,7 @@ export default class WebGLGPGPUBubble extends WebGLCanvasBase {
 			// 初期位置バラすためにここでバラす
 			x = (Math.random()-0.5) * 1000.
 			y = (Math.random()-0.5) * 1000.
-			z = (Math.random()-0.5) * 3000.
+			z = (Math.random()-0.5) * 2000.
 
 			// posArrayの形式=一次元配列に変換
 			posArray[k+0] = x
