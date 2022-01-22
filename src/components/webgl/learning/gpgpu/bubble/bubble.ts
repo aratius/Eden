@@ -36,7 +36,7 @@ export default class WebGLGPGPUBubble extends WebGLCanvasBase {
 		bloomPass.radius == 0
 		this.composer.addPass(bloomPass)
 
-		this.composer.addPass(new AfterimagePass(0.7))
+		this.composer.addPass(new AfterimagePass(0.9))
 
 		this.endLoading()
 	}
