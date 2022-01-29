@@ -1,6 +1,5 @@
 #include <common>
 uniform sampler2D u_texture_position;
-uniform sampler2D u_texture_face;
 varying vec2 v_uv;
 varying vec4 v_color;
 uniform float u_time;
@@ -18,16 +17,16 @@ void main() {
 
     // 前のランダムなポジション
 
-    vec4 tex = texture2D(u_texture_face, uv);
-    v_color = tex.rgba;
 
     // ポイントのサイズを決定
-    vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
-    gl_PointSize = 5.;
+    vec4 worldPosition = modelMatrix * vec4( pos, 1.0 );
+    gl_PointSize = 5000. / distance(worldPosition.xyz, cameraPosition);
+    v_color = vec4(1.);
+    v_color.a = 500. / distance(worldPosition.xyz, cameraPosition);;
 
     // uv情報の引き渡し
     v_uv = uv;
 
     // 変換して格納
-    gl_Position = projectionMatrix * mvPosition;
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
 }

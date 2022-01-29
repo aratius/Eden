@@ -11,7 +11,7 @@ export default class SeaBoxMaterial extends ShaderMaterial {
 			side: BackSide,
 			uniforms: {
 				u_time: {value: 0},
-				u_base_color: {value: new Color(0x002744)},
+				u_base_color: {value: new Color(0x001021)},
 			}
 		})
 	}
@@ -43,8 +43,8 @@ class Shader {
 		void main() {
 			vec4 color = vec4(u_base_color, 1.);
 
-			color.r -= noise(v_uv*5. + vec2(u_time*0.2)) * 0.2;
-			color.g -= noise(v_uv*5. + vec2(-u_time*0.2)) * 0.2;
+			color.r -= noise(v_uv*5. + vec2(u_time*0.2)) * 0.1;
+			color.g -= noise(v_uv*5. + vec2(-u_time*0.2)) * 0.1;
 
 			gl_FragColor = color;
 		}
