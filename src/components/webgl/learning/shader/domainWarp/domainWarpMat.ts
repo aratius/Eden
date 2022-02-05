@@ -10,7 +10,8 @@ export default class DomainWarpMaterial extends ShaderMaterial {
         u_time: {value: 0}
       },
       fragmentShader,
-      vertexShader
+      vertexShader,
+      transparent: true
     })
   }
 
