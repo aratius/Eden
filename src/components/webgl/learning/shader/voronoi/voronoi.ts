@@ -9,22 +9,15 @@ export default class Voronoi extends WebGLCanvasBase {
 
   _onInit(): void {
 
-    const geo: PlaneBufferGeometry = new PlaneBufferGeometry(500, 500, 1000, 1000)
+    const geo: PlaneBufferGeometry = new PlaneBufferGeometry(500, 500, 100, 100)
     const mat: VoronoiMaterial = new VoronoiMaterial()
     this.mat = mat
     const mesh: Mesh = new Mesh(geo, mat)
-    mesh.scale.set(10, 10, 1.5)
-    mesh.rotateX(Math.PI/2)
-    mesh.position.setY(-100)
+    mesh.scale.set(1, 1, 0.2)
+    // mesh.rotateX(Math.PI/2)
+    mesh.position.setY(-50)
     mesh.position.setZ(0)
     this.scene.add(mesh)
-
-    const mesh2: Mesh = new Mesh(geo, mat)
-    mesh2.scale.set(10, 10, 1.5)
-    mesh2.rotateX(-Math.PI/2)
-    mesh2.position.setY(100)
-    mesh2.position.setZ(0)
-    this.scene.add(mesh2)
 
     this.endLoading()
   }

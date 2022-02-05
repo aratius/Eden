@@ -31,9 +31,8 @@ class Shader {
 
     void main() {
       vec2 pos = v_uv;
-      pos.y = mod(pos.y+u_time/20., 1.);
       pos = pos * 2. - 1.;
-      pos *= 20.;
+      pos *= 3.;
 
       // タイルスペース
       // 各セルごと一様な値
@@ -68,7 +67,7 @@ class Shader {
         }
       }
 
-      color += 1. - min_dist;
+      color += min_dist;
 
       // color = vec4(vec3(f_pos, 1.), 1.);
 
@@ -94,13 +93,23 @@ class Shader {
       }
     }
 
+    float easeInOutElastic(float x) {
+      float c5 = (2. * 3.1415) / 4.5;
+      if(x == 0.) return 0.;
+      else if (x == 1.) return 1.;
+      else if (x < 0.5) {
+        return -(pow(2., 20. * x - 10.) * sin((20. * x - 11.125) * c5)) / 2.;
+      } else {
+        return (pow(2., -20. * x + 10.) * sin((20. * x - 11.125) * c5)) / 2. + 1.;
+      }
+    }
+
     void main() {
       v_uv = uv;
 
       vec2 coord = uv;
-      coord.y = mod(coord.y+u_time/20., 1.);
       coord = coord * 2. - 1.;
-      coord *= 20.;
+      coord *= 3.;
 
       // タイルスペース
       // 各セルごと一様な値
@@ -137,7 +146,7 @@ class Shader {
 
       vec3 pos = position;
 
-      pos.z += easeInOutQuad(min_dist)*100.;
+      // pos.z += easeInOutQuad(min_dist)*100.;
 
       // かける順番大事
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(pos, 1.);

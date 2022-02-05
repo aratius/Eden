@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "es6-promise": "^4.2.8",
+    "glsl-noise": "0.0.0",
     "gsap": "^3.7.1",
     "lethargy": "^1.0.9",
     "next": "^10.0.0",
