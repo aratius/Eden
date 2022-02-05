@@ -11,7 +11,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 
 export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 
-	private readonly size: Vector2 = new Vector2(100, 100)
+	private readonly size: Vector2 = new Vector2(50, 50)
 	private readonly particleNum: number = this.size.x * this.size.y
 	private particlePlane: Points = null
 	private gpuCompute: GPUComputationRenderer = new GPUComputationRenderer(this.size.x, this.size.y, this.renderer)
@@ -31,10 +31,10 @@ export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 		this.initParticle()
 
 		this.composer.removePass(this.loadingShaderPass)
-		this.composer.addPass(new AfterimagePass(0.99))
-		// this.composer.addPass(new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 1.2, 0.8, 0.5))
+		this.composer.addPass(new AfterimagePass(0.993))
+		this.composer.addPass(new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.6, 0.8, 0.5))
 
-		this.camera.position.setZ(2000)
+		this.camera.position.setZ(1500)
 		this.endLoading()
 	}
 
@@ -117,12 +117,14 @@ export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 	private initParticle(): void {
 		const geometry: BufferGeometry = new BufferGeometry()
 		const positions: Float32Array = new Float32Array(this.particleNum*3)
+		const indices: Float32Array = new Float32Array(this.particleNum)
 		let p: number = 0
 		// 位置情報はShader側で決定するので、とりあえず適当に値を埋める
 		for(let i = 0; i < this.particleNum; i++) {
 			positions[p++] = 0
 			positions[p++] = 0
 			positions[p++] = 0
+			indices[i] = i
 		}
 
 	// uv情報 テクスチャから情報を取り出すときに必要
@@ -138,6 +140,7 @@ export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 		// attribute登録
 		geometry.setAttribute("position", new BufferAttribute(positions, 3))
 		geometry.setAttribute("uv", new BufferAttribute(uvs, 2))
+		geometry.setAttribute("index", new BufferAttribute(indices, 1))
 
 		const material: ParticlePlaneMaterial = new ParticlePlaneMaterial()
 		material.extensions.drawBuffers = true
