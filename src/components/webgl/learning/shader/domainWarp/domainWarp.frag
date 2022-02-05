@@ -4,6 +4,7 @@
 
 varying vec2 v_uv;
 uniform float u_time;
+uniform float u_index;
 
 #define OCTAVES 6
 float fbm (in vec2 st) {
@@ -39,6 +40,11 @@ void main() {
 
   vec2 p = v_uv;
 
+  // float time = u_time/(-u_index + 3.);
+  float time = u_time/u_index;
+
+  p += vec2(cos(time), sin(time));
+
   vec2 q = vec2(0.);
   q.x = _fbm(p);
   q.y = _fbm(p + 1.);
@@ -50,8 +56,12 @@ void main() {
   float c = fbm(p + r);
 
   // float c = _fbm(p*5.);
-  c = 1. - c;
+  c = .5 - c;
   c*=c;
+
+  float d = length(vec2(0.5) - v_uv);
+  d += snoise3(vec3(v_uv, time)) * 0.3;
+  if(d > 0.3) discard;
 
   gl_FragColor = vec4(c, c, c, 1.);
 }
