@@ -23,15 +23,15 @@ export default class DomainWarp extends WebGLCanvasBase {
 
   _onUpdate(): void {
     this._planes.forEach((plane: Mesh, i: number) => {
-      (<DomainWarpMaterial>plane.material).uniforms.u_time.value = this.elapsedTime/10.
-      plane.position.setY(Math.sin(this.elapsedTime/10./(i+1)) * 250)
-      plane.position.setX(Math.cos(this.elapsedTime/10./(i+1)) * 250)
+      (<DomainWarpMaterial>plane.material).uniforms.u_time.value = this.elapsedTime/5.
+      plane.position.setY(Math.sin(this.elapsedTime/5./(i+1)) * 200)
+      plane.position.setX(Math.cos(this.elapsedTime/5./(i+1)) * 200)
 
     })
   }
 
   private _initPlane(): void {
-    const geo = new PlaneBufferGeometry(250, 250, 300, 300)
+    const geo = new PlaneBufferGeometry(400, 400, 300, 300)
     const mat = new DomainWarpMaterial()
     // this._plane = new Mesh(geo, mat)
     // this._plane.rotateX(Math.PI/2)
