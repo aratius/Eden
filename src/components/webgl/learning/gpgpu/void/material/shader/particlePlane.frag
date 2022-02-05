@@ -6,5 +6,5 @@ void main() {
     if ( f > 0.1 ) {
         discard;
     }
-    gl_FragColor = vec4(1.);
+    gl_FragColor = vec4(1., 1., 1., 0.8);
 }

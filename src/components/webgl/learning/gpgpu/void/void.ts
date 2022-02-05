@@ -6,10 +6,12 @@ import { GPUComputationRenderer, Variable } from "three/examples/jsm/misc/GPUCom
 import computeShaderPosition from "./material/shader/computeShaderPosition.frag"
 import computeShaderVelocity from "./material/shader/computeShaderVelocity.frag"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { AfterimagePass } from "three/examples/jsm/postprocessing/AfterimagePass";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 
 export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 
-	private readonly size: Vector2 = new Vector2(60, 60)
+	private readonly size: Vector2 = new Vector2(100, 100)
 	private readonly particleNum: number = this.size.x * this.size.y
 	private particlePlane: Points = null
 	private gpuCompute: GPUComputationRenderer = new GPUComputationRenderer(this.size.x, this.size.y, this.renderer)
@@ -28,6 +30,11 @@ export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 		this.initComputationRenderer()
 		this.initParticle()
 
+		this.composer.removePass(this.loadingShaderPass)
+		this.composer.addPass(new AfterimagePass(0.99))
+		// this.composer.addPass(new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 1.2, 0.8, 0.5))
+
+		this.camera.position.setZ(2000)
 		this.endLoading()
 	}
 
