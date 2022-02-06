@@ -4,6 +4,7 @@
 
 varying vec2 v_uv;
 uniform float u_time;
+uniform float u_index;
 
 #define OCTAVES 6
 float fbm(in vec2 st) {
@@ -38,8 +39,32 @@ float _fbm(in vec2 st) {
 void main() {
 
     v_uv = uv;
+    vec2 p = uv;
+
+    // float time = u_time/(-u_index + 3.);
+    float time = u_time / u_index;
+
+    //   p += vec2(cos(time), sin(time))/2.;
+    p.x += time / 100.;
+    p *= 5.;
+
+    vec2 q = vec2(0.);
+    q.x = _fbm(p);
+    q.y = _fbm(p + 1.);
+
+    vec2 r = vec2(0.);
+    r.x = _fbm(q + u_time * 0.05);
+    r.y = _fbm(q - u_time * 0.1);
+
+    float c = fbm(p + r);
+
+    // float c = _fbm(p*5.);
+    c = .5 - c;
+    c *= c;
 
     vec3 pos = position;
+    float d = distance(vec2(0.5), uv);
+    pos.z -= c * 10. * max(0.5 - d, 0.);
 
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(pos, 1.);
 }

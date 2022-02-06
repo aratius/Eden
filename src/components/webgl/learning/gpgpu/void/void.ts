@@ -30,11 +30,10 @@ export default class WebGLGPGPUVoid extends WebGLCanvasBase {
 		this.initComputationRenderer()
 		this.initParticle()
 
-		this.composer.removePass(this.loadingShaderPass)
-		this.composer.addPass(new AfterimagePass(0.993))
-		this.composer.addPass(new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.6, 0.8, 0.5))
+		this.composer.addPass(new AfterimagePass(0.995))
+		this.composer.addPass(new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 1, 0.8, 0.5))
 
-		this.camera.position.setZ(1500)
+		this.camera.position.setZ(500																				)
 		this.endLoading()
 	}
 
