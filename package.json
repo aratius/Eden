@@ -20,7 +20,7 @@
     "react-dom": "17.0.1",
     "sass": "^1.35.2",
     "simplenoise": "^1.0.1",
-    "three": "^0.130.1",
+    "three": "^0.135.0",
     "three-gltf-loader": "^1.111.0"
   },
   "devDependencies": {
@@ -33,7 +33,7 @@
     "@types/react-dom": "^17.0.9",
     "@types/sass": "^1.16.1",
     "@types/stats.js": "^0.17.0",
-    "@types/three": "^0.130.0",
+    "@types/three": "^0.135.0",
     "dat.gui": "^0.7.7",
     "exports-loader": "^0.7.0",
     "express": "^4.17.2",

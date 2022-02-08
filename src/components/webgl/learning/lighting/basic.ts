@@ -1,5 +1,5 @@
 import { dir } from "console";
-import { AmbientLight, BoxBufferGeometry, DirectionalLight, Mesh, MeshStandardMaterial } from "three";
+import { AmbientLight, BoxBufferGeometry, DirectionalLight, Mesh, MeshStandardMaterial, VSMShadowMap } from "three";
 import WebGLCanvasBase from "../../utils/template/template";
 
 const BOX_ROW = 10
@@ -12,6 +12,7 @@ export default class LightingBasic extends WebGLCanvasBase {
 
   _onInit(): void {
     this.renderer.shadowMap.enabled = true
+    this.renderer.shadowMap.type = VSMShadowMap
 
     this._initBoxes()
     this._initLights()
@@ -33,7 +34,7 @@ export default class LightingBasic extends WebGLCanvasBase {
 
   _initLights(): void {
     const dirL = new DirectionalLight(0xffffff, 1)
-    dirL.position.set(500, 500, 500)
+    dirL.position.set(300, 300, 300)
     dirL.lookAt(0,0,0)
     dirL.castShadow = true
     dirL.shadow.camera.right = window.innerWidth
@@ -42,14 +43,17 @@ export default class LightingBasic extends WebGLCanvasBase {
     dirL.shadow.camera.bottom = -window.innerHeight
     dirL.shadow.camera.near = 4
     dirL.shadow.camera.far = 1500
+    dirL.shadow.camera.updateProjectionMatrix()
     dirL.shadow.mapSize.width = 2048
     dirL.shadow.mapSize.height = 2048
-    dirL.shadow.radius = 10
-    dirL.shadow.camera.updateMatrix()
+    dirL.shadow.radius = 20
+    dirL.shadow.blurSamples = 32
+    dirL.shadow.autoUpdate = true
+    console.log(dirL);
     dirL.updateMatrix()
     this.scene.add(dirL)
 
-    const ambL = new AmbientLight(0xffffff, 0.2)
+    const ambL = new AmbientLight(0xffffff, 0.4)
     this.scene.add(ambL)
   }
 
