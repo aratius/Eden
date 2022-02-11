@@ -2,9 +2,6 @@ varying vec2 v_uv;
 uniform sampler2D u_current_texture;
 uniform sampler2D u_old_texture;
 
-const int segX = 10;
-const int segY = 7;
-
 vec2 get_pos(vec2 pos, int x, int y) {
   return pos * vec2(10., 10.) - vec2(float(x), float(y));
 }

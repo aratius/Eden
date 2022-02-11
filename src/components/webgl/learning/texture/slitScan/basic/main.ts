@@ -8,6 +8,8 @@ import CopiedMaterial from "./material/copiedMaterial";
 import SlitScanMaterial from "./material/slitScanMaterial";
 import TimeMapMaterial from "./material/timeMapMaterial";
 
+const BASE_SIZE = new Vector2(1000, 720)
+
 /**
  * 必要になりそうなシェーダー & テクスチャ
  * 毎回planeに描画して、それをrtCameraから取得して、というフローになる
@@ -30,6 +32,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	private _copiedTarget: FeedbackRT = null
 	private _timeMapTarget: FeedbackRT = null
 	private _slideTimeline: GSAPTimeline = null
+	private _size: Vector2 = BASE_SIZE.clone().multiplyScalar(3)
 
 	/**
 	 * ディスプレイを作る
@@ -47,19 +50,37 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		return display
 	}
 
+	constructor(canvas: HTMLCanvasElement) {
+		super(canvas)
+		const gui = new GUI()
+		gui.on(GUI.SLIDE, this._slideUI)
+		gui.on(GUI.CHANGE_RES, this._changeRes)
+	}
+
 	async _onInit(): Promise<void> {
 		this._videoTexture = await this._initVideo()
 		this._initRenderTargets()
 		this._initDisplays()
 
-		const gui = new GUI()
 
 		this.renderer.setClearColor(0x000)
 
 		this.endLoading()
 	}
 
-	_onDeInit(): void {}
+	_onDeInit(): void {
+		this._displays.forEach((display: Mesh) => {
+			(display.material as Material).dispose()
+			this.scene.remove(display);
+		})
+		this._displays = []
+
+		this._combinedTarget.deInit()
+		this._copiedTarget.deInit()
+		this._timeMapTarget.deInit()
+
+		this._videoTexture = null
+	}
 
 	_onResize(): void {}
 
@@ -70,21 +91,28 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	/**
 	 * ディスプレイをスライド
 	 */
-	private _slideUI(): void {
+	private _slideUI = (): void => {
 		const positoins = this._displays.map(d => d.position)
 		const scales = this._displays.map(d => d.scale)
 
-		if(this._slideTimeline.isActive()) return
-		if(this._slideTimeline != null) this._slideTimeline.kill()
+		if(this._slideTimeline != null && this._slideTimeline.isActive()) return
+
 		this._slideTimeline = gsap.timeline()
 
 		this._displays.forEach((display: Mesh, i: number, arr: Mesh[]) => {
 			const nextIndex = i+1 > arr.length-1 ? 0 : i+1
 			const p = positoins[nextIndex]
 			const s = scales[nextIndex]
+			display.position.setZ(p.z)
 			this._slideTimeline.to(display.position, {x: p.x, y: p.y}, 0)
 			this._slideTimeline.to(display.scale, {x: s.x, y: s.y}, 0)
 		})
+	}
+
+	private _changeRes = (res: number): void => {
+		this._size = BASE_SIZE.clone().multiplyScalar(res)
+		this.deInit()
+		this.init()
 	}
 
 	/**
@@ -110,24 +138,24 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	 * 各種裏側の処理の確認用のディスプレイを初期化
 	 */
 	private _initDisplays(): void {
-		const basicMat = (map: Texture) => new MeshBasicMaterial({map})
+	const basicMat = (map: Texture) => new MeshBasicMaterial({map})
 
 		const realTimeDisplay = WebGLSlitScanBasic._createDisplay(
 			basicMat(this._videoTexture),
 			new Vector2(500/3.1, 360/3.1),
-			new Vector3(280, 122, 0)
+			new Vector3(280, 122, 0.1)
 		)
 
 		const timeslicedDisplay = WebGLSlitScanBasic._createDisplay(
 			basicMat(this._combinedTarget.texture),
 			new Vector2(500/3.1, 360/3.1),
-			new Vector3(280, 0, 0)
+			new Vector3(280, 0, 0.2)
 		)
 
 		const timeMapDisplay = WebGLSlitScanBasic._createDisplay(
 			basicMat(this._timeMapTarget.texture),
 			new Vector2(500/3.1, 360/3.1),
-			new Vector3(280, -122, 0)
+			new Vector3(280, -122, 0.3)
 		)
 
 		const slitScanResult = WebGLSlitScanBasic._createDisplay(
@@ -144,9 +172,9 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	 * レンダーターゲット系を初期化
 	 */
 	private _initRenderTargets(): void {
-		this._combinedTarget = new FeedbackRT(new Vector2(1000*3, 720*3), new CombinedMaterial())
+		this._combinedTarget = new FeedbackRT(this._size, new CombinedMaterial())
 		this._combinedTarget.setTexture("u_current_texture", this._videoTexture)
-		this._copiedTarget = new FeedbackRT(new Vector2(1000*3, 720*3), new CopiedMaterial())
+		this._copiedTarget = new FeedbackRT(this._size, new CopiedMaterial())
 		this._timeMapTarget = new FeedbackRT(new Vector2(1000, 720), new TimeMapMaterial())
 	}
 
