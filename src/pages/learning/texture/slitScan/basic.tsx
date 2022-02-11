@@ -30,10 +30,10 @@ export default class Fluid extends Component<Props> {
 		return (
 			<>
 				<_Head
-					title="texture mapping"
-					ogUrl="https://eden.aualrxse.com/learning/textureMapping"
+					title="Slit scan"
+					ogUrl="https://eden.aualrxse.com/learning/texture/slitScan/basic"
 					ogImgPath="https://eden.aualrxse.com/og/face/og.png"
-					description="Teresa installation."
+					description="Slit scan"
 				></_Head>
 				<div className={styles.container}>
 					<canvas
@@ -47,7 +47,7 @@ export default class Fluid extends Component<Props> {
 				</div>
 				<Info
 						// ref={this.onReadyInfo}
-						title="slit scan basic"
+						title="Basic slit scan"
 						details={[
 							[
 								{

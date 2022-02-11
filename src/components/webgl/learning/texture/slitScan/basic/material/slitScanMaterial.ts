@@ -8,6 +8,7 @@ export default class SlitScanMaterial extends ShaderMaterial {
     super({
       fragmentShader,
       vertexShader,
+      depthTest: true,
       uniforms: {
         u_timemachine: { value: texture },
         u_map: {value: map}

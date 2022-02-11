@@ -112,8 +112,8 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 			const nextIndex = i+1 > arr.length-1 ? 0 : i+1
 			const p = positoins[nextIndex]
 			const s = scales[nextIndex]
-			display.position.setZ(p.z)
-			this._slideTimeline.to(display.position, {x: p.x, y: p.y}, 0)
+			display.renderOrder = p.z
+			this._slideTimeline.to(display.position, {x: p.x, y: p.y, z: p.z, onUpdate: () => console.log(display.position.z)}, 0)
 			this._slideTimeline.to(display.scale, {x: s.x, y: s.y}, 0)
 		})
 	}
@@ -159,30 +159,70 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	 * 各種裏側の処理の確認用のディスプレイを初期化
 	 */
 	private _initDisplays(): void {
-	const basicMat = (map: Texture) => new MeshBasicMaterial({map})
+		const basicMat = (map: Texture) => new MeshBasicMaterial({map, depthTest: true})
+
+		let posScaleList = [
+			{
+				s: this._BASESIZE.multiplyScalar(0.5 / 3.1),
+				p: new Vector3(280, 122, 0.3)
+			},
+			{
+				s: this._BASESIZE.multiplyScalar(0.5 / 3.1),
+				p: new Vector3(280, 0, 0.2)
+			},
+			{
+				s: this._BASESIZE.multiplyScalar(0.5 / 3.1),
+				p: new Vector3(280, -122, 0.1)
+			},
+			{
+				s: this._BASESIZE.multiplyScalar(0.5),
+				p: new Vector3(-100, 0, 0)
+			}
+		]
+
+		if(window.innerWidth < 800) {
+			posScaleList = [
+				{
+					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8 / 2),
+					p: new Vector3(0, -300, 0)
+				},
+				{
+					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8 / 2),
+					p: new Vector3(0, 0, 50)
+				},
+				{
+					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8 / 2),
+					p: new Vector3(0, 300, 100)
+				},
+				{
+					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8),
+					p: new Vector3(0, 0, 150)
+				}
+			]
+		}
 
 		const realTimeDisplay = WebGLSlitScanBasic._createDisplay(
 			basicMat(this._videoTexture),
-			this._BASESIZE.multiplyScalar(0.5 / 3.1),
-			new Vector3(280, 122, 0.1)
+			posScaleList[0].s,
+			posScaleList[0].p
 		)
 
 		const timeslicedDisplay = WebGLSlitScanBasic._createDisplay(
 			basicMat(this._combinedTarget.texture),
-			this._BASESIZE.multiplyScalar(0.5 / 3.1),
-			new Vector3(280, 0, 0.2)
+			posScaleList[1].s,
+			posScaleList[1].p
 		)
 
 		const timeMapDisplay = WebGLSlitScanBasic._createDisplay(
 			basicMat(this._timeMapTarget.texture),
-			this._BASESIZE.multiplyScalar(0.5 / 3.1),
-			new Vector3(280, -122, 0.3)
+			posScaleList[2].s,
+			posScaleList[2].p
 		)
 
 		const slitScanResult = WebGLSlitScanBasic._createDisplay(
 			new SlitScanMaterial(this._combinedTarget.texture, this._timeMapTarget.texture),
-			this._BASESIZE.multiplyScalar(0.5),
-			new Vector3(-100, 0, 0)
+			posScaleList[3].s,
+			posScaleList[3].p
 		)
 
 		this.scene.add(realTimeDisplay, timeslicedDisplay, timeMapDisplay, slitScanResult)
@@ -217,6 +257,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 			this._timeMapTarget.render(this.renderer)
 			this._timeMapTarget.setTime(this.elapsedTime)
 		}
+		this.renderer.render(this.scene, this.camera)
 	}
 
 
