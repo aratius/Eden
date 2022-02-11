@@ -2,6 +2,7 @@ import { Component, ReactElement } from 'react'
 import styles from '../../../../styles/layout/top/top.module.scss'
 import _Head from '../../../../components/next/common/head'
 import WebGLSlitScanBasic from '../../../../components/webgl/learning/texture/slitScan/basic/main'
+import Info from '../../../../components/next/common/info'
 
 interface Props {
 
@@ -44,6 +45,13 @@ export default class Fluid extends Component<Props> {
 						height="1080"
 					></canvas>
 				</div>
+				<Info
+						// ref={this.onReadyInfo}
+						title="slit scan basic"
+						details={[]}
+						shareText="author @aualrxse"
+						shareUrl="https://eden.aualrxse.com/learning/texture/slitScan/basic"
+					/>
 			</>
 		)
 	}

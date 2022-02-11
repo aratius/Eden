@@ -5,10 +5,11 @@
 
 varying vec2 v_uv;
 uniform float u_time;
+uniform float u_type;
 
 void main() {
   vec2 pos = v_uv;
-  float col = snoise3(vec3(pos, u_time/10.));
+  float col = snoise3(vec3(pos, u_time/10.)) * 0.5 + 0.5;
 
   gl_FragColor = vec4(vec3(col), 1.);
 }

@@ -1,4 +1,5 @@
-import { LinearFilter, Mesh, MeshBasicMaterial, PlaneBufferGeometry, RGBFormat, Vector2, VideoTexture } from "three";
+import gsap from "gsap";
+import { LinearFilter, Material, Mesh, MeshBasicMaterial, PlaneBufferGeometry, RGBFormat, Texture, Vector2, Vector3, VideoTexture } from "three";
 import WebGLCanvasBase from "../../../../utils/template/template";
 import FeedbackRT from "./feedbackTarget";
 import CombinedMaterial from "./material/combinedMaterial";
@@ -22,19 +23,35 @@ import TimeMapMaterial from "./material/timeMapMaterial";
  */
 export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 
-	private _realTimeDisplay: Mesh = null
-	private _video: HTMLVideoElement = null
+	private _displays: Mesh[] = []
+	private _videoTexture: Texture = null
 	private _combinedTarget: FeedbackRT = null
 	private _copiedTarget: FeedbackRT = null
 	private _timeMapTarget: FeedbackRT = null
+	private _slideTimeline: GSAPTimeline = null
+
+	/**
+	 * ディスプレイを作る
+	 * @param mat
+	 * @param size
+	 * @param pos
+	 * @returns
+	 */
+	private static _createDisplay(mat: Material, size: Vector2, pos: Vector3): Mesh {
+		const geo = new PlaneBufferGeometry(1, 1, 1, 1)
+
+		const display = new Mesh(geo, mat)
+		display.position.set(pos.x, pos.y, pos.z)
+		display.scale.set(size.x, size.y, 1)
+		return display
+	}
 
 	async _onInit(): Promise<void> {
-		await this._initVideo()
+		this._videoTexture = await this._initVideo()
 		this._initRenderTargets()
-		this._initCombinedDisplay()
-		this._initRealTimeDisplay()
-		this._initTimeMapDisplay()
-		this._initSlitScanResult()
+		this._initDisplays()
+
+		this.renderer.setClearColor(0x000)
 
 		this.endLoading()
 	}
@@ -48,82 +65,90 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	}
 
 	/**
-	 * initialize web camera
-	 * @returns {Promise<void>}
+	 * ディスプレイをスライド
 	 */
-	 private async _initVideo(): Promise<void> {
-		return new Promise<void>(async(res) => {
-			try {
-				const localMediaStream: MediaStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false})
-				this._video = document.createElement("video")
-				this._video.srcObject = localMediaStream
-				this._video.addEventListener("loadeddata", () => {
-					this._video.play()
-					res()
-				})
-			} catch(err) {
-				console.error(err)
-			}
+	private _slideUI(): void {
+		const positoins = this._displays.map(d => d.position)
+		const scales = this._displays.map(d => d.scale)
+
+		if(this._slideTimeline.isActive()) return
+		if(this._slideTimeline != null) this._slideTimeline.kill()
+		this._slideTimeline = gsap.timeline()
+
+		this._displays.forEach((display: Mesh, i: number, arr: Mesh[]) => {
+			const nextIndex = i+1 > arr.length-1 ? 0 : i+1
+			const p = positoins[nextIndex]
+			const s = scales[nextIndex]
+			this._slideTimeline.to(display.position, {x: p.x, y: p.y}, 0)
+			this._slideTimeline.to(display.scale, {x: s.x, y: s.y}, 0)
 		})
 	}
 
 	/**
-	 * 現在のvideoを単に表示
-	 * @return {Promise<void>}
+	 * initialize web camera
+	 * @returns {Promise<void>}
 	 */
-	private async _initRealTimeDisplay(): Promise<void> {
-		const tex = new VideoTexture(this._video)
-		tex.magFilter = LinearFilter
-		tex.minFilter = LinearFilter
-		tex.format = RGBFormat
-		const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
-		const mat = new MeshBasicMaterial({color: 0xffffff, map: tex})
+	 private async _initVideo(): Promise<Texture> {
+		try {
+			const localMediaStream: MediaStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false})
+			const video = document.createElement("video")
+			video.srcObject = localMediaStream
 
-		this._realTimeDisplay = new Mesh(geo, mat)
-		this._realTimeDisplay.position.set(400, 200, 0)
-		this.scene.add(this._realTimeDisplay)
+			video.addEventListener("loadeddata", () => {
+				video.play()
+			})
+			return new VideoTexture(video)
+		} catch(err) {
+			console.error(err)
+		}
 	}
 
 	/**
-	 * 全部をグリッド状に並べたtimeslicedを表示
-	 * @return {Promise<void>}
+	 * 各種裏側の処理の確認用のディスプレイを初期化
 	 */
-	private async _initCombinedDisplay(): Promise<void> {
-		const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
-		const mat = new MeshBasicMaterial({color: 0xffffff, map: this._combinedTarget.texture})
+	private _initDisplays(): void {
+		const basicMat = (map: Texture) => new MeshBasicMaterial({map})
 
-		const combinedDisplay = new Mesh(geo, mat)
-		combinedDisplay.position.set(-400, -200, 10)
-		this.scene.add(combinedDisplay)
-	}
+		const realTimeDisplay = WebGLSlitScanBasic._createDisplay(
+			basicMat(this._videoTexture),
+			new Vector2(500/3.1, 360/3.1),
+			new Vector3(280, 122, 0)
+		)
 
-	/**
-	 * 時間経過を表すmap
-	 * @return {Promise<void>}
-	 */
-	 private async _initTimeMapDisplay(): Promise<void> {
-		const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
-		const mat = new MeshBasicMaterial({color: 0xffffff, map: this._timeMapTarget.texture})
+		const timeslicedDisplay = WebGLSlitScanBasic._createDisplay(
+			basicMat(this._combinedTarget.texture),
+			new Vector2(500/3.1, 360/3.1),
+			new Vector3(280, 0, 0)
+		)
 
-		const timeMapDisplay = new Mesh(geo, mat)
-		timeMapDisplay.position.set(400, -200, 10)
-		this.scene.add(timeMapDisplay)
+		const timeMapDisplay = WebGLSlitScanBasic._createDisplay(
+			basicMat(this._timeMapTarget.texture),
+			new Vector2(500/3.1, 360/3.1),
+			new Vector3(280, -122, 0)
+		)
+
+		const slitScanResult = WebGLSlitScanBasic._createDisplay(
+			new SlitScanMaterial(this._combinedTarget.texture, this._timeMapTarget.texture),
+			new Vector2(500, 360),
+			new Vector3(-100, 0, 0)
+		)
+
+		this.scene.add(realTimeDisplay, timeslicedDisplay, timeMapDisplay, slitScanResult)
+		this._displays.push(realTimeDisplay, timeslicedDisplay, timeMapDisplay, slitScanResult)
 	}
 
 	/**
 	 * レンダーターゲット系を初期化
 	 */
 	private _initRenderTargets(): void {
-		this._combinedTarget = new FeedbackRT(new Vector2(1000*3, 700*3), new CombinedMaterial())
-		this._combinedTarget.setTexture("u_current_texture", new VideoTexture(this._video))
-
-		this._copiedTarget = new FeedbackRT(new Vector2(1000*3, 700*3), new CopiedMaterial())
-
-		this._timeMapTarget = new FeedbackRT(new Vector2(1000, 700), new TimeMapMaterial())
+		this._combinedTarget = new FeedbackRT(new Vector2(1000*3, 720*3), new CombinedMaterial())
+		this._combinedTarget.setTexture("u_current_texture", this._videoTexture)
+		this._copiedTarget = new FeedbackRT(new Vector2(1000*3, 720*3), new CopiedMaterial())
+		this._timeMapTarget = new FeedbackRT(new Vector2(1000, 720), new TimeMapMaterial())
 	}
 
 	/**
-	 *
+	 * レンダーターゲットを更新
 	 */
 	private _updateRenderTargets(): void {
 		if(this._combinedTarget != null && this._copiedTarget != null && this._timeMapTarget != null) {
@@ -140,16 +165,5 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		}
 	}
 
-	/**
-	 *
-	 */
-	private _initSlitScanResult(): void {
-		const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
-		const mat = new SlitScanMaterial(this._combinedTarget.texture, this._timeMapTarget.texture)
-
-		const result = new Mesh(geo, mat)
-		result.position.set(-400, 200, 10)
-		this.scene.add(result)
-	}
 
 }
