@@ -1,4 +1,4 @@
-import { LinearFilter, Mesh, NearestFilter, OrthographicCamera, PlaneBufferGeometry, Renderer, RGBFormat, Scene, ShaderMaterial, Texture, Vector2, WebGLRenderer, WebGLRenderTarget } from "three";
+import { LinearFilter, Mesh, MeshBasicMaterial, NearestFilter, OrthographicCamera, PlaneBufferGeometry, Renderer, RGBFormat, Scene, ShaderMaterial, SphereBufferGeometry, Texture, Vector2, WebGLRenderer, WebGLRenderTarget } from "three";
 import FeedbackMaterialBase from "./material/feedbackMaterialBase";
 
 /**
@@ -21,10 +21,13 @@ export default class FeedbackRT {
 		})
 		this._rtScene = new Scene()
 		this._rtCamera = new OrthographicCamera(-size.x/2, size.x/2, size.y/2, -size.y/2)
+		this._rtCamera.position.setZ(10)
 
 		// テクスチャ保存のためのPlane
 		const geo = new PlaneBufferGeometry(size.x, size.y, 1, 1)
+
 		const plane = new Mesh(geo, this._planeMaterial)
+		// plane.rotateX(Math.PI)
 		this._rtScene.add(plane)
 	}
 
@@ -43,6 +46,7 @@ export default class FeedbackRT {
 		renderer.setRenderTarget(this._renderTarget)
 		renderer.render(this._rtScene, this._rtCamera)
 		renderer.setRenderTarget(null)
+
 	}
 
 	/**
