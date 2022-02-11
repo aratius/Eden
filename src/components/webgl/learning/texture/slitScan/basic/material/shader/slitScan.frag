@@ -11,9 +11,13 @@ uniform float u_time;
 void main() {
   vec2 pos = v_uv;
 
-  float map = pos.y;
-  map = snoise3(vec3(pos, 1.)) * 0.5+0.5;
-  map = length(vec2(0.5) - pos);
+  float map = 0.;
+  // linear gradient
+  map = pos.y;
+  // noise
+  // map = snoise3(vec3(pos, 1.)) * 0.5+0.5;
+  // circular
+  // map = length(vec2(0.5) - pos);
 
   float time = map;
   time = floor(time * 99.);

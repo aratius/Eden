@@ -1,3 +1,6 @@
 interface Navigator {
-    getUserMedia: any
+    getUserMedia: any,
+    webkitGetUserMedia: any
+    mozGetUserMedia: any,
+    msGetUserMedia: any
 }

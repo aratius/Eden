@@ -32,7 +32,6 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		this._initRenderTargets()
 
 		this._initCombinedDisplay()
-		// this._initCopiedDisplay()
 		this._initRealTimeDisplay()
 
 		this._initSlitScanResult()
@@ -57,21 +56,20 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	 * @returns {Promise<void>}
 	 */
 	 private async _initVideo(): Promise<void> {
+		 const getUserMedia = navigator.getUserMedia || navigator.mediaDevices.getUserMedia
+
 		return new Promise<void>((res) => {
-			navigator.getUserMedia(
-				{video: true, audio: false},
-				(localMediaStream: MediaStream) => {
-					this._video = document.createElement("video")
-					this._video.srcObject = localMediaStream
-					this._video.addEventListener("loadeddata", () => {
-						this._video.play()
-						res()
-					})
-				},
-				(err: any) => {
-					console.error(err)
-				}
-			)
+			navigator.mediaDevices.getUserMedia({video: true, audio: false}).then((localMediaStream: MediaStream) => {
+				this._video = document.createElement("video")
+				this._video.srcObject = localMediaStream
+				// this._video.src = URL.createObjectURL(localMediaStream)
+				this._video.addEventListener("loadeddata", () => {
+					this._video.play()
+					res()
+				})
+			}).catch((err) => {
+				console.error(err)
+			})
 		})
 	}
 
@@ -101,18 +99,6 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		const combinedDisplay = new Mesh(geo, mat)
 		combinedDisplay.position.set(-400, -200, 10)
 		this.scene.add(combinedDisplay)
-	}
-
-	/**
-	 * @return {Promise<void>}
-	 */
-	 private async _initCopiedDisplay(): Promise<void> {
-		const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
-		const mat = new MeshBasicMaterial({color: 0xffffff, map: this._copiedTarget.texture})
-
-		const copiedDisplay = new Mesh(geo, mat)
-		copiedDisplay.position.set(400, -200, 10)
-		this.scene.add(copiedDisplay)
 	}
 
 	private _initRenderTargets(): void {
