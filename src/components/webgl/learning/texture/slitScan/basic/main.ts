@@ -55,7 +55,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		const gui = new GUI()
 		gui.on(GUI.SLIDE, this._slideUI)
 		gui.on(GUI.CHANGE_RES, this._changeRes)
-
+		gui.on(GUI.CHANGE_MAP, this._changeMap)
 	}
 
 	async _onInit(): Promise<void> {
@@ -116,6 +116,11 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		this.init()
 	}
 
+	private _changeMap = (mapType: number): void => {
+		console.log(mapType);
+		this._timeMapTarget.setUniform("u_map_type", mapType)
+	}
+
 	/**
 	 * initialize web camera
 	 * @returns {Promise<void>}
@@ -174,7 +179,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	 */
 	private _initRenderTargets(): void {
 		this._combinedTarget = new FeedbackRT(this._size, new CombinedMaterial())
-		this._combinedTarget.setTexture("u_current_texture", this._videoTexture)
+		this._combinedTarget.setUniform("u_current_texture", this._videoTexture)
 		this._copiedTarget = new FeedbackRT(this._size, new CopiedMaterial())
 		this._timeMapTarget = new FeedbackRT(BASE_SIZE.clone(), new TimeMapMaterial())
 	}
@@ -185,11 +190,11 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	private _updateRenderTargets(): void {
 		if(this._combinedTarget != null && this._copiedTarget != null && this._timeMapTarget != null) {
 			// TODO: oldを受ける
-			this._combinedTarget.setTexture("u_old_texture", this._copiedTarget.texture)
+			this._combinedTarget.setUniform("u_old_texture", this._copiedTarget.texture)
 			this._combinedTarget.render(this.renderer)
 
 			// TODO: newを受ける
-			this._copiedTarget.setTexture("u_copied_texture", this._combinedTarget.texture)
+			this._copiedTarget.setUniform("u_copied_texture", this._combinedTarget.texture)
 			this._copiedTarget.render(this.renderer)
 
 			this._timeMapTarget.render(this.renderer)

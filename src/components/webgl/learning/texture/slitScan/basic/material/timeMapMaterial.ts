@@ -13,6 +13,9 @@ export default class TimeMapMaterial extends FeedbackMaterialBase {
     super({
       fragmentShader,
       vertexShader,
+      uniforms: {
+        u_map_type: {value: 1}
+      }
     })
   }
 

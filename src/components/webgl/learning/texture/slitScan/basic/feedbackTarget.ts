@@ -58,11 +58,11 @@ export default class FeedbackRT {
 	/**
 	 * uniformでわたすテクスチャを更新
 	 * @param uniformName
-	 * @param texture
+	 * @param val
 	 */
-	public setTexture(uniformName: string, texture: Texture): void {
+	public setUniform<T>(uniformName: string, val: T): void {
 		if(!(uniformName in this._planeMaterial.uniforms)) console.error("uniform does not exist in this._planeMaterial");
-		this._planeMaterial.uniforms[uniformName].value = texture
+		this._planeMaterial.uniforms[uniformName].value = val
 	}
 
 	public resize(size: Vector2): void {
