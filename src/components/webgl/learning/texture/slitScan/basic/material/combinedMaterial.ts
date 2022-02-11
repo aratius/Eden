@@ -1,12 +1,14 @@
 import { Texture } from "three";
 import FeedbackMaterialBase from "./feedbackMaterialBase";
+import fragmentShader from "./shader/combine.frag"
+import vertexShader from "./shader/allVertex.frag"
 
 /**
  * 古いものと新しいものを結合してTime machineを作成
  */
-export default class CombineMaterial extends FeedbackMaterialBase {
+export default class CombinedMaterial extends FeedbackMaterialBase {
 
-  constructor(fragmentShader: string, vertexShader: string) {
+  constructor() {
     super({
       fragmentShader,
       vertexShader,
