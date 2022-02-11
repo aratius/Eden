@@ -10,8 +10,11 @@ void main() {
 
   float time_to_pick = floor(map.r*100.);
   pos /= 10.;
-  pos += vec2(mod(time_to_pick, 10.)/10., floor(time_to_pick/100.));
+  pos.x += mod(time_to_pick, 10.)/10.;
+  pos.y += mod(time_to_pick, 10.)/10.;
+  // pos.y += floor(time_to_pick/10.);
 
   vec4 col = texture2D(u_timemachine, pos);
+  // gl_FragColor = vec4(vec3(pos, 0.), 1.);
   gl_FragColor = col;
 }
