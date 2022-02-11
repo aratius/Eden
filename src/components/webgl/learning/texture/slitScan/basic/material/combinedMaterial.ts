@@ -1,7 +1,7 @@
 import { Texture } from "three";
 import FeedbackMaterialBase from "./feedbackMaterialBase";
 import fragmentShader from "./shader/combine.frag"
-import vertexShader from "./shader/allVertex.frag"
+import vertexShader from "./shader/allVertex.vert"
 
 /**
  * 古いものと新しいものを結合してTime machineを作成

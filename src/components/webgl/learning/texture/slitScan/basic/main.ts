@@ -1,6 +1,8 @@
-import { LinearFilter, Mesh, MeshBasicMaterial, PlaneBufferGeometry, RGBFormat, VideoTexture } from "three";
+import { LinearFilter, Mesh, MeshBasicMaterial, PlaneBufferGeometry, RGBFormat, Texture, Vector2, VideoTexture } from "three";
 import WebGLCanvasBase from "../../../../utils/template/template";
-import FeedbackRT from "./slitRenderTarget";
+import FeedbackRT from "./feedbackTarget";
+import CombinedMaterial from "./material/combinedMaterial";
+import CopiedMaterial from "./material/copiedMaterial";
 
 
 /**
@@ -20,12 +22,16 @@ import FeedbackRT from "./slitRenderTarget";
 export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 
     private _realTimeDisplay: Mesh = null
-    private _lastFeedback: FeedbackRT
+    private _combinedDisplay: Mesh = null
     private _video: HTMLVideoElement = null
+    private _combinedTarget: FeedbackRT = null
+    private _copiedTarget: FeedbackRT = null
 
     async _onInit(): Promise<void> {
         await this._initVideo()
+        this._initCombinedDisplay()
         this._initRealTimeDisplay()
+
         this.endLoading()
     }
 
@@ -43,25 +49,9 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 
     /**
      *
+     * @returns {Promise<void>}
      */
-    private async _initRealTimeDisplay(): Promise<void> {
-        const texture = new VideoTexture(this._video)
-        texture.magFilter = LinearFilter
-        texture.minFilter = LinearFilter
-        texture.format = RGBFormat
-        const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
-        const mat = new MeshBasicMaterial({color: 0xffffff, map: texture})
-
-        this._realTimeDisplay = new Mesh(geo, mat)
-        this._realTimeDisplay.position.set(200, 150, 0)
-        this.scene.add(this._realTimeDisplay)
-    }
-
-    /**
-     *
-     * @returns
-     */
-    private async _initVideo(): Promise<void> {
+     private async _initVideo(): Promise<void> {
         return new Promise<void>((res) => {
             navigator.getUserMedia(
                 {video: true, audio: false},
@@ -75,10 +65,45 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
                     })
                 },
                 (err: any) => {
-                    console.log(err)
+                    console.error(err)
                 }
             )
         })
+    }
+
+    /**
+     * @return {Promise<void>}
+     */
+    private async _initRealTimeDisplay(): Promise<void> {
+        const tex = new VideoTexture(this._video)
+        tex.magFilter = LinearFilter
+        tex.minFilter = LinearFilter
+        tex.format = RGBFormat
+        const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
+        const mat = new MeshBasicMaterial({color: 0xffffff, map: tex})
+
+        this._realTimeDisplay = new Mesh(geo, mat)
+        this._realTimeDisplay.position.set(200, 150, 0)
+        this.scene.add(this._realTimeDisplay)
+    }
+
+    /**
+     * @return {Promise<void>}
+     */
+    private async _initCombinedDisplay(): Promise<void> {
+        const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
+        const mat = new MeshBasicMaterial({color: 0xfff000})
+
+        this._combinedDisplay = new Mesh(geo, mat)
+        this._combinedDisplay.position.set(-200, -150, 10)
+        this.scene.add(this._combinedDisplay)
+    }
+
+    private _initRenderTargets(): void {
+
+        this._combinedTarget = new FeedbackRT(new Vector2(1000/2, 700/2), new CombinedMaterial())
+
+        this._copiedTarget = new FeedbackRT(new Vector2(1000/2, 700/2), new CopiedMaterial())
     }
 
 }

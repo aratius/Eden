@@ -1,7 +1,7 @@
 import { Texture } from "three";
 import FeedbackMaterialBase from "./feedbackMaterialBase";
 import fragmentShader from "./shader/copy.frag";
-import vertexShader from "./shader/allVertex.frag";
+import vertexShader from "./shader/allVertex.vert";
 
 
 /**
