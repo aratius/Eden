@@ -4,12 +4,13 @@ import fragmentShader from "./shader/slitScan.frag"
 
 export default class SlitScanMaterial extends ShaderMaterial {
 
-  constructor(texture: Texture) {
+  constructor(texture: Texture, map: Texture) {
     super({
       fragmentShader,
       vertexShader,
       uniforms: {
-        u_timemachine: { value: texture }
+        u_timemachine: { value: texture },
+        u_map: {value: map}
       }
     })
   }

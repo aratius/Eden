@@ -4,6 +4,7 @@
 
 varying vec2 v_uv;
 uniform sampler2D u_timemachine;
+uniform sampler2D u_map;
 uniform float u_time;
 
 // time slice count => 100
@@ -11,13 +12,7 @@ uniform float u_time;
 void main() {
   vec2 pos = v_uv;
 
-  float map = 0.;
-  // linear gradient
-  map = pos.y;
-  // noise
-  // map = snoise3(vec3(pos, 1.)) * 0.5+0.5;
-  // circular
-  // map = length(vec2(0.5) - pos);
+  float map = texture2D(u_map, pos).r;
 
   float time = map;
   time = floor(time * 99.);

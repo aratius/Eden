@@ -59,4 +59,8 @@ export default class FeedbackRT {
 		this._planeMaterial.uniforms[uniformName].value = texture
 	}
 
+	public setTime(time: number): void {
+		this._planeMaterial.setTime(time)
+	}
+
 }

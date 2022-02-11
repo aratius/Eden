@@ -4,6 +4,7 @@ import FeedbackRT from "./feedbackTarget";
 import CombinedMaterial from "./material/combinedMaterial";
 import CopiedMaterial from "./material/copiedMaterial";
 import SlitScanMaterial from "./material/slitScanMaterial";
+import TimeMapMaterial from "./material/timeMapMaterial";
 
 /**
  * 必要になりそうなシェーダー & テクスチャ
@@ -25,12 +26,14 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	private _video: HTMLVideoElement = null
 	private _combinedTarget: FeedbackRT = null
 	private _copiedTarget: FeedbackRT = null
+	private _timeMapTarget: FeedbackRT = null
 
 	async _onInit(): Promise<void> {
 		await this._initVideo()
 		this._initRenderTargets()
 		this._initCombinedDisplay()
 		this._initRealTimeDisplay()
+		this._initTimeMapDisplay()
 		this._initSlitScanResult()
 
 		this.endLoading()
@@ -65,6 +68,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	}
 
 	/**
+	 * 現在のvideoを単に表示
 	 * @return {Promise<void>}
 	 */
 	private async _initRealTimeDisplay(): Promise<void> {
@@ -81,6 +85,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	}
 
 	/**
+	 * 全部をグリッド状に並べたtimeslicedを表示
 	 * @return {Promise<void>}
 	 */
 	private async _initCombinedDisplay(): Promise<void> {
@@ -93,20 +98,35 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	}
 
 	/**
-	 *
+	 * 時間経過を表すmap
+	 * @return {Promise<void>}
+	 */
+	 private async _initTimeMapDisplay(): Promise<void> {
+		const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
+		const mat = new MeshBasicMaterial({color: 0xffffff, map: this._timeMapTarget.texture})
+
+		const timeMapDisplay = new Mesh(geo, mat)
+		timeMapDisplay.position.set(400, -200, 10)
+		this.scene.add(timeMapDisplay)
+	}
+
+	/**
+	 * レンダーターゲット系を初期化
 	 */
 	private _initRenderTargets(): void {
 		this._combinedTarget = new FeedbackRT(new Vector2(1000*3, 700*3), new CombinedMaterial())
 		this._combinedTarget.setTexture("u_current_texture", new VideoTexture(this._video))
 
 		this._copiedTarget = new FeedbackRT(new Vector2(1000*3, 700*3), new CopiedMaterial())
+
+		this._timeMapTarget = new FeedbackRT(new Vector2(1000, 700), new TimeMapMaterial())
 	}
 
 	/**
 	 *
 	 */
 	private _updateRenderTargets(): void {
-		if(this._combinedTarget != null && this._copiedTarget != null) {
+		if(this._combinedTarget != null && this._copiedTarget != null && this._timeMapTarget != null) {
 			// TODO: oldを受ける
 			this._combinedTarget.setTexture("u_old_texture", this._copiedTarget.texture)
 			this._combinedTarget.render(this.renderer)
@@ -114,6 +134,9 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 			// TODO: newを受ける
 			this._copiedTarget.setTexture("u_copied_texture", this._combinedTarget.texture)
 			this._copiedTarget.render(this.renderer)
+
+			this._timeMapTarget.render(this.renderer)
+			this._timeMapTarget.setTime(this.elapsedTime)
 		}
 	}
 
@@ -122,7 +145,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	 */
 	private _initSlitScanResult(): void {
 		const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
-		const mat = new SlitScanMaterial(this._combinedTarget.texture)
+		const mat = new SlitScanMaterial(this._combinedTarget.texture, this._timeMapTarget.texture)
 
 		const result = new Mesh(geo, mat)
 		result.position.set(-400, 200, 10)
