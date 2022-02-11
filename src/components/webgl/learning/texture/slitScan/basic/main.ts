@@ -1,6 +1,6 @@
 import { LinearFilter, Mesh, MeshBasicMaterial, PlaneBufferGeometry, RGBFormat, VideoTexture } from "three";
 import WebGLCanvasBase from "../../../../utils/template/template";
-import SlitScanRenderTargetUtil from "./feedBack";
+import FeedbackRT from "./slitRenderTarget";
 
 
 /**
@@ -20,7 +20,7 @@ import SlitScanRenderTargetUtil from "./feedBack";
 export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 
     private _realTimeDisplay: Mesh = null
-    private _lastFeedback: SlitScanRenderTargetUtil
+    private _lastFeedback: FeedbackRT
     private _video: HTMLVideoElement = null
 
     async _onInit(): Promise<void> {
@@ -49,7 +49,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
         texture.magFilter = LinearFilter
         texture.minFilter = LinearFilter
         texture.format = RGBFormat
-        const geo = new PlaneBufferGeometry(1000/2, 600/2, 10, 10)
+        const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
         const mat = new MeshBasicMaterial({color: 0xffffff, map: texture})
 
         this._realTimeDisplay = new Mesh(geo, mat)

@@ -20,6 +20,6 @@
     "include": [
 		"next-env.d.ts",
 		"src/**/*"
-	],
+, "src/components/webgl/learning/texture/slitScan/basic/material/.ts"	],
     "exclude": ["node_modules"]
   }

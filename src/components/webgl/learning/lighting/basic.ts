@@ -1,10 +1,11 @@
 import { dir } from "console";
 import { AmbientLight, BoxBufferGeometry, DirectionalLight, Mesh, MeshStandardMaterial, VSMShadowMap } from "three";
 import WebGLCanvasBase from "../../utils/template/template";
+const noise = require('simplenoise')
 
-const BOX_ROW = 10
-const BOX_COLUM = 10
-const BOX_SIZE = 100
+const BOX_ROW = 20
+const BOX_COLUM = 20
+const BOX_SIZE = 50
 
 export default class LightingBasic extends WebGLCanvasBase {
 
@@ -29,11 +30,16 @@ export default class LightingBasic extends WebGLCanvasBase {
   }
 
   _onUpdate(): void {
-
+    this._boxes.forEach((box: Mesh, i: number) => {
+      const x = i % BOX_ROW
+      const y = Math.floor(i / BOX_COLUM)
+      const h = noise.simplex3(x/10, y/10, this.elapsedTime / 7)
+      box.position.setZ(h * 300)
+    })
   }
 
   _initLights(): void {
-    const dirL = new DirectionalLight(0xffffff, 1)
+    const dirL = new DirectionalLight(0xffffff, 0.4)
     dirL.position.set(300, 300, 300)
     dirL.lookAt(0,0,0)
     dirL.castShadow = true
@@ -46,14 +52,15 @@ export default class LightingBasic extends WebGLCanvasBase {
     dirL.shadow.camera.updateProjectionMatrix()
     dirL.shadow.mapSize.width = 2048
     dirL.shadow.mapSize.height = 2048
-    dirL.shadow.radius = 20
-    dirL.shadow.blurSamples = 32
+    dirL.shadow.radius = 10
+    dirL.shadow.blurSamples = 10
     dirL.shadow.autoUpdate = true
-    console.log(dirL);
     dirL.updateMatrix()
-    this.scene.add(dirL)
+    const dirL2 = dirL.clone()
+    dirL2.position.set(-300, -300, 300)
+    this.scene.add(dirL, dirL2)
 
-    const ambL = new AmbientLight(0xffffff, 0.4)
+    const ambL = new AmbientLight(0xffffff, 0.5)
     this.scene.add(ambL)
   }
 
@@ -64,9 +71,11 @@ export default class LightingBasic extends WebGLCanvasBase {
       for(let y = 0; y < BOX_COLUM; y++) {
         const box = new Mesh(geo, mat)
         box.position.set((x-BOX_ROW/2)*BOX_SIZE + BOX_SIZE/2, (y-BOX_COLUM/2)*BOX_SIZE + BOX_SIZE/2, Math.random()*BOX_SIZE)
-        box.receiveShadow = true
-        box.castShadow = true
+        // box.receiveShadow = true
+        // box.castShadow = true
+        box.scale.multiplyScalar(0.9)
         this.scene.add(box)
+        this._boxes.push(box)
       }
     }
   }
