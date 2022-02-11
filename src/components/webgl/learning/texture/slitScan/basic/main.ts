@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import { LinearFilter, Material, Mesh, MeshBasicMaterial, PlaneBufferGeometry, RGBFormat, Texture, Vector2, Vector3, VideoTexture } from "three";
+import { CameraSettings, RendererSettings } from "../../../../interfaces";
 import WebGLCanvasBase from "../../../../utils/template/template";
 import FeedbackRT from "./feedbackTarget";
 import GUI from "./gui";
@@ -51,8 +52,8 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		return display
 	}
 
-	constructor(canvas: HTMLCanvasElement) {
-		super(canvas)
+	constructor(canvas: HTMLCanvasElement, renderer: RendererSettings, camera: CameraSettings) {
+		super(canvas, renderer, camera)
 		this._gui = new GUI()
 		this._gui.on(GUI.SLIDE, this._slideUI)
 		this._gui.on(GUI.CHANGE_RES, this._changeRes)
