@@ -2,6 +2,7 @@ import gsap from "gsap";
 import { LinearFilter, Material, Mesh, MeshBasicMaterial, PlaneBufferGeometry, RGBFormat, Texture, Vector2, Vector3, VideoTexture } from "three";
 import WebGLCanvasBase from "../../../../utils/template/template";
 import FeedbackRT from "./feedbackTarget";
+import GUI from "./gui";
 import CombinedMaterial from "./material/combinedMaterial";
 import CopiedMaterial from "./material/copiedMaterial";
 import SlitScanMaterial from "./material/slitScanMaterial";
@@ -50,6 +51,8 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		this._videoTexture = await this._initVideo()
 		this._initRenderTargets()
 		this._initDisplays()
+
+		const gui = new GUI()
 
 		this.renderer.setClearColor(0x000)
 
