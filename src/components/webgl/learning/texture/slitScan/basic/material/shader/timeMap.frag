@@ -27,6 +27,9 @@ void main() {
     // slit
     col += mod(pos.x * 10. * 2., 1.);
   } else if (u_map_type == 6.) {
+    // circular slit
+    col = abs(0.5 - mod(length(vec2(0.5) - pos) * 20., 1.))*2.;
+  } else if (u_map_type == 7.) {
     // check
     pos *= 10.;
     col += abs(step(0.5, fract(pos.x)) - step(0.5, fract(pos.y)));

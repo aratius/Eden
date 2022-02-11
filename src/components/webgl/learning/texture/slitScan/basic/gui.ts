@@ -44,7 +44,7 @@ export default class _GUI extends EventEmitter {
     this._gui = new GUI()
 
     this._gui.add(this._config, "timeslice_resolution", {"very high": 4,"high": 3, "medium": 2, "low": 1, "very low": 0.5}).onChange(() => this.emit(_GUI.CHANGE_RES, this._config.timeslice_resolution))
-    this._gui.add(this._config, "time_map_type", {"vertical": 1, "horizontal": 2, "noise": 3, "circular": 4, "slit": 5, "check": 6}).onChange(() => this.emit(_GUI.CHANGE_MAP, this._config.time_map_type))
+    this._gui.add(this._config, "time_map_type", {"vertical": 1, "horizontal": 2, "noise": 3, "circular": 4, "slit": 5, "circular slit": 6, "check": 7}).onChange(() => this.emit(_GUI.CHANGE_MAP, this._config.time_map_type))
     this._gui.add(this._config, "slide")
 
     this._gui.onChange(() => {
