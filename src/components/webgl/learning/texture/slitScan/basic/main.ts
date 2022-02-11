@@ -87,7 +87,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		const mat = new MeshBasicMaterial({color: 0xffffff, map: tex})
 
 		this._realTimeDisplay = new Mesh(geo, mat)
-		this._realTimeDisplay.position.set(200, 150, 0)
+		this._realTimeDisplay.position.set(400, 200, 0)
 		this.scene.add(this._realTimeDisplay)
 	}
 
@@ -99,7 +99,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		const mat = new MeshBasicMaterial({color: 0xffffff, map: this._combinedTarget.texture})
 
 		const combinedDisplay = new Mesh(geo, mat)
-		combinedDisplay.position.set(-200, -150, 10)
+		combinedDisplay.position.set(-400, -200, 10)
 		this.scene.add(combinedDisplay)
 	}
 
@@ -111,7 +111,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		const mat = new MeshBasicMaterial({color: 0xffffff, map: this._copiedTarget.texture})
 
 		const copiedDisplay = new Mesh(geo, mat)
-		copiedDisplay.position.set(200, -150, 10)
+		copiedDisplay.position.set(400, -200, 10)
 		this.scene.add(copiedDisplay)
 	}
 
@@ -139,7 +139,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		const mat = new SlitScanMaterial(this._combinedTarget.texture)
 
 		const result = new Mesh(geo, mat)
-		result.position.set(-200, 150, 10)
+		result.position.set(-400, 200, 10)
 		this.scene.add(result)
 	}
 

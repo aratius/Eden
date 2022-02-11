@@ -4,17 +4,18 @@
 
 varying vec2 v_uv;
 uniform sampler2D u_timemachine;
+uniform float u_time;
 
 // time slice count => 100
 
 void main() {
   vec2 pos = v_uv;
 
-  // vec4 map = vec4(vec3(pos.y), 1.);
-  vec4 map = vec4(vec3(snoise3(vec3(pos, 1.)) * 0.5+0.5), 1.);
-  // vec4 map = vec4(1.);
+  float map = pos.y;
+  map = snoise3(vec3(pos, 1.)) * 0.5+0.5;
+  map = length(vec2(0.5) - pos);
 
-  float time = map.r;
+  float time = map;
   time = floor(time * 99.);
   pos /= 10.;
   pos.x += mod(time, 10.)/10.;
