@@ -1,10 +1,9 @@
-import { LinearFilter, Mesh, MeshBasicMaterial, PlaneBufferGeometry, RGBFormat, Texture, Vector2, VideoTexture } from "three";
+import { LinearFilter, Mesh, MeshBasicMaterial, PlaneBufferGeometry, RGBFormat, Vector2, VideoTexture } from "three";
 import WebGLCanvasBase from "../../../../utils/template/template";
 import FeedbackRT from "./feedbackTarget";
 import CombinedMaterial from "./material/combinedMaterial";
 import CopiedMaterial from "./material/copiedMaterial";
 import SlitScanMaterial from "./material/slitScanMaterial";
-
 
 /**
  * 必要になりそうなシェーダー & テクスチャ
@@ -30,46 +29,38 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	async _onInit(): Promise<void> {
 		await this._initVideo()
 		this._initRenderTargets()
-
 		this._initCombinedDisplay()
 		this._initRealTimeDisplay()
-
 		this._initSlitScanResult()
 
 		this.endLoading()
 	}
 
-	_onDeInit(): void {
+	_onDeInit(): void {}
 
-	}
-
-	_onResize(): void {
-
-	}
+	_onResize(): void {}
 
 	_onUpdate(): void {
 		this._updateRenderTargets()
 	}
 
 	/**
-	 *
+	 * initialize web camera
 	 * @returns {Promise<void>}
 	 */
 	 private async _initVideo(): Promise<void> {
-		 const getUserMedia = navigator.getUserMedia || navigator.mediaDevices.getUserMedia
-
-		return new Promise<void>((res) => {
-			navigator.mediaDevices.getUserMedia({video: true, audio: false}).then((localMediaStream: MediaStream) => {
+		return new Promise<void>(async(res) => {
+			try {
+				const localMediaStream: MediaStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false})
 				this._video = document.createElement("video")
 				this._video.srcObject = localMediaStream
-				// this._video.src = URL.createObjectURL(localMediaStream)
 				this._video.addEventListener("loadeddata", () => {
 					this._video.play()
 					res()
 				})
-			}).catch((err) => {
+			} catch(err) {
 				console.error(err)
-			})
+			}
 		})
 	}
 
@@ -101,6 +92,9 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		this.scene.add(combinedDisplay)
 	}
 
+	/**
+	 *
+	 */
 	private _initRenderTargets(): void {
 		this._combinedTarget = new FeedbackRT(new Vector2(1000*3, 700*3), new CombinedMaterial())
 		this._combinedTarget.setTexture("u_current_texture", new VideoTexture(this._video))
@@ -108,6 +102,9 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		this._copiedTarget = new FeedbackRT(new Vector2(1000*3, 700*3), new CopiedMaterial())
 	}
 
+	/**
+	 *
+	 */
 	private _updateRenderTargets(): void {
 		if(this._combinedTarget != null && this._copiedTarget != null) {
 			// TODO: oldを受ける
@@ -120,6 +117,9 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		}
 	}
 
+	/**
+	 *
+	 */
 	private _initSlitScanResult(): void {
 		const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
 		const mat = new SlitScanMaterial(this._combinedTarget.texture)
