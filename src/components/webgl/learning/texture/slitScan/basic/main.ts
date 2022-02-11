@@ -101,10 +101,10 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	}
 
 	private _initRenderTargets(): void {
-		this._combinedTarget = new FeedbackRT(new Vector2(1000/2, 700/2), new CombinedMaterial())
+		this._combinedTarget = new FeedbackRT(new Vector2(1000, 700), new CombinedMaterial())
 		this._combinedTarget.setTexture("u_current_texture", new VideoTexture(this._video))
 
-		this._copiedTarget = new FeedbackRT(new Vector2(1000/2, 700/2), new CopiedMaterial())
+		this._copiedTarget = new FeedbackRT(new Vector2(1000, 700), new CopiedMaterial())
 	}
 
 	private _updateRenderTargets(): void {
