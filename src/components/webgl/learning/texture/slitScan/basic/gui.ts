@@ -22,17 +22,34 @@ export default class _GUI extends EventEmitter {
     this._init()
   }
 
+  public get config(): {[key: string]: (number|Function)} {
+    return this._config
+  }
+
   private _init(): void {
-    const config = {
+    this._config = {
       ...this._config,
       slide: () => this.emit(_GUI.SLIDE)
     }
 
+    const lastConfig = localStorage.getItem("guiConf")
+    if(lastConfig != null) {
+
+      this._config = {
+        ...this._config,
+        ...JSON.parse(lastConfig)
+      }
+    }
+
     this._gui = new GUI()
 
-    this._gui.add(config, "timeslice_resolution", {"very high": 4,"high": 3, "medium": 2, "low": 1, "very low": 0.5}).onChange(() => this.emit(_GUI.CHANGE_RES, config.timeslice_resolution))
-    this._gui.add(config, "time_map_type", {"linear": 1, "noise": 2, circular: 3}).onChange(() => this.emit(_GUI.CHANGE_MAP, config.time_map_type))
-    this._gui.add(config, "slide")
+    this._gui.add(this._config, "timeslice_resolution", {"very high": 4,"high": 3, "medium": 2, "low": 1, "very low": 0.5}).onChange(() => this.emit(_GUI.CHANGE_RES, this._config.timeslice_resolution))
+    this._gui.add(this._config, "time_map_type", {"linear": 1, "noise": 2, circular: 3}).onChange(() => this.emit(_GUI.CHANGE_MAP, this._config.time_map_type))
+    this._gui.add(this._config, "slide")
+
+    this._gui.onChange(() => {
+      localStorage.setItem("guiConf", JSON.stringify(this._config))
+    })
   }
 
 }

@@ -33,6 +33,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 	private _timeMapTarget: FeedbackRT = null
 	private _slideTimeline: GSAPTimeline = null
 	private _size: Vector2 = BASE_SIZE.clone().multiplyScalar(3)
+	private _gui: GUI = null
 
 	/**
 	 * ディスプレイを作る
@@ -52,14 +53,16 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 
 	constructor(canvas: HTMLCanvasElement) {
 		super(canvas)
-		const gui = new GUI()
-		gui.on(GUI.SLIDE, this._slideUI)
-		gui.on(GUI.CHANGE_RES, this._changeRes)
-		gui.on(GUI.CHANGE_MAP, this._changeMap)
+		this._gui = new GUI()
+		this._gui.on(GUI.SLIDE, this._slideUI)
+		this._gui.on(GUI.CHANGE_RES, this._changeRes)
+		this._gui.on(GUI.CHANGE_MAP, this._changeMap)
 	}
 
 	async _onInit(): Promise<void> {
 		this.composer.removePass(this.loadingShaderPass)
+		this._size = BASE_SIZE.clone().multiplyScalar(this._gui.config.timeslice_resolution as number)
+
 		this._videoTexture = await this._initVideo()
 		this._initRenderTargets()
 		this._initDisplays()
@@ -110,14 +113,21 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		})
 	}
 
+	/**
+	 * デカテクスチャの解像度変更
+	 * @param res
+	 */
 	private _changeRes = (res: number): void => {
 		this._size = BASE_SIZE.clone().multiplyScalar(res)
 		this.deInit()
 		this.init()
 	}
 
+	/**
+	 * タイムマップの種類切り替え
+	 * @param mapType
+	 */
 	private _changeMap = (mapType: number): void => {
-		console.log(mapType);
 		this._timeMapTarget.setUniform("u_map_type", mapType)
 	}
 
@@ -182,6 +192,8 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		this._combinedTarget.setUniform("u_current_texture", this._videoTexture)
 		this._copiedTarget = new FeedbackRT(this._size, new CopiedMaterial())
 		this._timeMapTarget = new FeedbackRT(BASE_SIZE.clone(), new TimeMapMaterial())
+		this._timeMapTarget.setUniform("u_map_type", this._gui.config.time_map_type)
+
 	}
 
 	/**
