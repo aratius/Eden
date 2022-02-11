@@ -32,7 +32,7 @@ export default abstract class WebGLCanvasBase extends Group {
 	private startTime: number = 0  // ......... initした時間
 	private updateId: number = null  // ....... requestAnimationFrameのID
 	private stats: Stats = new Stats()  // .... stats
-	private loadingShaderPass: ShaderPass = null
+	protected loadingShaderPass: ShaderPass = null
 
 	/**
 	 * コンストラクタ

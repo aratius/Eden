@@ -55,13 +55,14 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		const gui = new GUI()
 		gui.on(GUI.SLIDE, this._slideUI)
 		gui.on(GUI.CHANGE_RES, this._changeRes)
+
 	}
 
 	async _onInit(): Promise<void> {
+		this.composer.removePass(this.loadingShaderPass)
 		this._videoTexture = await this._initVideo()
 		this._initRenderTargets()
 		this._initDisplays()
-
 
 		this.renderer.setClearColor(0x000)
 
@@ -142,25 +143,25 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 
 		const realTimeDisplay = WebGLSlitScanBasic._createDisplay(
 			basicMat(this._videoTexture),
-			new Vector2(500/3.1, 360/3.1),
+			BASE_SIZE.clone().multiplyScalar(0.5 / 3.1),
 			new Vector3(280, 122, 0.1)
 		)
 
 		const timeslicedDisplay = WebGLSlitScanBasic._createDisplay(
 			basicMat(this._combinedTarget.texture),
-			new Vector2(500/3.1, 360/3.1),
+			BASE_SIZE.clone().multiplyScalar(0.5 / 3.1),
 			new Vector3(280, 0, 0.2)
 		)
 
 		const timeMapDisplay = WebGLSlitScanBasic._createDisplay(
 			basicMat(this._timeMapTarget.texture),
-			new Vector2(500/3.1, 360/3.1),
+			BASE_SIZE.clone().multiplyScalar(0.5 / 3.1),
 			new Vector3(280, -122, 0.3)
 		)
 
 		const slitScanResult = WebGLSlitScanBasic._createDisplay(
 			new SlitScanMaterial(this._combinedTarget.texture, this._timeMapTarget.texture),
-			new Vector2(500, 360),
+			BASE_SIZE.clone().multiplyScalar(0.5),
 			new Vector3(-100, 0, 0)
 		)
 
@@ -175,7 +176,7 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		this._combinedTarget = new FeedbackRT(this._size, new CombinedMaterial())
 		this._combinedTarget.setTexture("u_current_texture", this._videoTexture)
 		this._copiedTarget = new FeedbackRT(this._size, new CopiedMaterial())
-		this._timeMapTarget = new FeedbackRT(new Vector2(1000, 720), new TimeMapMaterial())
+		this._timeMapTarget = new FeedbackRT(BASE_SIZE.clone(), new TimeMapMaterial())
 	}
 
 	/**

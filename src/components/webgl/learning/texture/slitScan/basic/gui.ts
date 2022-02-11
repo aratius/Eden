@@ -7,8 +7,8 @@ export default class _GUI extends EventEmitter {
 
   private _gui: GUI = null
   private _config = {
-    timeslice_resolution: "high",
-    time_map_type: "linear",
+    timeslice_resolution: 3,
+    time_map_type: 1,
     slide: () => {},
   }
 
@@ -30,7 +30,7 @@ export default class _GUI extends EventEmitter {
 
     this._gui = new GUI()
 
-    this._gui.add(config, "timeslice_resolution", {"high": 3, "medium": 2, "low": 1}).onChange(() => this.emit(_GUI.CHANGE_RES, config.timeslice_resolution))
+    this._gui.add(config, "timeslice_resolution", {"very high": 4,"high": 3, "medium": 2, "low": 1, "very low": 0.5}).onChange(() => this.emit(_GUI.CHANGE_RES, config.timeslice_resolution))
     this._gui.add(config, "time_map_type", {"linear": 1, "noise": 2, circular: 3}).onChange(() => this.emit(_GUI.CHANGE_MAP, config.time_map_type))
     this._gui.add(config, "slide")
   }
