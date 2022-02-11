@@ -3,6 +3,7 @@ import WebGLCanvasBase from "../../../../utils/template/template";
 import FeedbackRT from "./feedbackTarget";
 import CombinedMaterial from "./material/combinedMaterial";
 import CopiedMaterial from "./material/copiedMaterial";
+import SlitScanMaterial from "./material/slitScanMaterial";
 
 
 /**
@@ -33,6 +34,8 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		this._initCombinedDisplay()
 		// this._initCopiedDisplay()
 		this._initRealTimeDisplay()
+
+		this._initSlitScanResult()
 
 		this.endLoading()
 	}
@@ -129,6 +132,15 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 			this._copiedTarget.setTexture("u_copied_texture", this._combinedTarget.texture)
 			this._copiedTarget.render(this.renderer)
 		}
+	}
+
+	private _initSlitScanResult(): void {
+		const geo = new PlaneBufferGeometry(1000/2, 700/2, 10, 10)
+		const mat = new SlitScanMaterial(this._combinedTarget.texture)
+
+		const result = new Mesh(geo, mat)
+		result.position.set(-200, 150, 10)
+		this.scene.add(result)
 	}
 
 }
