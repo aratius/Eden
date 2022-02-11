@@ -26,7 +26,10 @@ void main () {
         if(pos.x > 0. && pos.x < 1. && pos.y > 0. && pos.y < 1.) {
           int bx = x;
           int by = y;
-          if(x == 0) by-=1;
+          if(x == 0) {
+            by-=1;
+            bx=9;
+          }
           else bx-=1;
 
           pos = pos/10. + vec2(float(bx)/10., float(by)/10.);
