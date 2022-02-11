@@ -5,11 +5,11 @@ import { EventEmitter } from "events"
 
 interface Props {
 	title: string,
-	details: Array<{
+	details: {
 		type: "link" | "text",
 		text: string,
 		link?: string
-	}>[],
+	}[][],
 	shareText: string,
 	shareUrl: string
 }

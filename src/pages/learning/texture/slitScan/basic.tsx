@@ -48,7 +48,22 @@ export default class Fluid extends Component<Props> {
 				<Info
 						// ref={this.onReadyInfo}
 						title="slit scan basic"
-						details={[]}
+						details={[
+							[
+								{
+									type: "link",
+									text: "slit-scan",
+									link: "https://scrapbox.io/lookdev/slit-scan"
+								},
+							],
+							[
+								{
+									type: "link",
+									text: "スリットスキャンの応用",
+									link: "https://baku89.com/tips/slit-scan"
+								},
+							]
+						]}
 						shareText="author @aualrxse"
 						shareUrl="https://eden.aualrxse.com/learning/texture/slitScan/basic"
 					/>
