@@ -26,12 +26,22 @@ export default class _GUI extends EventEmitter {
     return this._config
   }
 
+  /**
+   * GUI初期化
+   */
   private _init(): void {
     this._config = {
       ...this._config,
       slide: () => this.emit(_GUI.SLIDE)
     }
 
+    // タッチデバイスのとき、デフォルトで解像度一個落とす
+    if(window.ontouchstart != undefined) this._config = {
+      ...this._config,
+      timeslice_resolution: 2,
+    }
+
+    // localStorageにデータが有る場合はそれで初期化
     const lastConfig = localStorage.getItem("guiConf")
     if(lastConfig != null) {
 
