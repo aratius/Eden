@@ -11,7 +11,8 @@ interface Props {
 		link?: string
 	}[][],
 	shareText: string,
-	shareUrl: string
+	shareUrl: string,
+	buttonColor?: string
 }
 
 export default class Info extends Component<Props> {
@@ -118,7 +119,11 @@ export default class Info extends Component<Props> {
 						</footer>
 					</article>
 				</section>
-				<a onClick={this.onClickButton} className={styles.button} href="#">i</a>
+				<a
+					onClick={this.onClickButton}
+					className={styles.button} href="#"
+					style={this.props.buttonColor && {color: this.props.buttonColor, borderColor: this.props.buttonColor}}
+				>i</a>
 			</>
 		)
 

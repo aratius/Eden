@@ -52,6 +52,7 @@ export default class Index extends Component<Props> {
 					]}
 					shareText="author @aualrxse"
 					shareUrl="https://eden.aualrxse.com/learning/shader/wave"
+					buttonColor='gray'
 				/>
 			</>
 		)
