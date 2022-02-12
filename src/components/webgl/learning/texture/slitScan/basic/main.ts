@@ -181,22 +181,23 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 		]
 
 		if(window.innerWidth < 800) {
+			const sizeMin = this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.7 / 3.1)
 			posScaleList = [
 				{
-					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8 / 2),
-					p: new Vector3(0, -300, 0)
+					s: sizeMin,
+					p: new Vector3(-sizeMin.x*1.05, -200, 0)
 				},
 				{
-					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8 / 2),
-					p: new Vector3(0, 0, 50)
+					s: sizeMin,
+					p: new Vector3(0, -200, 0)
 				},
 				{
-					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8 / 2),
-					p: new Vector3(0, 300, 100)
+					s: sizeMin,
+					p: new Vector3(sizeMin.x*1.05, -200, 0)
 				},
 				{
-					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8),
-					p: new Vector3(0, 0, 150)
+					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.7),
+					p: new Vector3(0, 50, 0)
 				}
 			]
 		}
