@@ -32,7 +32,7 @@ export default class Fluid extends Component<Props> {
 				<_Head
 					title="Slit scan"
 					ogUrl="https://eden.aualrxse.com/learning/texture/slitScan/basic"
-					ogImgPath="https://eden.aualrxse.com/og/face/og.png"
+					ogImgPath="https://eden.aualrxse.com/og/slitScan/og.png"
 					description="Slit scan"
 				></_Head>
 				<div className={styles.container}>
@@ -47,7 +47,7 @@ export default class Fluid extends Component<Props> {
 				</div>
 				<Info
 						// ref={this.onReadyInfo}
-						title="Basic slit scan"
+						title="Slit scan"
 						details={[
 							[
 								{
