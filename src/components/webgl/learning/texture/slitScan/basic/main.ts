@@ -74,6 +74,9 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 
 		this.renderer.setClearColor(0x000)
 
+		window.removeEventListener("touchstart", this._onTouch)
+		window.removeEventListener("touchmove", this._onTouch)
+
 		this.endLoading()
 	}
 
@@ -176,27 +179,29 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 			},
 			{
 				s: this._BASESIZE.multiplyScalar(0.5),
-				p: new Vector3(-100, 0, 0)
+				p: new Vector3(-100, 0, 0.4)
 			}
 		]
 
 		if(window.innerWidth < 800) {
+			const sizeMin = this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.7 / 3.1)
+			const sizeMax = this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.7)
 			posScaleList = [
 				{
-					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8 / 2),
-					p: new Vector3(0, -300, 0)
+					s: sizeMin,
+					p: new Vector3(-sizeMin.x*1.05, -sizeMax.y/2 - sizeMin.y/2+40, 0.3)
 				},
 				{
-					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8 / 2),
-					p: new Vector3(0, 0, 50)
+					s: sizeMin,
+					p: new Vector3(0, -sizeMax.y/2 - sizeMin.y/2+40, 0.2)
 				},
 				{
-					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8 / 2),
-					p: new Vector3(0, 300, 100)
+					s: sizeMin,
+					p: new Vector3(sizeMin.x*1.05, -sizeMax.y/2 - sizeMin.y/2+40, 0.1)
 				},
 				{
-					s: this._BASESIZE.divideScalar(Math.max(this._BASESIZE.x, this._BASESIZE.y)).multiplyScalar(window.innerWidth * 0.8),
-					p: new Vector3(0, 0, 150)
+					s: sizeMax,
+					p: new Vector3(0, 50, 0.4)
 				}
 			]
 		}
