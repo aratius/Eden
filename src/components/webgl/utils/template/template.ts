@@ -146,8 +146,8 @@ export default abstract class WebGLCanvasBase extends Group {
 		this.mouse.setPosition(e.clientX, e.clientY)
 	}
 
-	private _onTouch = (e: TouchEvent): void => {
-		if(e && e.cancelable) e.preventDefault()
+	protected _onTouch = (e: TouchEvent): void => {
+		// if(e && e.cancelable) e.preventDefault()
 	}
 
 	/**

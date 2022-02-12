@@ -74,6 +74,9 @@ export default class WebGLSlitScanBasic extends WebGLCanvasBase {
 
 		this.renderer.setClearColor(0x000)
 
+		window.removeEventListener("touchstart", this._onTouch)
+		window.removeEventListener("touchmove", this._onTouch)
+
 		this.endLoading()
 	}
 
