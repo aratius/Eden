@@ -1,7 +1,7 @@
 import gsap from "gsap";
 import { Mesh, PlaneBufferGeometry } from "three";
 import WebGLCanvasBase from "../../../utils/template/template";
-import DomainWarpMaterial from "./domainWarpMat";
+import DomainWarpMaterial from "./waveMat";
 
 export default class Wave extends WebGLCanvasBase {
 
