@@ -9,6 +9,9 @@ uniform float u_index;
 const vec3 WIN_DEEP = vec3(100./255., 120./255., 150./255.);
 const vec3 WIN_SHALLOW = vec3(230./255., 240./255., 255./255.);
 
+const vec3 SUM_DEEP = vec3(2./255., 89./255., 49./255.);
+const vec3 SUM_SHALLOW = vec3(4./255., 170./255., 40./255.);
+
 #define OCTAVES 6
 float fbm (in vec2 st) {
     // Initial values
@@ -66,7 +69,11 @@ void main() {
     float d = length(vec2(0.5) - v_uv);
     if(d > 0.5) discard;
 
-    vec3 col = mix(WIN_DEEP, WIN_SHALLOW, pow(c, 1.)-0.6);
+    vec3 col = mix(SUM_DEEP, SUM_SHALLOW, pow(c, 1.)-0.6);
+
+    col.r += _fbm(q*100.) * 0.05;
+    col.g += _fbm(q*100. + vec2(1.)) * 0.05;
+    col.b += _fbm(q*100. + vec2(2.)) * 0.05;
 
   gl_FragColor = vec4(col, 1.);
 }
